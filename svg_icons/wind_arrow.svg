@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  viewBox="0 0 100 100" stroke="black" fill="white" stroke-width="4">
+  <!-- <path d="M 50 80 v 0 -40" /> -->
+  <!-- <path d="M 60 80 h 0 -20" /> -->
+  <!-- <path d="M 50 10 l -15 45 l 15 -15 l 15 15 l -15 -45" stroke-linecap="round" fill="black" stroke-width="0" /> -->
+  <path d="M 50 10 l -25 80 l 25 -20 l 25 20 l -25 -80" stroke-linecap="round" fill="black" stroke-width="0" />
+  <!-- <path d="M 50 10 C 45 60 45 60 30 90 l 20 -20 l 20 20 C 55 60 55 60 50 10" stroke-linecap="round" fill="black" stroke-width="0" /> -->
+  <!-- <path d="M 0 0 h 100 v 100 h -100 v -100" fill="transparent" /> -->
+</svg>

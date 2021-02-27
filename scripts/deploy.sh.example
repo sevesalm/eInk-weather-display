@@ -1,0 +1,10 @@
+#!/bin/bash
+
+IP_ADDRESS=192.168.0.0
+DEPLOYMENT_DIRECTORY=/path/to/deployment/dir
+
+# This copies all needed files (and a bit more) to Raspberry Pi
+rsync -av --exclude __pycache__ --exclude svg_icons --delete . $IP_ADDRESS:$DEPLOYMENT_DIRECTORY
+
+# This kills ALL python scripts. USE WITH CAUTION!
+ssh raspberry "pkill python; cd ${DEPLOYMENT_DIRECTORY}; ./run.sh"

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+VENV_DIRECTORY=/path/to/venv/dir
+DEPLOYMENT_DIRECTORY=/path/to/deployment/dir
+
+. ${VENV_DIRECTORY}/bin/activate
+cd ${DEPLOYMENT_DIRECTORY}
+python weather-display.py

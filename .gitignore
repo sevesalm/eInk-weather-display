@@ -1,0 +1,8 @@
+png_icons/
+logger.log
+.ideas
+.vscode/
+__pycache__/
+scripts/deploy.sh
+scripts/run.sh
+logger.log

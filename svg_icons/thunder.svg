@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  viewBox="0 0 130 130" stroke="black" fill="white" stroke-width="6">
+  <path id="lightning" d="M 80 80 l 10 0 -5 15 10 0 -10 25 3 -20 -10 0 z" stroke-width="2" stroke-linejoin="round"
+    fill="black" />
+  <use xlink:href="#lightning" transform="translate(-35 0)" />
+  <path d="M 40 80 C 20 80, 20 40, 45 45 C 45 20, 85 25, 85 45 C 115 40, 115 80, 95 80 z" />
+</svg>
