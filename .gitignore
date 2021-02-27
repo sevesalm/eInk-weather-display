@@ -3,6 +3,7 @@ logger.log
 .ideas
 .vscode/
 __pycache__/
-scripts/deploy.sh
-scripts/run.sh
+deploy.sh
+run.sh
 logger.log
+.DS_Store
