@@ -12,6 +12,8 @@ The prototype hardware:
 - [Waveshare 3.7" e-Paper HAT](https://www.waveshare.com/product/raspberry-pi/displays/e-paper/3.7inch-e-paper-hat.htm) e-Ink display
 - [RuuviTag](https://ruuvi.com/ruuvitag-specs/) sensors
 
+![prototype](images/weather-display.jpg)
+
 ## Development and Deployment
 
 ### Deployment
