@@ -2,7 +2,7 @@ from PIL import Image, ImageDraw
 from celestial import get_moon_phase, get_sunrise_sunset, map_moon_phase_to_icon
 
 def parse_sunrise_sunset_time(val):
-  return val.astimezone(tz=None).strftime('%H:%M')
+  return val.astimezone(tz=None).strftime('%-H:%M')
 
 def get_sunrise_sunset_panel(position, misc_images, fonts, config):
   (sunrise, sunset) = get_sunrise_sunset(position)
