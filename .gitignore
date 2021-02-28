@@ -7,3 +7,4 @@ deploy.sh
 run.sh
 logger.log
 .DS_Store
+config.ini
