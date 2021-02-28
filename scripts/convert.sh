@@ -7,5 +7,5 @@ rm png_icons/*
 for f in svg_icons/*.svg
 do
   echo Converting $f
-  rsvg-convert -w 200 $f > png_icons/$(basename $f .svg).png
+  rsvg-convert -w 200 $f > eInk-weather-display/png_icons/$(basename $f .svg).png
 done

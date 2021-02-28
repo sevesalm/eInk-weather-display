@@ -57,7 +57,7 @@ def main():
   logger.info("App starting")
   try:
     config_parser = configparser.ConfigParser()
-    config_parser.read('config.ini')
+    config_parser.read('../config.ini')
     config = config_parser['general']
     (observation_images, forecast_images, misc_images) = get_weather_images(config)
     epd = epd_utils.get_epd()
