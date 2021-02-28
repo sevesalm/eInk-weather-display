@@ -37,8 +37,9 @@ def get_observation_panel(location, observation_images, misc_images, fonts, conf
   
   # Weather icon
   weather_symbol = latest['wawa']
-  if(not math.isnan(weather_symbol) and weather_symbol in observation_images or config['RANDOMIZE_WEATHER_ICONS']):
-    if(not config['RANDOMIZE_WEATHER_ICONS']):
+  randomize_weather_icons = config.getboolean('RANDOMIZE_WEATHER_ICONS')
+  if(not math.isnan(weather_symbol) and weather_symbol in observation_images or randomize_weather_icons):
+    if(not randomize_weather_icons):
       image_set = observation_images.get(weather_symbol)
     else:
       image_set = observation_images[random.choice(list(observation_images.keys()))]
@@ -51,7 +52,7 @@ def get_observation_panel(location, observation_images, misc_images, fonts, conf
     draw.text((int(3*x_size/4), int(y_size/2)), f'(NA: {weather_symbol})', font = fonts['font_sm'], fill = 0, anchor = 'mm')
 
   # Borders
-  if (config['DRAW_PANEL_BORDERS']):
+  if (config.getboolean('DRAW_PANEL_BORDERS')):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
     
   return image

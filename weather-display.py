@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
+import configparser
 from PIL import Image, ImageDraw, ImageFont
 from apscheduler.schedulers.blocking import BlockingScheduler
 from log import get_logger
@@ -11,14 +12,6 @@ from forecast_panel import get_forecasts_panel
 from celestial_panel import get_sunrise_sunset_panel, get_moon_phase_panel
 from info_panel import get_info_panel
 
-config = {
-  'FMI_LOCATION': 'Ahvionniemi',
-  'RANDOMIZE_WEATHER_ICONS': False,
-  'DRAW_PANEL_BORDERS': False,
-  'DRAW_BORDERS': True,
-  'ICON_WIDTH': 80
-}
-
 fonts = {
   'font_lg': ImageFont.truetype('fonts/FiraSansCondensed-400.woff', 32),
   'font_sm': ImageFont.truetype('fonts/FiraSansCondensed-400.woff', 18),
@@ -27,7 +20,7 @@ fonts = {
   'font_weather_m': ImageFont.truetype('fonts/weathericons-regular-webfont.woff', 52)
 }
 
-def main_loop(epd, observation_images, forecast_images, misc_images):
+def main_loop(epd, observation_images, forecast_images, misc_images, config):
   logger = get_logger(__name__)
   logger.info('Refresh started')
   full_image = Image.new('L', (epd.height, epd.width), 0xff)
@@ -49,7 +42,7 @@ def main_loop(epd, observation_images, forecast_images, misc_images):
   full_image.paste(forecasts_panel, (0, observation_panel.height))
   full_image.paste(info_panel, (epd.height - info_panel.width, 0))
 
-  if(config['DRAW_BORDERS']):
+  if(config.get('DRAW_BORDERS')):
     draw.line([20, observation_panel.height, full_image.width - 20, observation_panel.height], fill=0xC0)
     draw.line([observation_panel.width, 20, observation_panel.width, observation_panel.height - 20], fill=0xC0)
 
@@ -63,15 +56,18 @@ def main():
   logger = get_logger(__name__)
   logger.info("App starting")
   try:
+    config_parser = configparser.ConfigParser()
+    config_parser.read('config.ini')
+    config = config_parser['general']
     (observation_images, forecast_images, misc_images) = get_weather_images(config)
     epd = epd_utils.get_epd()
     epd_utils.epd_init(epd) 
     logger.info("Initial refresh")
-    main_loop(epd, observation_images, forecast_images, misc_images) # Once in the beginning
+    main_loop(epd, observation_images, forecast_images, misc_images, config) # Once in the beginning
 
     logger.info('Starting scheduler')
     scheduler = BlockingScheduler()
-    scheduler.add_job(lambda: main_loop(epd, observation_images, forecast_images, misc_images), 'cron', minute='5/10')
+    scheduler.add_job(lambda: main_loop(epd, observation_images, forecast_images, misc_images, config), 'cron', minute='5/10')
     scheduler.start()
     epd_utils.epd_exit(epd) 
 

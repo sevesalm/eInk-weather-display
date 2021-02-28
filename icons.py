@@ -5,17 +5,18 @@ from icon_mapping import observation_mapping, forecast_mapping, misc_icons
 def get_weather_images(config):
   logger = get_logger(__name__)
   logger.info('Importing icons')
+  icon_width = config.getint('ICON_WIDTH')
   observation_images = {}
   for key, icon_set in observation_mapping.items():
-    observation_images[key] = {'day': read_weather_icon(icon_set['day'], config['ICON_WIDTH']) }
+    observation_images[key] = {'day': read_weather_icon(icon_set['day'], icon_width) }
     if('night' in icon_set):
-      observation_images[key]['night'] = read_weather_icon(icon_set['night'], config['ICON_WIDTH'])
+      observation_images[key]['night'] = read_weather_icon(icon_set['night'], icon_width)
 
   forecast_images = {}
   for key, icon_set in forecast_mapping.items():
-    forecast_images[key] = { 'day': read_weather_icon(icon_set['day'], config['ICON_WIDTH']) }
+    forecast_images[key] = { 'day': read_weather_icon(icon_set['day'], icon_width) }
     if('night' in icon_set):
-      forecast_images[key]['night'] = read_weather_icon(icon_set['night'], config['ICON_WIDTH'])
+      forecast_images[key]['night'] = read_weather_icon(icon_set['night'], icon_width)
 
   misc_images = {}
   for icon_name, icon_size in misc_icons:

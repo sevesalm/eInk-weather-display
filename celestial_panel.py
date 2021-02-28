@@ -20,7 +20,7 @@ def get_sunrise_sunset_panel(position, misc_images, fonts, config):
   draw.text((3*x_size/4, y_size-5), parse_sunrise_sunset_time(sunset), font = fonts['font_sm'], fill = 0, anchor = 'md')
 
   # Borders
-  if (config['DRAW_PANEL_BORDERS']):
+  if (config.getboolean('DRAW_PANEL_BORDERS')):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
   return image
 
@@ -36,7 +36,7 @@ def get_moon_phase_panel(fonts, config):
   draw.text((x_size/2, y_size - 5), f'{round(percent)} %', font = fonts['font_sm'], fill = 0, anchor = 'md') 
 
   # Borders
-  if (config['DRAW_PANEL_BORDERS']):
+  if (config.getboolean('DRAW_PANEL_BORDERS')):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
     
   return image 

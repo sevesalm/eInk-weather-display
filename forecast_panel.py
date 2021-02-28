@@ -8,7 +8,7 @@ import utils
 
 def get_forecasts_panel(forecast_images, misc_images, fonts, config):
   logger = get_logger(__name__)
-  (forecasts, first_position) = get_forecasts(config['FMI_LOCATION'], 6, 6)
+  (forecasts, first_position) = get_forecasts(config.get('FMI_LOCATION'), 6, 6)
   logger.info(forecasts)
   x_size = 480
   y_size = 180
@@ -24,8 +24,9 @@ def get_forecasts_panel(forecast_images, misc_images, fonts, config):
     # Time
     draw.text((50 + i*75, 10), date_formatted, font = (fonts['font_sm'] if date_formatted != "15:00" else fonts['font_sm_bold']), fill = 0, anchor = 'mt')
     # Icon
-    if(weather_symbol in forecast_images or config['RANDOMIZE_WEATHER_ICONS']):
-      if(not config['RANDOMIZE_WEATHER_ICONS']):
+    randomize_weather_icons = config.getboolean('RANDOMIZE_WEATHER_ICONS')
+    if(weather_symbol in forecast_images or randomize_weather_icons):
+      if(not randomize_weather_icons):
         image_set = forecast_images.get(weather_symbol) 
       else: 
         image_set = forecast_images[random.choice(list(forecast_images.keys()))]
@@ -46,7 +47,7 @@ def get_forecasts_panel(forecast_images, misc_images, fonts, config):
     image.paste(wind_image_rot, (int(i*75 + 50 - wind_image.width/2), 150))
 
   # Borders
-  if (config['DRAW_PANEL_BORDERS']):
+  if (config.getboolean('DRAW_PANEL_BORDERS')):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
     
   return (image, first_position)
