@@ -56,6 +56,7 @@ def main():
   logger = get_logger(__name__)
   logger.info("App starting")
   try:
+    utils.check_python_version()
     config_parser = configparser.ConfigParser()
     config_parser.read('../config.ini')
     config = config_parser['general']
