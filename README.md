@@ -22,6 +22,7 @@ The prototype hardware:
 1. Create a venv and activate it
 1. Install dependencies: `pip install -r requirements.txt`
 1. Convert the SVG images: `./convert.sh` (install `rsvg-convert` if needed)
+1. Create `config.ini` file (see: [config_example.ini](config_example.ini))
 1. Start: `python weather-display.py`
 
 ### Development
@@ -55,3 +56,5 @@ The icons contain night variants for some icons. The night varian is used when t
 ## Used licenses
 
 See the [fonts/README.md](fonts/README.md) for information about fonts used in this project and their licenses.
+
+See the files in [lib](lib) directory for their respective license info.
