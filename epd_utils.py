@@ -1,4 +1,4 @@
-import epd3in7
+from lib import epd3in7
 from log import get_logger
 
 def get_epd():
