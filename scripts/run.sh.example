@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VENV_DIRECTORY=/path/to/venv/dir
-DEPLOYMENT_DIRECTORY=/path/to/deployment/dir
+DEPLOYMENT_DIRECTORY=/path/to/deployment/dir/eInk-weather-display
 
 . ${VENV_DIRECTORY}/bin/activate
 cd ${DEPLOYMENT_DIRECTORY}

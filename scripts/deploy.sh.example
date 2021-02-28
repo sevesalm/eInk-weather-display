@@ -7,4 +7,4 @@ DEPLOYMENT_DIRECTORY=/path/to/deployment/dir
 rsync -av --exclude __pycache__ --exclude svg_icons --delete . $IP_ADDRESS:$DEPLOYMENT_DIRECTORY
 
 # This kills ALL python scripts. USE WITH CAUTION!
-ssh raspberry "pkill python; cd ${DEPLOYMENT_DIRECTORY}; ./run.sh"
+ssh raspberry "pkill python; cd ${DEPLOYMENT_DIRECTORY}; scripts/run.sh"
