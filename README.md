@@ -49,7 +49,7 @@ The application shows sunrise and sunset times and the phase of the Moon. These 
 
 The data from FMI API includes [WaWa and WeatherSymbol3](weather_icon_codes.md) codes which can be used to show a weather icon or a description to the user. There are a lot of free weather icons or icon fonts available in the Internet but it is hard to find one which covers all the codes FMI uses. For this reason I have created a set of weather icons for this need.
 
-The weather icon set contains a unique icon for almost all weather codes. The icons were drawn programmatically in svg. Because the PILLOW library doesn't support SVG format, the icons have to be converted to PNG images using the provided [script](convert.sh) before usage.
+The weather icon set contains a unique icon for almost all weather codes. The icons were drawn programmatically in svg. Because the PILLOW library doesn't support SVG format, the icons have to be converted to PNG images using the provided [script](scripts/convert.sh) before usage.
 
 The icons contain night variants for some icons. The night varian is used when the observation/forecast time is determined to happen after sunset but before sunrise - commonly know as "during the night".
 
@@ -57,4 +57,4 @@ The icons contain night variants for some icons. The night varian is used when t
 
 See the [fonts/README.md](fonts/README.md) for information about fonts used in this project and their licenses.
 
-See the files in [lib](lib) directory for their respective license info.
+See the files in [eInk-weather-display/lib](eInk-weather-display/lib) directory for their respective license info.
