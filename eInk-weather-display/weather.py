@@ -72,7 +72,9 @@ def get_next_forecast_start_timestamp():
   new_time = (now + timedelta(hours=new_hour - now.hour)).replace(minute=0, second=0, microsecond=0).astimezone(tz=None).isoformat()
   return new_time
 
-def get_forecasts(place, count, skip_count, next_timestamp = get_next_forecast_start_timestamp()):
+def get_forecasts(place, count, skip_count, next_timestamp = None):
+  if (next_timestamp == None):
+    next_timestamp = get_next_forecast_start_timestamp()
   xml_data = fetch_data(FORECAST_ID, place, FORECAST_PARAMETERS, next_timestamp)
   forecast_data = combine([parse_data(xml_data, parameter, 'mts-1-1-', count, True, skip_count) for parameter in FORECAST_PARAMETERS])
   first_position = get_first_position(xml_data)
