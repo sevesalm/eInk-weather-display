@@ -3,7 +3,6 @@ import io
 import pytz
 from datetime import datetime, timedelta
 import requests
-import logging
 
 OBS_PARAMETERS=['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wawa']
 OBS_ID='fmi::observations::weather::timevaluepair'

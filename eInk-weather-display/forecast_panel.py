@@ -2,12 +2,13 @@ from dateutil.parser import parse
 import pytz
 from PIL import Image, ImageDraw, ImageOps
 from celestial import get_is_day
-from log import get_logger
+import logging
 from weather import get_forecasts
 import utils
 
 def get_forecasts_panel(forecast_images, misc_images, fonts, config):
-  logger = get_logger(__name__)
+  logger = logging.getLogger(__name__)
+  logger.info('Generating forecast panel')
   (forecasts, first_position) = get_forecasts(config.get('FMI_LOCATION'), 6, 6)
   logger.info(forecasts)
   x_size = 480

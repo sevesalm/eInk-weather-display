@@ -1,7 +1,10 @@
 import time
 from PIL import Image, ImageDraw
+import logging
 
 def get_info_panel(fonts, config):
+  logger = logging.getLogger(__name__)
+  logger.info('Generating info panel')
   x_size = 200
   y_size = 18
   image = Image.new('L', (x_size, y_size), 0xff)

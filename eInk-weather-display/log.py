@@ -1,23 +1,22 @@
 import logging
+import http.client
+import logging
+import os.path
 
 DEFAULT_FILENAME = 'logger.log'
 
-def get_logger(name, filename = DEFAULT_FILENAME):
-  logger = logging.getLogger(name)
+def setup(loglevel = logging.DEBUG):
+    fileHandler = logging.FileHandler(DEFAULT_FILENAME)
+    fileHandler.setLevel(logging.WARN)
+    handlers = [fileHandler]
 
-  # Check if this logger already has been configured
-  if(not logger.hasHandlers()):
-    logger.setLevel(logging.DEBUG)
-    file_handler = logging.FileHandler('logger.log')
-    file_handler.setLevel(logging.WARN)
+    if loglevel is not None:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(loglevel)
+        handlers.append(stream_handler)
 
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.DEBUG)
-
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-    logger.addHandler(console_handler)
-
-  return logger
+    log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig(
+        format=log_format, datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=handlers, level=logging.DEBUG
+    )

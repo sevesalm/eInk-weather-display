@@ -1,12 +1,13 @@
 import math
 from PIL import Image, ImageDraw, ImageOps
-from log import get_logger
+import logging
 from weather import get_observations
 from celestial import get_is_day
 import utils
 
 def get_observation_panel(location, observation_images, misc_images, fonts, config):
-  logger = get_logger(__name__)
+  logger = logging.getLogger(__name__)
+  logger.info('Generating observation panel')
   (observations, first_position) = get_observations(location, 1)
   latest_date = max(observations.keys())
   isDay = get_is_day(first_position, latest_date)

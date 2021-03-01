@@ -27,7 +27,7 @@
 # THE SOFTWARE.
 #
 
-from log import get_logger
+import logging
 from lib import epdconfig
 
 # Display resolution
@@ -132,7 +132,7 @@ class EPD:
 
 
     def ReadBusy(self):
-        logger = get_logger(__name__)
+        logger = logging.getLogger(__name__)
         logger.debug("e-Paper busy")
         while(epdconfig.digital_read(self.busy_pin) == 1):      #  0: idle, 1: busy
             epdconfig.delay_ms(10) 
@@ -140,7 +140,7 @@ class EPD:
 
 
     def init(self, mode):
-        logger = get_logger(__name__)
+        logger = logging.getLogger(__name__)
         if (epdconfig.module_init() != 0):
             return -1
         # EPD hardware init start
@@ -239,7 +239,7 @@ class EPD:
 
 
     def getbuffer(self, image):
-        logger = get_logger(__name__)
+        logger = logging.getLogger(__name__)
         # logger.debug("bufsiz = ",int(self.width/8) * self.height)
         buf = [0xFF] * (int(self.width/8) * self.height)
         image_monocolor = image.convert('1')
@@ -265,7 +265,7 @@ class EPD:
 
 
     def getbuffer_4Gray(self, image):
-        logger = get_logger(__name__)
+        logger = logging.getLogger(__name__)
         # logger.debug("bufsiz = ",int(self.width/8) * self.height)
         buf = [0xFF] * (int(self.width / 4) * self.height)
         image_monocolor = image.convert('L')
@@ -411,7 +411,7 @@ class EPD:
         
 
     def Clear(self, color, mode):
-        logger = get_logger(__name__)
+        logger = logging.getLogger(__name__)
         self.send_command(0x4E)
         self.send_data(0x00)
         self.send_data(0x00)

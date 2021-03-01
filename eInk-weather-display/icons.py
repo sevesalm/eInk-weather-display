@@ -1,9 +1,9 @@
-from log import get_logger
+import logging
 from PIL import Image
 from icon_mapping import observation_mapping, forecast_mapping, misc_icons
 
 def get_weather_images(config):
-  logger = get_logger(__name__)
+  logger = logging.getLogger(__name__)
   logger.info('Importing icons')
   icon_width = config.getint('ICON_WIDTH')
   observation_images = {}

@@ -1,10 +1,13 @@
 from PIL import Image, ImageDraw
 from celestial import get_moon_phase, get_sunrise_sunset, map_moon_phase_to_icon
+import logging
 
 def parse_sunrise_sunset_time(val):
   return val.astimezone(tz=None).strftime('%-H:%M')
 
 def get_sunrise_sunset_panel(position, misc_images, fonts, config):
+  logger = logging.getLogger(__name__)
+  logger.info('Generating sunrise/sunset panel')
   (sunrise, sunset) = get_sunrise_sunset(position)
   x_size = 140
   y_size = 70 
@@ -25,6 +28,8 @@ def get_sunrise_sunset_panel(position, misc_images, fonts, config):
   return image
 
 def get_moon_phase_panel(fonts, config):
+  logger = logging.getLogger(__name__)
+  logger.info('Generating moon phase panel')
   x_size = 70
   y_size = 70
 

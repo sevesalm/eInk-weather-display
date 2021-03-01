@@ -3,7 +3,8 @@
 import configparser
 from PIL import Image, ImageDraw, ImageFont
 from apscheduler.schedulers.blocking import BlockingScheduler
-from log import get_logger
+import log
+import logging
 import utils
 import epd_utils
 from icons import get_weather_images
@@ -21,7 +22,7 @@ fonts = {
 }
 
 def main_loop(epd, observation_images, forecast_images, misc_images, config):
-  logger = get_logger(__name__)
+  logger = logging.getLogger(__name__)
   logger.info('Refresh started')
   full_image = Image.new('L', (epd.height, epd.width), 0xff)
   draw = ImageDraw.Draw(full_image)
@@ -53,7 +54,8 @@ def main_loop(epd, observation_images, forecast_images, misc_images, config):
   logger.info('Refresh complete')
 
 def main():
-  logger = get_logger(__name__)
+  log.setup()
+  logger = logging.getLogger(__name__)
   logger.info("App starting")
   try:
     utils.check_python_version()

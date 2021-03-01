@@ -1,4 +1,4 @@
-from log import get_logger
+import logging
 import ephem
 
 def get_is_day(position, utc_datetime):
@@ -33,7 +33,7 @@ def get_moon_phase():
   return (phase, moon.phase)
 
 def map_moon_phase_to_icon(moon_phase_deg):
-  logger = get_logger(__name__)
+  logger = logging.getLogger(__name__)
   logger.info('Moon phase: %s °', moon_phase_deg)
   base = 0xf0d0
   icon_count = 28
