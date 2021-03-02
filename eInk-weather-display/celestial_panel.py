@@ -9,7 +9,7 @@ def get_sunrise_sunset_panel(position, misc_images, fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating sunrise/sunset panel')
   (sunrise, sunset) = get_sunrise_sunset(position)
-  x_size = 140
+  x_size = 110
   y_size = 70 
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
@@ -30,7 +30,7 @@ def get_sunrise_sunset_panel(position, misc_images, fonts, config):
 def get_moon_phase_panel(fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating moon phase panel')
-  x_size = 70
+  x_size = 60
   y_size = 70
 
   (moon_phase, percent) = get_moon_phase()

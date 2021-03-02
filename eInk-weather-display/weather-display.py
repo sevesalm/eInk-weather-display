@@ -12,6 +12,7 @@ from observation_panel import get_observation_panel
 from forecast_panel import get_forecasts_panel
 from celestial_panel import get_sunrise_sunset_panel, get_moon_phase_panel
 from info_panel import get_info_panel
+from sensor_panel import get_sensor_panel
 
 fonts = {
   'font_lg': ImageFont.truetype('fonts/FiraSansCondensed-400.woff', 32),
@@ -34,6 +35,7 @@ def main_loop(epd, observation_images, forecast_images, misc_images, config):
   (forecasts_panel, first_position) = get_forecasts_panel(forecast_images, misc_images, fonts, config)
   sunrise_sunset_panel = get_sunrise_sunset_panel(first_position, misc_images, fonts, config)
   moon_phase_panel = get_moon_phase_panel(fonts, config)
+  sensor_panel = get_sensor_panel(fonts, config)
 
   # Paste the panels on the main image
   logger.info('Pasting panels')
@@ -42,6 +44,7 @@ def main_loop(epd, observation_images, forecast_images, misc_images, config):
   full_image.paste(moon_phase_panel, (observation_panel.width + sunrise_sunset_panel.width, 30))
   full_image.paste(forecasts_panel, (0, observation_panel.height))
   full_image.paste(info_panel, (epd.height - info_panel.width, 0))
+  full_image.paste(sensor_panel, (observation_panel.width + sunrise_sunset_panel.width + moon_phase_panel.width, 30))
 
   if(config.get('DRAW_BORDERS')):
     draw.line([20, observation_panel.height, full_image.width - 20, observation_panel.height], fill=0xC0)

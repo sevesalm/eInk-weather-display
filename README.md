@@ -39,8 +39,6 @@ The application shows real time weather observations and near term forecast data
 
 RuuviTag sensors measure temperature, barometric pressure and humidity every few seconds and broadcast it using Bluetooth 5. This data is read by Raspberry Pi and further showed on the display.
 
-Note: Currently this feature is not implemented.
-
 ## Celestial data
 
 The application shows sunrise and sunset times and the phase of the Moon. These are calculated using [PyEphem library](https://rhodesmill.org/pyephem/).
