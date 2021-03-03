@@ -6,6 +6,8 @@ import os.path
 DEFAULT_FILENAME = 'logger.log'
 
 def setup(loglevel = logging.DEBUG):
+    bleson_logger = logging.getLogger('bleson')
+    bleson_logger.setLevel(logging.ERROR)
     fileHandler = logging.FileHandler(DEFAULT_FILENAME)
     fileHandler.setLevel(logging.WARN)
     handlers = [fileHandler]
