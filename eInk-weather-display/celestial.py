@@ -34,7 +34,7 @@ def get_moon_phase():
 
 def map_moon_phase_to_icon(moon_phase_deg):
   logger = logging.getLogger(__name__)
-  logger.info('Moon phase: %s °', moon_phase_deg)
+  logger.info('Moon phase: %s deg', moon_phase_deg)
   base = 0xf0d0
   icon_count = 28
   val = base + round(icon_count/360 * ((moon_phase_deg - 360/icon_count) % 360))
