@@ -10,7 +10,7 @@ def get_forecasts_panel(forecast_images, misc_images, fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating forecast panel')
   (forecasts, first_position) = get_forecasts(config.get('FMI_LOCATION'), 6, 6)
-  logger.info(forecasts)
+  logger.info('Received data: %s', repr(forecasts))
   x_size = 480
   y_size = 180
   dates = sorted(forecasts.keys())

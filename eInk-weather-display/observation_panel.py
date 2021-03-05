@@ -9,12 +9,12 @@ def get_observation_panel(location, observation_images, misc_images, fonts, conf
   logger = logging.getLogger(__name__)
   logger.info('Generating observation panel')
   (observations, first_position) = get_observations(location, 1)
+  logger.info('Received data: %s', repr(observations))
   latest_date = max(observations.keys())
   isDay = get_is_day(first_position, latest_date)
   x_size = 220
   y_size = 100
   latest = observations[latest_date]
-  logger.info(latest)
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
   
