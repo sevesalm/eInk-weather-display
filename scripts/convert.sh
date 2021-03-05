@@ -4,6 +4,7 @@
 # You might need to install it before using the script.
 
 rm png_icons/*
+rm eInk-weather-display/png_icons/*
 for f in svg_icons/*.svg
 do
   echo Converting $f
