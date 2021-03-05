@@ -1,4 +1,5 @@
 observation_mapping = {
+  0:  {'day': 'no_phenomenon'},
   10: {'day': 'mist'},
   20: {'day': 'fog'},
   21: {'day': 'rain_mild'},
