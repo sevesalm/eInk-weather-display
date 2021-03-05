@@ -76,6 +76,11 @@ forecast_mapping = {
   92: {'day': 'fog'},
 }
 
-misc_icons = [('wind_arrow', 30), ('sunrise', 60), ('sunset', 60)]
+misc_icons = [
+  ('wind_arrow', 30), 
+  ('sunrise', 60), 
+  ('sunset', 60), 
+  ('no_wifi', 70)
+]
 
 # FMI symbol descriptions: https://www.ilmatieteenlaitos.fi/latauspalvelun-pikaohje

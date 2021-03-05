@@ -34,7 +34,7 @@ def main_loop(epd, observation_images, forecast_images, misc_images, config):
   info_panel = get_info_panel(fonts, config)
   (forecasts_panel, first_position) = get_forecasts_panel(forecast_images, misc_images, fonts, config)
   celestial_panel = get_celestial_panel(first_position, misc_images, fonts, config)
-  sensor_panel = get_sensor_panel(fonts, config)
+  sensor_panel = get_sensor_panel(misc_images, fonts, config)
 
   # Paste the panels on the main image
   logger.info('Pasting panels')
