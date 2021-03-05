@@ -6,6 +6,7 @@ Note that the icons will look a bit odd if you use Dark Mode. They are meant to 
 
 ## Weather icons
 
+![no_phenomenon.svg](no_phenomenon.svg)
 ![clear.svg](clear.svg)
 ![clear_night.svg](clear_night.svg)
 ![clouds.svg](clouds.svg)
@@ -66,3 +67,4 @@ Note that the icons will look a bit odd if you use Dark Mode. They are meant to 
 ![sunrise.svg](sunrise.svg)
 ![sunset.svg](sunset.svg)
 ![wind_arrow.svg](wind_arrow.svg)
+![no_wifi.svg](no_wifi.svg)
