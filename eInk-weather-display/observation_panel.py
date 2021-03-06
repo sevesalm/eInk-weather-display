@@ -47,14 +47,15 @@ def get_observation_panel(location, observation_images, forecast_images, misc_im
   # Temperature
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 5), str(latest["t2m"]), '°C', fonts, 'font_lg')
 
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 30), str(latest["ws_10min"]), 'm/s', fonts)
-
   # Relative humidity
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 50), str(latest["rh"]), '%', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 30), str(latest["rh"]), '%', fonts)
 
   # Barometric pressure
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 70), str(latest["p_sea"]), 'hPa', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 50), str(latest["p_sea"]), 'hPa', fonts)
   
+  # Wind speed
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 70), str(latest["ws_10min"]), 'm/s', fonts)
+
   # Weather icon
   weather_symbol = latest['wawa']
   cloud_coverage = latest['n_man']
