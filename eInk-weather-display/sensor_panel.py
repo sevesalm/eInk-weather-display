@@ -15,7 +15,7 @@ def get_sensor_panel(misc_images, fonts, config):
 
   logger.info('Fetching sensor data')
   try:
-    sensor_data = RuuviTagSensor.get_data_for_sensors([config.get('RUUVITAG_MAC_IN')], 5)
+    sensor_data = RuuviTagSensor.get_data_for_sensors([config.get('RUUVITAG_MAC_IN')], config.getint('SENSOR_POLL_TIMEOUT'))
   except e:
     logger.error('get_data_for_sensors() failed %s', repr(e))
     sensor_data = {}
