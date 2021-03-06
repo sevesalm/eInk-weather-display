@@ -5,7 +5,31 @@ from weather import get_observations
 from celestial import get_is_day
 import utils
 
-def get_observation_panel(location, observation_images, misc_images, fonts, config):
+def get_observation_icon(randomize_weather_icons, cloud_coverage, forecast_images, observation_images, weather_symbol, isDay):
+  if(not randomize_weather_icons):
+    # For codes 0 to 3, let's use cloud cover to determine the icon set
+    if(0 <= weather_symbol <= 3 and not math.isnan(cloud_coverage)):
+      if(cloud_coverage <= 1): # Clear sky
+        image_set = forecast_images.get(1)
+      elif(cloud_coverage < 7): # Partially cloudy
+        image_set = forecast_images.get(2)
+      elif(cloud_coverage < 9): # Overcast
+        image_set = forecast_images.get(3)
+      else: # Lolwut?
+        image_set = observation_images.get(0)
+    else:
+      image_set = observation_images.get(weather_symbol)
+  else:
+    image_set = observation_images[random.choice(list(observation_images.keys()))]
+
+  if(not isDay and 'night' in image_set):
+    weather_icon = image_set['night']
+  else:
+    weather_icon = image_set['day']
+
+  return weather_icon
+
+def get_observation_panel(location, observation_images, forecast_images, misc_images, fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating observation panel')
   (observations, first_position) = get_observations(location, 1)
@@ -38,16 +62,10 @@ def get_observation_panel(location, observation_images, misc_images, fonts, conf
   
   # Weather icon
   weather_symbol = latest['wawa']
+  cloud_coverage = latest['n_man']
   randomize_weather_icons = config.getboolean('RANDOMIZE_WEATHER_ICONS')
   if(not math.isnan(weather_symbol) and weather_symbol in observation_images or randomize_weather_icons):
-    if(not randomize_weather_icons):
-      image_set = observation_images.get(weather_symbol)
-    else:
-      image_set = observation_images[random.choice(list(observation_images.keys()))]
-    if(not isDay and 'night' in image_set):
-      weather_icon = image_set['night']
-    else:
-      weather_icon = image_set['day']
+    weather_icon = get_observation_icon(randomize_weather_icons, cloud_coverage, forecast_images, observation_images, weather_symbol, isDay)
     image.paste(weather_icon, (int(3*x_size/4 - weather_icon.width/2), int(y_size/2 - weather_icon.height/2)))
   else:
     draw.text((int(3*x_size/4), int(y_size/2)), f'(NA: {weather_symbol})', font = fonts['font_sm'], fill = 0, anchor = 'mm')

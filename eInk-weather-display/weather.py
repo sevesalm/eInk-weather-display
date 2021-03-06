@@ -4,7 +4,7 @@ import pytz
 from datetime import datetime, timedelta
 import requests
 
-OBS_PARAMETERS=['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wawa']
+OBS_PARAMETERS=['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'n_man', 'wawa']
 OBS_ID='fmi::observations::weather::timevaluepair'
 OBS_TIMESTEP = 60
 FORECAST_PARAMETERS=['Temperature', 'WindSpeedMS', 'WindDirection', 'WeatherSymbol3']
