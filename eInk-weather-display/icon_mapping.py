@@ -2,7 +2,7 @@ observation_mapping = {
   0:  {'day': 'no_phenomenon'},
   10: {'day': 'mist'},
   20: {'day': 'fog'},
-  21: {'day': 'rain_mild'},
+  # 21: {'day': 'rain_mild'}, # Unknown form
   22: {'day': 'drizzle'},
   23: {'day': 'rain'},
   24: {'day': 'snow'},
@@ -12,9 +12,9 @@ observation_mapping = {
   32: {'day': 'fog'},
   33: {'day': 'fog'},
   34: {'day': 'fog'},
-  40: {'day': 'rain'},
-  41: {'day': 'rain_mild'},
-  42: {'day': 'rain_strong'},
+  # 40: {'day': 'rain'}, # Unknown form
+  # 41: {'day': 'rain_mild'}, # Unknown form
+  # 42: {'day': 'rain_strong'}, # Unknown form
   50: {'day': 'drizzle_mild'},
   51: {'day': 'drizzle_mild'},
   52: {'day': 'drizzle'},
