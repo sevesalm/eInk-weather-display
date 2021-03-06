@@ -8,7 +8,7 @@ def parse_sunrise_sunset_time(val):
 def get_celestial_panel(position, misc_images, fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating celestial panel')
-  x_size = 170
+  x_size = 180
   y_size = 70 
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)

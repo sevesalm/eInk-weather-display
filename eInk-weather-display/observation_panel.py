@@ -36,22 +36,17 @@ def get_observation_panel(location, observation_images, forecast_images, misc_im
   logger.info('Received data: %s', repr(observations))
   latest_date = max(observations.keys())
   isDay = get_is_day(first_position, latest_date)
-  x_size = 220
+  x_size = 200
   y_size = 100
   latest = observations[latest_date]
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
   
-  delimiter_x = 80
+  delimiter_x = 150
   data_y_base = 15
   # Temperature
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 5), str(latest["t2m"]), '°C', fonts, 'font_lg')
 
-  # Wind direction and speed
-  if(not math.isnan(latest['wd_10min'])):
-    wind_image = misc_images['wind_arrow']
-    wind_image_rot = wind_image.rotate(-latest['wd_10min'] + 180, fillcolor = 0xff)
-    image.paste(wind_image_rot, (delimiter_x - 60 - wind_image.width//2, data_y_base + 30 - wind_image.height//2), ImageOps.invert(wind_image_rot))
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 30), str(latest["ws_10min"]), 'm/s', fonts)
 
   # Relative humidity
@@ -66,9 +61,14 @@ def get_observation_panel(location, observation_images, forecast_images, misc_im
   randomize_weather_icons = config.getboolean('RANDOMIZE_WEATHER_ICONS')
   if(not math.isnan(weather_symbol) and weather_symbol in observation_images or randomize_weather_icons):
     weather_icon = get_observation_icon(randomize_weather_icons, cloud_coverage, forecast_images, observation_images, weather_symbol, isDay)
-    image.paste(weather_icon, (int(3*x_size/4 - weather_icon.width/2), int(y_size/2 - weather_icon.height/2)))
+    image.paste(weather_icon, (15, 0))
   else:
-    draw.text((int(3*x_size/4), int(y_size/2)), f'(NA: {weather_symbol})', font = fonts['font_sm'], fill = 0, anchor = 'mm')
+    draw.text((15 + config.getint('ICON_WIDTH')//2, config.getint('ICON_WIDTH')//2), f'(NA: {weather_symbol})', font = fonts['font_sm'], fill = 0, anchor = 'mm')
+  # Wind direction and speed
+  if(not math.isnan(latest['wd_10min'])):
+    wind_image = misc_images['wind_arrow']
+    wind_image_rot = wind_image.rotate(-latest['wd_10min'] + 180, fillcolor = 0xff)
+    image.paste(wind_image_rot, (15 + config.getint('ICON_WIDTH')//2 - wind_image.width//2, y_size - wind_image.height), ImageOps.invert(wind_image_rot))
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):
