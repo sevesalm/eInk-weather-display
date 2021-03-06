@@ -7,4 +7,4 @@ DEPLOYMENT_DIRECTORY=/path/to/deployment/dir/eInk-weather-display
 
 . ${VENV_DIRECTORY}/bin/activate
 cd ${DEPLOYMENT_DIRECTORY}
-python weather-display.py
+python weather-display.py; exec $SHELL # Leaves the tmux session running so we can see errors 
