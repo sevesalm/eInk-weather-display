@@ -55,6 +55,6 @@ The icons contain night variants for some icons. The night varian is used when t
 
 ## Used licenses
 
-See the [fonts/README.md](fonts/README.md) for information about fonts used in this project and their licenses.
+See the [eInk-weather-display/fonts/README.md](eInk-weather-display/fonts/README.md) for information about fonts used in this project and their licenses.
 
 See the files in [eInk-weather-display/lib](eInk-weather-display/lib) directory for their respective license info.
