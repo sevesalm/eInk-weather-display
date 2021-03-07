@@ -14,6 +14,8 @@ The prototype hardware:
 
 ![prototype](images/eInk-weather-display.jpg)
 
+See a [demo video](https://www.youtube.com/watch?v=xKmcR_p6gKA) on YouTube.
+
 ## Development and Deployment
 
 ### Deployment
