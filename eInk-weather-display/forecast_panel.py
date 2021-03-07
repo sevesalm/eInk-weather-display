@@ -1,3 +1,4 @@
+import random
 from dateutil.parser import parse
 import pytz
 from PIL import Image, ImageDraw, ImageOps
