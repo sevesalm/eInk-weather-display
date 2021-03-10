@@ -3,7 +3,7 @@
   viewBox="0 0 130 130" width="80" height="80" style="background-color: white" stroke="black" fill="white"
   stroke-width="6">
   <path d="M 40 80 C 20 80, 20 40, 45 45 C 45 20, 85 25, 85 45 C 115 40, 115 80, 95 80 z" />
-  <g id="flake" stroke-width="6">
+  <g id="flake" stroke-width="4">
     <path d="M 65 95 v 20" stroke-linecap="round" />
     <path d="M 65 95 v 20" stroke-linecap="round" transform="rotate(60 65 105)" />
     <path d="M 65 95 v 20" stroke-linecap="round" transform="rotate(120 65 105)" />

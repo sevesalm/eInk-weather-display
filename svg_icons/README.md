@@ -10,7 +10,6 @@ Note that the icons will look a bit odd if you use Dark Mode. They are meant to 
 ![clear.svg](clear.svg)
 ![clear_night.svg](clear_night.svg)
 ![clouds.svg](clouds.svg)
-![cloudy.svg](cloudy.svg)
 ![drizzle.svg](drizzle.svg)
 ![drizzle_icing.svg](drizzle_icing.svg)
 ![drizzle_mild.svg](drizzle_mild.svg)
