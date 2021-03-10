@@ -8,13 +8,13 @@ import utils
 
 def get_observation_icon(randomize_weather_icons, cloud_coverage, forecast_images, observation_images, weather_symbol, isDay):
   if(not randomize_weather_icons):
-    # For codes 0 to 3, let's use cloud cover to determine the icon set
-    if(0 <= weather_symbol <= 3 and not math.isnan(cloud_coverage)):
+    # For codes 0 to 3 and 20 to 26, let's use cloud cover to determine the icon set
+    if(((0 <= weather_symbol <= 3) or (20 <= weather_symbol <= 26)) and not math.isnan(cloud_coverage)):
       if(cloud_coverage <= 1): # Clear sky
         image_set = forecast_images.get(1)
-      elif(cloud_coverage < 7): # Partially cloudy
+      elif(2 <= cloud_coverage <= 6): # Partially cloudy
         image_set = forecast_images.get(2)
-      elif(cloud_coverage < 9): # Overcast
+      elif(7 <= cloud_coverage <= 8): # Overcast
         image_set = forecast_images.get(3)
       else: # Lolwut?
         image_set = observation_images.get(0)
