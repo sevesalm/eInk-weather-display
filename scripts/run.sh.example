@@ -7,4 +7,7 @@ DEPLOYMENT_DIRECTORY=/path/to/deployment/dir/eInk-weather-display
 
 . ${VENV_DIRECTORY}/bin/activate
 cd ${DEPLOYMENT_DIRECTORY}
-python weather-display.py; exec $SHELL # Leaves the tmux session running so we can see errors 
+
+# Sudo needed to access Bluetooth and BCM2835
+# Leaves the tmux session running so we can see errors 
+sudo ${VENV_DIRECTORY}/bin/python weather-display.py; exec $SHELL 

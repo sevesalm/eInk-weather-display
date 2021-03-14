@@ -1,5 +1,4 @@
 APScheduler==3.7.0
-bleson==0.1.8
 certifi==2020.12.5
 chardet==4.0.0
 ephem==3.7.7.1
