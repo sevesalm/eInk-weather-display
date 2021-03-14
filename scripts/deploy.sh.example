@@ -22,7 +22,3 @@ ssh $IP_ADDRESS SESSION_NAME=$SESSION_NAME DEPLOYMENT_DIRECTORY=$DEPLOYMENT_DIRE
   cd ${DEPLOYMENT_DIRECTORY}/eInk-weather-display
   tmux new-session -d -s $SESSION_NAME ./run.sh
 ENDSSH
-
-
-#!/bin/bash
-
