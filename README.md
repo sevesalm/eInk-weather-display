@@ -25,11 +25,12 @@ The prototype hardware:
 1. Install dependencies: `pip install -r requirements.txt`
 1. Convert the SVG images: `./convert.sh` (install `rsvg-convert` if needed)
 1. Create `config.ini` file (see: [config_example.ini](config_example.ini))
-1. Start: `python weather-display.py`
+1. Create `scripts/run.sh` (see: [scripts/run.sh.example](scripts/run.sh.example))
+1. Start: `./scripts/run.sh`
 
 ### Development
 
-The script [deploy.sh](scripts/deploy.sh.example) is a small helper which copies all the files over SSH to Raspberry Pi, activates venv and starts the application remotely using the [run.sh](scripts/run.sh.example) script. This is useful if you run your Raspberry Pi in headless mode.
+The script [scripts/deploy.sh.example](scripts/deploy.sh.example) is a small helper which copies all the files over SSH to Raspberry Pi, activates venv and starts the application remotely using the [scripts/run.sh.example](scripts/run.sh.example) script. This is useful if you run your Raspberry Pi in headless mode. The script [scripts/pi-compile.sh.example](scripts/pi-compile.sh.example) allows compiling the shared C library on Raspberry Pi.
 
 Example scripts are provided. Please edit them to suit your needs.
 
@@ -55,10 +56,16 @@ The weather icon set contains a unique icon for almost all weather codes. The ic
 
 The icons contain night variants for some icons. The night varian is used when the observation/forecast time is determined to happen after sunset but before sunrise - commonly know as "during the night".
 
+## Future plans
+
+The prototype works well using Waveshare 3.7" HAT display. The natural next step is to go bigger. The [Waveshare 7.8" E-Ink display](https://www.waveshare.com/product/raspberry-pi/displays/e-paper/7.8inch-e-paper-hat.htm) has a resolution of 1872 x 1404 pixels - almost 20x as much pixels as the 3.7" display has. The larger display refreshes faster (0.45 s vs 3.0 s) and supports 4-bit gray scales as opposed to 2-bit on 3.7". The larger physical size and resolution allows showing bigger digits and icons and add more information - such as _rainfall_ and _cloud amount_.
+
+The 7.8" display comes only with C code for controlling it using the [BCM 2835 GPIO driver](https://www.airspayce.com/mikem/bcm2835/). For that reason the current 3.7" implementation has been modified to work with a library written in C for operating the display. The included shared library [eInk-weather-display/lib/epd.so](eInk-weather-display/lib/epd.so) handles operating the display and is called using [ctypes](https://docs.python.org/3/library/ctypes.html) from Python.
+
 ## Used licenses
 
 See the [eInk-weather-display/fonts/README.md](eInk-weather-display/fonts/README.md) for information about fonts used in this project and their licenses.
 
-See the files in [eInk-weather-display/lib](eInk-weather-display/lib) directory for their respective license info. 
+See the files in [eInk-weather-display/lib](eInk-weather-display/lib) directory for their respective license info.
 
 The licenses of C library files can be found in the files in directory [clib](clib)
