@@ -69,7 +69,7 @@ def get_observation_panel(location, observation_images, forecast_images, misc_im
   # Wind direction and speed
   if(not math.isnan(latest['wd_10min'])):
     wind_image = misc_images['wind_arrow']
-    wind_image_rot = wind_image.rotate(-latest['wd_10min'] + 180, fillcolor = 0xff)
+    wind_image_rot = wind_image.rotate(-latest['wd_10min'] + 180, fillcolor = 0xff, resample=Image.BICUBIC)
     image.paste(wind_image_rot, (15 + config.getint('ICON_WIDTH')//2 - wind_image.width//2, y_size - wind_image.height), ImageOps.invert(wind_image_rot))
 
   # Borders

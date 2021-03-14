@@ -45,7 +45,7 @@ def get_forecasts_panel(forecast_images, misc_images, fonts, config):
     utils.draw_quantity(draw, (50 + i*75, 140), str(round(data["WindSpeedMS"])), 'm/s', fonts)
   
     wind_image = misc_images['wind_arrow'] 
-    wind_image_rot = wind_image.rotate(-data['WindDirection'] + 180, fillcolor = 0xff)
+    wind_image_rot = wind_image.rotate(-data['WindDirection'] + 180, fillcolor = 0xff, resample=Image.BICUBIC)
     image.paste(wind_image_rot, (int(i*75 + 50 - wind_image.width/2), 150))
 
   # Borders
