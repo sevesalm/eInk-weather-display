@@ -59,4 +59,6 @@ The icons contain night variants for some icons. The night varian is used when t
 
 See the [eInk-weather-display/fonts/README.md](eInk-weather-display/fonts/README.md) for information about fonts used in this project and their licenses.
 
-See the files in [eInk-weather-display/lib](eInk-weather-display/lib) directory for their respective license info.
+See the files in [eInk-weather-display/lib](eInk-weather-display/lib) directory for their respective license info. 
+
+The licenses of C library files can be found in the files in directory [clib](clib)
