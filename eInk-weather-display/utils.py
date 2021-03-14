@@ -10,3 +10,23 @@ def check_python_version():
   minor = sys.version_info[1]
   if major < 3 or minor < 7:
     raise Exception('Python 3.7 or newer required')
+
+# Converts a 8-bit image into a packed 2-bit image which can be fed to EPD
+def from_8bit_to_2bit(image):
+  if(image.mode != 'L'):
+    raise Exception('Image mode must be \'L\'')
+  if(image.width % 4 != 0):
+    raise Exception('Image width % 4 must be 0')
+  
+  image_bytes = image.tobytes()
+  result = bytearray()
+  for y in range(image.height):
+    for x in range(image.width // 4):
+      px0 = (image_bytes[y*image.width + x*4 + 0] & (0x3 << 6)) >> 0
+      px1 = (image_bytes[y*image.width + x*4 + 1] & (0x3 << 6)) >> 2
+      px2 = (image_bytes[y*image.width + x*4 + 2] & (0x3 << 6)) >> 4
+      px3 = (image_bytes[y*image.width + x*4 + 3] & (0x3 << 6)) >> 6
+
+      new_px = px0 | px1 | px2 | px3
+      result.append(new_px)
+  return bytes(result)

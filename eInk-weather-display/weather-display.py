@@ -5,6 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 from apscheduler.schedulers.blocking import BlockingScheduler
 import log
 import logging
+import ctypes
 import utils
 import epd_utils
 from icons import get_weather_images
@@ -22,7 +23,7 @@ fonts = {
   'font_weather_m': ImageFont.truetype('fonts/weathericons-regular-webfont.woff', 52)
 }
 
-def main_loop(epd, observation_images, forecast_images, misc_images, config):
+def main_loop(epd, observation_images, forecast_images, misc_images, config, epd_so):
   logger = logging.getLogger(__name__)
   logger.info('Refresh started')
   full_image = Image.new('L', (epd.height, epd.width), 0xff)
@@ -45,13 +46,16 @@ def main_loop(epd, observation_images, forecast_images, misc_images, config):
   full_image.paste(info_panel, (epd.height - info_panel.width, 0))
 
   if(config.get('DRAW_BORDERS')):
-    draw.line([20, observation_panel.height, full_image.width - 20, observation_panel.height], fill=0xC0)
-    draw.line([observation_panel.width, 20, observation_panel.width, observation_panel.height - 20], fill=0xC0)
+    draw.line([20, observation_panel.height, full_image.width - 20, observation_panel.height], fill=0x80)
+    draw.line([observation_panel.width, 20, observation_panel.width, observation_panel.height - 20], fill=0x80)
 
   logger.info('Sending image to EPD')
-  epd.init(0)
-  epd.display_4Gray(epd.getbuffer_4Gray(full_image))
-  epd.sleep()
+  if (config.getboolean('USE_C_LIBRARY')):
+    image_bytes = utils.from_8bit_to_2bit(full_image.rotate(90, expand=True))
+    epd_so.draw_image(image_bytes)
+  else:
+    epd.display_4Gray(epd.getbuffer_4Gray(full_image))
+    epd.sleep()
   logger.info('Refresh complete')
 
 def main():
@@ -65,13 +69,18 @@ def main():
     config = config_parser['general']
     (observation_images, forecast_images, misc_images) = get_weather_images(config)
     epd = epd_utils.get_epd()
-    epd_utils.epd_init(epd) 
+    if(not config.getboolean('USE_C_LIBRARY')):
+      epd_utils.epd_init(epd) 
+
+    logger.info('Import epd.so')
+    epd_so = ctypes.CDLL("lib/epd.so")
+
     logger.info("Initial refresh")
-    main_loop(epd, observation_images, forecast_images, misc_images, config) # Once in the beginning
+    main_loop(epd, observation_images, forecast_images, misc_images, config, epd_so) # Once in the beginning
 
     logger.info('Starting scheduler')
     scheduler = BlockingScheduler()
-    scheduler.add_job(lambda: main_loop(epd, observation_images, forecast_images, misc_images, config), 'cron', minute='5/10')
+    scheduler.add_job(lambda: main_loop(epd, observation_images, forecast_images, misc_images, config, epd_so), 'cron', minute='5/10')
     scheduler.start()
     epd_utils.epd_exit(epd) 
 
