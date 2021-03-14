@@ -66,7 +66,9 @@ def main():
     utils.check_python_version()
     config_parser = configparser.ConfigParser()
     config_parser.read('config.ini')
+    logger.info('Config: %s', config_parser.items('general'))
     config = config_parser['general']
+
     (observation_images, forecast_images, misc_images) = get_weather_images(config)
     epd = epd_utils.get_epd()
     if(not config.getboolean('USE_C_LIBRARY')):
