@@ -29,6 +29,7 @@
 ******************************************************************************/
 #include "DEV_Config.h"
 #include <fcntl.h>
+#include "logger.h"
 
 /**
  * GPIO
@@ -93,38 +94,31 @@ static int DEV_Equipment_Testing(void)
 	int fd;
 	char value_str[20];
 	fd = open("/etc/issue", O_RDONLY);
-    printf("Current environment: ");
 	while(1) {
 		if (fd < 0) {
-			Debug( "Read failed Pin\n");
 			return -1;
 		}
 		for(i=0;; i++) {
 			if (read(fd, &value_str[i], 1) < 0) {
-				Debug( "failed to read value!\n");
 				return -1;
 			}
 			if(value_str[i] ==32) {
-				printf("\r\n");
 				break;
 			}
-			printf("%c",value_str[i]);
 		}
 		break;
 	}
-#ifdef RPI
+
 	if(i<5) {
-		printf("Unrecognizable\r\n");
+		return -1;
 	} else {
 		char RPI_System[10]   = {"Raspbian"};
 		for(i=0; i<6; i++) {
 			if(RPI_System[i]!= value_str[i]) {
-				printf("Please make JETSON !!!!!!!!!!\r\n");
 				return -1;
 			}
 		}
 	}
-#endif
 	return 0;
 }
 
@@ -150,18 +144,16 @@ function:	Module Initialize, the library and initialize the pins, SPI protocol
 parameter:
 Info:
 ******************************************************************************/
-UBYTE DEV_Module_Init(void)
+UBYTE DEV_Module_Init(t_logger logger)
 {
-  printf("/***********************************/ \r\n");
 	if(DEV_Equipment_Testing() < 0) {
+		logger(LOG_LEVEL_ERROR, L"DEV_Equipment_Testing() failed");
 		return 1;
 	}
 	if(!bcm2835_init()) {
-		printf("bcm2835 init failed  !!! \r\n");
+		logger(LOG_LEVEL_ERROR, L"bcm2835_init() failed");
 		return 1;
-	} else {
-		printf("bcm2835 init success !!! \r\n");
-	}
+	} 
 
 	// GPIO Config
 	DEV_GPIO_Init();
@@ -173,7 +165,6 @@ UBYTE DEV_Module_Init(void)
 	bcm2835_spi_chipSelect(BCM2835_SPI_CS0);                     //set CE0
 	bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, LOW);     //enable cs0
 
-	printf("/***********************************/ \r\n");
 	return 0;
 }
 

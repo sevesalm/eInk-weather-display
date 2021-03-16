@@ -52,7 +52,7 @@ def main_loop(epd, observation_images, forecast_images, misc_images, config, epd
   logger.info('Sending image to EPD')
   if (config.getboolean('USE_C_LIBRARY')):
     image_bytes = utils.from_8bit_to_2bit(full_image.rotate(90 if not config.getboolean('ROTATE_180') else 270, expand=True))
-    epd_so.draw_image(image_bytes)
+    epd_so.draw_image(image_bytes, ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_wchar_p)(logging.getLogger('esp.so').log))
   else:
     epd.display_4Gray(epd.getbuffer_4Gray(full_image))
     epd.sleep()

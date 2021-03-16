@@ -1,7 +1,7 @@
 DIR_Config   = ./lib/Config
-DIR_e-Paper      = ./lib/e-Paper
+DIR_e-Paper  = ./lib/e-Paper
 DIR_Src = ./src
-DIR_BIN      = ./bin
+DIR_BIN = ./bin
 
 OBJ_C = $(wildcard ${DIR_e-Paper}/*.c ${DIR_Src}/*.c )
 OBJ_O = $(patsubst %.c,${DIR_BIN}/%.o,$(notdir ${OBJ_C}))

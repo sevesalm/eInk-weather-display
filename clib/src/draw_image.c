@@ -27,19 +27,24 @@
 # THE SOFTWARE.
 #
 ******************************************************************************/
+#include "logger.h"
 #include "draw_image.h"
 #include "EPD_3in7.h"
 
-int draw_image(UBYTE *image) {
-    if(DEV_Module_Init() != 0){
+int draw_image(UBYTE *image, t_logger logger) {
+    logger(LOG_LEVEL_INFO, L"DEV_Module_Init()");
+    if(DEV_Module_Init(logger) != 0){
         return -1;
     }
-
+    logger(LOG_LEVEL_INFO, L"Initializing");
 	EPD_3IN7_4Gray_Init();
+    logger(LOG_LEVEL_INFO, L"Drawing");
     EPD_3IN7_4Gray_Display(image);
+    logger(LOG_LEVEL_INFO, L"Sleeping");
     EPD_3IN7_Sleep(); // Sleep & close 5V
+    logger(LOG_LEVEL_INFO, L"Delaying (2000 ms)");
     DEV_Delay_ms(2000); //important, at least 2s
+    logger(LOG_LEVEL_INFO, L"DEV_Module_Exit()");
     DEV_Module_Exit();
-
     return 0;
 }

@@ -27,12 +27,13 @@
 # THE SOFTWARE.
 #
 ******************************************************************************/
-#ifndef _EPD_TEST_H_
-#define _EPD_TEST_H_
+#ifndef _DRAW_IMAGE_H_
+#define _DRAW_IMAGE_H_
 
 #include "DEV_Config.h"
 #include "Debug.h"
+#include "logger.h"
 #include <stdlib.h>
 
-int draw_image(UBYTE *image);
+int draw_image(UBYTE *image, t_logger);
 #endif
