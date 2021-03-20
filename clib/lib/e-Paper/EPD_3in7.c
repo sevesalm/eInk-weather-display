@@ -398,108 +398,56 @@ void EPD_3IN7_1Gray_Clear(void)
   EPD_3IN7_ReadBusy_HIGH();    
 }
 
+//  Used to extract every odd (shift = 0) or every even (shift = 1) bit 
+//  and pack them.
+UBYTE morton(UWORD x)
+{
+    x = x & 0x5555;
+    x = (x | (x >> 1)) & 0x3333;
+    x = (x | (x >> 2)) & 0x0F0F;
+    x = (x | (x >> 4)) & 0x00FF;
+    return x;
+}
+
+UBYTE pack_bits(const UBYTE *Image, UDOUBLE i, int shift) {
+    UWORD val;
+    val = Image[i*2] << 8 | Image[i*2 + 1];
+    return morton(val >> shift);
+}
+
 /******************************************************************************
 function :	Sends the image buffer in RAM to e-Paper and displays
 parameter:
 ******************************************************************************/
 void EPD_3IN7_4Gray_Display(const UBYTE *Image)
 {
-    UDOUBLE i,j,k;
-    UBYTE temp1,temp2,temp3;
-    
     EPD_3IN7_SendCommand(0x49);
     EPD_3IN7_SendData(0x00);
 
-    
     EPD_3IN7_SendCommand(0x4E);
     EPD_3IN7_SendData(0x00);
     EPD_3IN7_SendData(0x00);
-    
     
     EPD_3IN7_SendCommand(0x4F);
     EPD_3IN7_SendData(0x00);
     EPD_3IN7_SendData(0x00);
     
     EPD_3IN7_SendCommand(0x24);
-    for(i=0;i<16800;i++){
-        temp3=0;
-        for(j=0; j<2; j++) {
-            temp1 = Image[i*2+j];
-            for(k=0; k<2; k++) {
-                temp2 = temp1&0xC0;
-                if(temp2 == 0xC0)
-                    temp3 |= 0x01;//white
-                else if(temp2 == 0x00)
-                    temp3 |= 0x00;  //black
-                else if(temp2 == 0x80)
-                    temp3 |= 0x00;  //gray1
-                else //0x40
-                    temp3 |= 0x01; //gray2
-                temp3 <<= 1;
-
-                temp1 <<= 2;
-                temp2 = temp1&0xC0 ;
-                if(temp2 == 0xC0)  //white
-                    temp3 |= 0x01;
-                else if(temp2 == 0x00) //black
-                    temp3 |= 0x00;
-                else if(temp2 == 0x80)
-                    temp3 |= 0x00; //gray1
-                else    //0x40
-                    temp3 |= 0x01;	//gray2
-                if(j!=1 || k!=1)
-                    temp3 <<= 1;
-
-                temp1 <<= 2;
-            }
-
-        }
-        EPD_3IN7_SendData(temp3);
+    for(unsigned int i=0;i<16800;i++){
+        EPD_3IN7_SendData(pack_bits(Image, i, 0));
     }
-    // new  data
+    
     EPD_3IN7_SendCommand(0x4E);
     EPD_3IN7_SendData(0x00);
     EPD_3IN7_SendData(0x00);
-     
     
     EPD_3IN7_SendCommand(0x4F);
     EPD_3IN7_SendData(0x00);
     EPD_3IN7_SendData(0x00);
     
     EPD_3IN7_SendCommand(0x26);
-    for(i=0; i<16800; i++) {
-        temp3=0;
-        for(j=0; j<2; j++) {
-            temp1 = Image[i*2+j];
-            for(k=0; k<2; k++) {
-                temp2 = temp1&0xC0 ;
-                if(temp2 == 0xC0)
-                    temp3 |= 0x01;//white
-                else if(temp2 == 0x00)
-                    temp3 |= 0x00;  //black
-                else if(temp2 == 0x80)
-                    temp3 |= 0x01;  //gray1
-                else //0x40
-                    temp3 |= 0x00; //gray2
-                temp3 <<= 1;
-
-                temp1 <<= 2;
-                temp2 = temp1&0xC0 ;
-                if(temp2 == 0xC0)  //white
-                    temp3 |= 0x01;
-                else if(temp2 == 0x00) //black
-                    temp3 |= 0x00;
-                else if(temp2 == 0x80)
-                    temp3 |= 0x01; //gray1
-                else    //0x40
-                    temp3 |= 0x00;	//gray2
-                if(j!=1 || k!=1)
-                    temp3 <<= 1;
-
-                temp1 <<= 2;
-            }
-        }
-        EPD_3IN7_SendData(temp3);
+    for(unsigned int i=0; i<16800; i++) {
+        EPD_3IN7_SendData(pack_bits(Image, i, 1));
     }
 
     EPD_3IN7_Load_LUT(0);
