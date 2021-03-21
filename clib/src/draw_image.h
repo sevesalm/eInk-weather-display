@@ -35,5 +35,6 @@
 #include "logger.h"
 #include <stdlib.h>
 
-int draw_image(UBYTE *image, t_logger);
+int draw_image_2bit(UBYTE *image, t_logger);
+int draw_image_1bit(UBYTE *image, t_logger);
 #endif

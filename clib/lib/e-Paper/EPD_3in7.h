@@ -41,9 +41,9 @@ void EPD_3IN7_4Gray_Clear(void);
 void EPD_3IN7_4Gray_Init(void);
 void EPD_3IN7_4Gray_Display(const UBYTE *Image);
 
-void EPD_3IN7_1Gray_Clear(void);
+void EPD_3IN7_1Gray_Clear(int mode);
 void EPD_3IN7_1Gray_Init(void);
-void EPD_3IN7_1Gray_Display(const UBYTE *Image);
+void EPD_3IN7_1Gray_Display(const UBYTE *Image, int mode);
 void EPD_3IN7_1Gray_Display_Part(const UBYTE *Image, UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend);
 
 void EPD_3IN7_Sleep(void);

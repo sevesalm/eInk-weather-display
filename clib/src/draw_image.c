@@ -31,20 +31,43 @@
 #include "draw_image.h"
 #include "EPD_3in7.h"
 
-int draw_image(UBYTE *image, t_logger logger) {
-    logger(LOG_LEVEL_INFO, L"DEV_Module_Init()");
-    if(DEV_Module_Init(logger) != 0){
-        return -1;
-    }
-    logger(LOG_LEVEL_INFO, L"Initializing");
-	EPD_3IN7_4Gray_Init();
-    logger(LOG_LEVEL_INFO, L"Drawing");
-    EPD_3IN7_4Gray_Display(image);
+void sleep_and_exit(t_logger logger) {
     logger(LOG_LEVEL_INFO, L"Sleeping");
     EPD_3IN7_Sleep(); // Sleep & close 5V
     logger(LOG_LEVEL_INFO, L"Delaying (2000 ms)");
     DEV_Delay_ms(2000); //important, at least 2s
     logger(LOG_LEVEL_INFO, L"DEV_Module_Exit()");
     DEV_Module_Exit();
+    return;
+}
+
+int draw_image_2bit(UBYTE *image, t_logger logger) {
+    logger(LOG_LEVEL_INFO, L"DEV_Module_Init()");
+    if(DEV_Module_Init(logger) != 0){
+        return -1;
+    }
+    logger(LOG_LEVEL_INFO, L"Initializing 2-bit mode");
+	EPD_3IN7_4Gray_Init();
+    logger(LOG_LEVEL_INFO, L"Drawing");
+    EPD_3IN7_4Gray_Display(image);
+    sleep_and_exit(logger);
+    return 0;
+}
+
+int draw_image_1bit(UBYTE *image, t_logger logger) {
+    int mode = 1;
+    logger(LOG_LEVEL_INFO, L"DEV_Module_Init()");
+    if(DEV_Module_Init(logger) != 0){
+        return -1;
+    }
+    logger(LOG_LEVEL_INFO, L"Initializing 1-bit mode");
+	EPD_3IN7_1Gray_Init();
+
+    logger(LOG_LEVEL_INFO, L"Clearing");
+    EPD_3IN7_1Gray_Clear(mode);
+
+    logger(LOG_LEVEL_INFO, L"Drawing");
+    EPD_3IN7_1Gray_Display(image, mode);
+    sleep_and_exit(logger);
     return 0;
 }

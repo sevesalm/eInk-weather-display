@@ -31,16 +31,22 @@ def full(epd, fonts, images, config, epd_so):
   full_image.paste(info_panel, (epd.height - info_panel.width, 0))
 
   if(config.get('DRAW_BORDERS')):
-    draw.line([20, observation_panel.height, full_image.width - 20, observation_panel.height], fill=0x80)
-    draw.line([observation_panel.width, 20, observation_panel.width, observation_panel.height - 20], fill=0x80)
+    border_color = 0x80 if not config.getboolean('ENABLE_1BIT_MODE') else 0x00
+    draw.line([20, observation_panel.height, full_image.width - 20, observation_panel.height], fill=border_color)
+    draw.line([observation_panel.width, 20, observation_panel.width, observation_panel.height - 20], fill=border_color)
 
   logger.info('Sending image to EPD')
   if (config.getboolean('USE_C_LIBRARY')):
-    image_bytes = utils.from_8bit_to_2bit(full_image.rotate(90 if not config.getboolean('ROTATE_180') else 270, expand=True))
-    epd_so.draw_image(image_bytes, ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_wchar_p)(logging.getLogger('esp.so').log))
+    if(config.getboolean('ENABLE_1BIT_MODE')):
+      image_bytes = full_image.rotate(90 if not config.getboolean('ROTATE_180') else 270, expand=True).convert(mode='1', dither=Image.NONE).tobytes()
+      epd_so.draw_image_1bit(image_bytes, ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_wchar_p)(logging.getLogger('esp.so').log))
+    else:
+      image_bytes = utils.from_8bit_to_2bit(full_image.rotate(90 if not config.getboolean('ROTATE_180') else 270, expand=True))
+      epd_so.draw_image_2bit(image_bytes, ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_wchar_p)(logging.getLogger('esp.so').log))
   else:
     epd.display_4Gray(epd.getbuffer_4Gray(full_image))
     epd.sleep()
+  logger.info('Saving to image.bmp')
   logger.info('Refresh complete')
 
 def partial():

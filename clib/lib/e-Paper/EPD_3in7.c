@@ -374,7 +374,7 @@ void EPD_3IN7_4Gray_Clear(void)
 function :  Clear screen
 parameter:
 ******************************************************************************/
-void EPD_3IN7_1Gray_Clear(void)
+void EPD_3IN7_1Gray_Clear(int mode)
 {
   UWORD i;
   UWORD IMAGE_COUNTER = EPD_3IN7_WIDTH * EPD_3IN7_HEIGHT / 8;
@@ -464,7 +464,7 @@ void EPD_3IN7_4Gray_Display(const UBYTE *Image)
 function :  Sends the image buffer in RAM to e-Paper and displays
 parameter:
 ******************************************************************************/
-void EPD_3IN7_1Gray_Display(const UBYTE *Image)
+void EPD_3IN7_1Gray_Display(const UBYTE *Image, int mode)
 {
   UWORD i;
   UWORD IMAGE_COUNTER = EPD_3IN7_WIDTH * EPD_3IN7_HEIGHT / 8;
@@ -482,7 +482,7 @@ void EPD_3IN7_1Gray_Display(const UBYTE *Image)
     EPD_3IN7_SendData(Image[i]);
   }
 
-  EPD_3IN7_Load_LUT(2);
+  EPD_3IN7_Load_LUT(mode);
   EPD_3IN7_SendCommand(0x20);
   EPD_3IN7_ReadBusy_HIGH();  
 }
