@@ -3,7 +3,7 @@ import logging
 from ruuvitag_sensor.ruuvi import RuuviTagSensor
 import utils
 
-def get_sensor_panel(misc_images, fonts, config):
+def get_sensor_panel(images, fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating sensor panel')
 
@@ -27,7 +27,7 @@ def get_sensor_panel(misc_images, fonts, config):
     utils.draw_quantity(draw, (x_size//2 + 15, 20), str(round(state_in['temperature'], 1)), '°C', fonts, 'font_lg')
     utils.draw_quantity(draw, (x_size//2 + 15, 45), str(round(state_in['humidity'], 1)), '%', fonts, 'font_sm')
   else: 
-    no_wifi_image = misc_images['no_wifi']
+    no_wifi_image = images['misc']['no_wifi']
     image.paste(no_wifi_image, (x_size//2 - no_wifi_image.width//2, y_size//2 - no_wifi_image.height//2), ImageOps.invert(no_wifi_image))
   
   # Borders

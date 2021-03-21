@@ -20,12 +20,12 @@ fonts = {
   'font_weather_m': ImageFont.truetype('fonts/weathericons-regular-webfont.woff', 52)
 }
 
-def main_loop(epd, fonts, observation_images, forecast_images, misc_images, config, epd_so):
+def main_loop(epd, fonts, images, config, epd_so):
   logger = logging.getLogger(__name__)
   logger.info("main_loop() started")
   wakeup_time = datetime.datetime.now()
   if((wakeup_time.minute - 5) % 10 == 0):
-    refresh.full(epd, fonts, observation_images, forecast_images, misc_images, config, epd_so)
+    refresh.full(epd, fonts, images, config, epd_so)
   else:
     refresh.partial()
 
@@ -40,7 +40,7 @@ def main():
     logger.info('Config: %s', config_parser.items('general'))
     config = config_parser['general']
 
-    (observation_images, forecast_images, misc_images) = get_weather_images(config)
+    images = get_weather_images(config)
     epd = epd_utils.get_epd()
     if(not config.getboolean('USE_C_LIBRARY')):
       epd_utils.epd_init(epd) 
@@ -49,11 +49,11 @@ def main():
     epd_so = ctypes.CDLL("lib/epd.so")
 
     logger.info("Initial refresh")
-    refresh.full(epd, fonts, observation_images, forecast_images, misc_images, config, epd_so) # Once in the beginning
+    refresh.full(epd, fonts, images, config, epd_so) # Once in the beginning
 
     logger.info('Starting scheduler')
     scheduler = BlockingScheduler()
-    scheduler.add_job(lambda: main_loop(epd, fonts, observation_images, forecast_images, misc_images, config, epd_so), 'cron', minute='5/1')
+    scheduler.add_job(lambda: main_loop(epd, fonts, images, config, epd_so), 'cron', minute='5/1')
     scheduler.start()
     epd_utils.epd_exit(epd) 
 

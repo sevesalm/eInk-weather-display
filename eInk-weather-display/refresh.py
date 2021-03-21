@@ -8,7 +8,7 @@ from celestial_panel import get_celestial_panel
 from sensor_panel import get_sensor_panel
 import utils
 
-def full(epd, fonts, observation_images, forecast_images, misc_images, config, epd_so):
+def full(epd, fonts, images, config, epd_so):
   logger = logging.getLogger(__name__)
   logger.info('Full refresh started')
   full_image = Image.new('L', (epd.height, epd.width), 0xff)
@@ -16,11 +16,11 @@ def full(epd, fonts, observation_images, forecast_images, misc_images, config, e
 
   # Draw individual panels
   logger.info('Drawing panels')
-  observation_panel = get_observation_panel(config['FMI_LOCATION'], observation_images, forecast_images, misc_images, fonts, config)
+  observation_panel = get_observation_panel(config['FMI_LOCATION'], images, fonts, config)
   info_panel = get_info_panel(fonts, config)
-  (forecasts_panel, first_position) = get_forecasts_panel(forecast_images, misc_images, fonts, config)
-  celestial_panel = get_celestial_panel(first_position, misc_images, fonts, config)
-  sensor_panel = get_sensor_panel(misc_images, fonts, config)
+  (forecasts_panel, first_position) = get_forecasts_panel(images, fonts, config)
+  celestial_panel = get_celestial_panel(first_position, images, fonts, config)
+  sensor_panel = get_sensor_panel(images, fonts, config)
 
   # Paste the panels on the main image
   logger.info('Pasting panels')
