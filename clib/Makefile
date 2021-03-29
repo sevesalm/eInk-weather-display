@@ -22,7 +22,7 @@ MSG = -g -O -ffunction-sections -fdata-sections -Wall
 CFLAGS += $(MSG)
 
 RPI_epd:${OBJ_O}
-	$(CC) $(CFLAGS) -shared -fPIC -D RPI $(OBJ_O) -o epd.so $(RPI_DEV_C) $(LIB_RPI) $(DEBUG)
+	$(CC) $(CFLAGS) -shared -fPIC -D RPI $(OBJ_O) -o epd37.so $(RPI_DEV_C) $(LIB_RPI) $(DEBUG)
     
 $(shell mkdir -p $(DIR_BIN))
 

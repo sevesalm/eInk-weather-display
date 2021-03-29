@@ -5,7 +5,8 @@ logger.log
 __pycache__/
 deploy.sh
 run.sh
-pi-compile.sh
+pi-compile37.sh
+pi-compile78.sh
 logger.log
 .DS_Store
 config.ini

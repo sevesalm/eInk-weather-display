@@ -5,11 +5,11 @@
 IP_ADDRESS=192.168.0.0
 DIRECTORY=/path/to/compile/dir
 
-rsync -av --delete clib $IP_ADDRESS:$DIRECTORY
+rsync -av --delete clib78 $IP_ADDRESS:$DIRECTORY
 # The script below deletes the old session if it exists and starts a new one
 ssh $IP_ADDRESS DIRECTORY=$DIRECTORY 'bash -s' <<'ENDSSH'
-  cd ${DIRECTORY}/clib
+  cd ${DIRECTORY}/clib78
   make
 ENDSSH
 
-rsync -v $IP_ADDRESS:$DIRECTORY/clib/epd.so eInk-weather-display/lib
+rsync -v $IP_ADDRESS:$DIRECTORY/clib78/epd78.so eInk-weather-display/lib

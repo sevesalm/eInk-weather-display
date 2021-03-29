@@ -58,9 +58,11 @@ The icons contain night variants for some icons. The night varian is used when t
 
 ## Future plans
 
-The prototype works well using Waveshare 3.7" HAT display. The natural next step is to go bigger. The [Waveshare 7.8" E-Ink display](https://www.waveshare.com/product/raspberry-pi/displays/e-paper/7.8inch-e-paper-hat.htm) has a resolution of 1872 x 1404 pixels - almost 20x as much pixels as the 3.7" display has. The larger display refreshes faster (0.45 s vs 3.0 s) and supports 4-bit gray scales as opposed to 2-bit on 3.7". The larger physical size and resolution allows showing bigger digits and icons and add more information - such as _rainfall_ and _cloud amount_.
+The prototype worked well using Waveshare 3.7" HAT display. The natural next step was to go bigger. The [Waveshare 7.8" E-Ink display](https://www.waveshare.com/product/raspberry-pi/displays/e-paper/7.8inch-e-paper-hat.htm) has a resolution of 1872 x 1404 pixels - almost 20x as much pixels as the 3.7" display has. The larger display refreshes faster (0.45 s vs 3.0 s) and supports 4-bit gray scales as opposed to 2-bit on 3.7". The larger physical size and resolution allows showing bigger digits and icons and add more information - such as _rainfall_ and _cloud amount_.
 
-The 7.8" display comes only with C code for controlling it using the [BCM 2835 GPIO driver](https://www.airspayce.com/mikem/bcm2835/). For that reason the current 3.7" implementation has been modified to work with a library written in C for operating the display. The included shared library [eInk-weather-display/lib/epd.so](eInk-weather-display/lib/epd.so) handles operating the display and is called using [ctypes](https://docs.python.org/3/library/ctypes.html) from Python.
+The 7.8" display comes only with C code for controlling it using the [BCM 2835 GPIO driver](https://www.airspayce.com/mikem/bcm2835/). For that reason the original 3.7" implementation has been modified to work with a library written in C for operating the display. The included shared library [eInk-weather-display/lib/epd37.so](eInk-weather-display/lib/epd37.so) handles operating the display and is called using [ctypes](https://docs.python.org/3/library/ctypes.html) from Python.
+
+Support for the 7.8" eInk has been added. The shared library [eInk-weather-display/lib/epd78.so](eInk-weather-display/lib/epd78.so) manages image bit depth operations and drawing the data on 7.8" eInk display.
 
 ## Used licenses
 
