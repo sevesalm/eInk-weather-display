@@ -12,14 +12,6 @@ import epd_utils
 from icons import get_weather_images
 import refresh
 
-fonts = {
-  'font_lg': ImageFont.truetype('fonts/FiraSansCondensed-400.woff', 32),
-  'font_sm': ImageFont.truetype('fonts/FiraSansCondensed-400.woff', 18),
-  'font_sm_bold': ImageFont.truetype('fonts/FiraSansCondensed-700.woff', 18),
-  'font_xs': ImageFont.truetype('fonts/FiraSansCondensed-400.woff', 14),
-  'font_weather_m': ImageFont.truetype('fonts/weathericons-regular-webfont.woff', 52)
-}
-
 def main_loop(epd, fonts, images, config, epd_so):
   logger = logging.getLogger(__name__)
   logger.info("main_loop() started")
@@ -40,6 +32,7 @@ def main():
     logger.info('Config: %s', config_parser.items('general'))
     config = config_parser['general']
 
+    fonts = utils.get_fonts(config)
     images = get_weather_images(config)
     epd = epd_utils.get_epd()
     if(not config.getboolean('USE_C_LIBRARY')):

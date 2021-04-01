@@ -30,3 +30,20 @@ def from_8bit_to_2bit(image):
       new_px = px0 | px1 | px2 | px3
       result.append(new_px)
   return bytes(result)
+
+
+def get_fonts(config):
+  if(config.get('EPD_MODEL') == '7.8'):
+    font_mult = 4
+  else:
+    raise Exception(f'Unsupported model: {config.get("EPD_MODEL")}')
+
+  return {
+    'font_lg': ImageFont.truetype('fonts/regular.woff', font_mult * 42),
+    'font_md': ImageFont.truetype('fonts/regular.woff', font_mult * 32),
+    'font_sm': ImageFont.truetype('fonts/regular.woff', font_mult * 18),
+    'font_sm_bold': ImageFont.truetype('fonts/bold.woff', font_mult * 18),
+    'font_xs': ImageFont.truetype('fonts/regular.woff', font_mult * 14),
+    'font_xxs': ImageFont.truetype('fonts/regular.woff', font_mult * 8),
+    'font_weather_m': ImageFont.truetype('fonts/weathericons-regular-webfont.woff', font_mult * 52)
+  }
