@@ -1,6 +1,7 @@
 from PIL import Image, ImageDraw, ImageOps
+from ruuvitag_sensor.ruuvi_rx import RuuviTagReactive
+import rx
 import logging
-from ruuvitag_sensor.ruuvi import RuuviTagSensor
 import utils
 
 def get_sensor_panel(images, fonts, config):
@@ -18,13 +19,27 @@ def get_sensor_panel(images, fonts, config):
   draw.text((title_size[0]//2, title_size[1]//2), 'IN', fill="white", font=fonts['font_sm'], anchor='mm')
 
   logger.info('Fetching sensor data')
+  sensor_mac = config.get('RUUVITAG_MAC_IN')
   try:
-    sensor_data = RuuviTagSensor.get_data_for_sensors([config.get('RUUVITAG_MAC_IN')], config.getint('SENSOR_POLL_TIMEOUT'))
+    if (not config.getboolean('FILE_OUTPUT')):
+      ruuvi_reactive = RuuviTagReactive([sensor_mac])
+      sensor_data = ruuvi_reactive\
+        .get_subject()\
+        .map(lambda x: {x[0]: x[1]})\
+        .merge(rx.Observable.timer(config.getint('SENSOR_POLL_TIMEOUT')).map(lambda x: {}))\
+        .to_blocking()\
+        .first()
+      ruuvi_reactive.stop() 
+    else:
+      sensor_data = {sensor_mac: {"temperature": 22.7, "humidity": 46.7}}
   except e:
     logger.error('get_data_for_sensors() failed %s', repr(e))
     sensor_data = {}
   logger.info('Received data: %s', repr(sensor_data))
 
+  if (sensor_mac in sensor_data):
+    data_y_base = 150
+    state_in = sensor_data[sensor_mac]
     utils.draw_quantity(draw, (x_size//2 + 150, data_y_base), str(round(state_in['temperature'], 1)), '°C', fonts, 'font_lg', 'font_sm')
     utils.draw_quantity(draw, (x_size//2 + 150, data_y_base + 90), str(round(state_in['humidity'])), '%', fonts, 'font_sm')
   else: 
