@@ -2,24 +2,22 @@
 # -*- coding:utf-8 -*-
 import configparser
 import datetime
-from PIL import ImageFont
 from apscheduler.schedulers.blocking import BlockingScheduler
 import log
 import logging
 import ctypes
 import utils
-import epd_utils
 from icons import get_weather_images
 import refresh
 
-def main_loop(epd, fonts, images, config, epd_so):
+def main_loop(panel_size, fonts, images, config, epd_so):
   logger = logging.getLogger(__name__)
   logger.info("main_loop() started")
   wakeup_time = datetime.datetime.now()
-  if((wakeup_time.minute - 5) % 10 == 0):
-    refresh.full(epd, fonts, images, config, epd_so)
-  else:
-    refresh.partial()
+  if((wakeup_time.minute - 5) % config.getint('REFRESH_FULL_INTERVAL') == 0):
+    refresh.refresh(panel_size, fonts, images, config, epd_so, True)
+  elif(wakeup_time.minute % config.getint('REFRESH_PARTIAL_INTERVAL') == 0):
+    refresh.refresh(panel_size, fonts, images, config, epd_so, False)
 
 def main():
   log.setup()
@@ -34,25 +32,20 @@ def main():
 
     fonts = utils.get_fonts(config)
     images = get_weather_images(config)
-    epd = epd_utils.get_epd()
-    if(not config.getboolean('USE_C_LIBRARY')):
-      epd_utils.epd_init(epd) 
 
-    logger.info('Import epd.so')
-    epd_so = ctypes.CDLL("lib/epd.so")
+    logger.info('Import epd control library')
+    (epd_so, panel_size) = utils.get_epd_data(config)
 
     logger.info("Initial refresh")
-    refresh.full(epd, fonts, images, config, epd_so) # Once in the beginning
+    refresh.refresh(panel_size, fonts, images, config, epd_so, True) # Once in the beginning
 
     logger.info('Starting scheduler')
     scheduler = BlockingScheduler()
-    scheduler.add_job(lambda: main_loop(epd, fonts, images, config, epd_so), 'cron', minute='5/1')
+    scheduler.add_job(lambda: main_loop(panel_size, fonts, images, config, epd_so), 'cron', minute='*/1')
     scheduler.start()
-    epd_utils.epd_exit(epd) 
 
   except KeyboardInterrupt:    
     logger.warning("KeyboardInterrupt error")
-    epd_utils.epd_exit(epd) 
 
   except Exception as e:
     logger.exception('Unexpected error')

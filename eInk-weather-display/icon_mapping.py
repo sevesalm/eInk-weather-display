@@ -77,10 +77,10 @@ forecast_mapping = {
 }
 
 misc_icons = [
-  ('wind_arrow', 30), 
-  ('sunrise', 60), 
-  ('sunset', 60), 
-  ('no_wifi', 70)
+  ('wind_icon', 200), 
+  ('sunrise', 200), 
+  ('sunset', 200), 
+  ('no_wifi', 200)
 ]
 
 # FMI symbol descriptions: https://www.ilmatieteenlaitos.fi/latauspalvelun-pikaohje

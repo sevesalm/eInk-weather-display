@@ -5,11 +5,13 @@ import logging
 def get_info_panel(fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating info panel')
-  x_size = 170
-  y_size = 18
+  x_size = 350
+  y_size = 180
   image = Image.new('L', (x_size, y_size), 0xff)
   draw = ImageDraw.Draw(image)
-  draw.text((165, 0), f'{config.get("FMI_LOCATION")} - {time.strftime("%H:%M:%S")}', font = fonts['font_xs'], fill = 0, anchor = 'ra')
+  
+  draw.text((x_size//2, 10), f'{time.strftime("%-H:%M")}', fill="black", font=fonts['font_md'], anchor='mt')
+  draw.text((x_size//2, y_size - 10), f'{time.strftime("%-d.%-m.%Y")}', fill="black", font=fonts['font_sm'], anchor='ms')
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):

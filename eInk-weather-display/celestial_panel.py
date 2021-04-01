@@ -8,15 +8,15 @@ def parse_sunrise_sunset_time(val):
 def get_celestial_panel(position, images, fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating celestial panel')
-  x_size = 180
-  y_size = 70 
+  x_size = 600
+  y_size = 270 
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
   
   # Icons
   (sunrise, sunset) = get_sunrise_sunset(position)
-  image.paste(images['misc']['sunrise'], (int(x_size/6 - images['misc']['sunrise'].width/2), 0))
-  image.paste(images['misc']['sunset'], (int(3*x_size/6  - images['misc']['sunset'].width/2), 0))
+  image.paste(images['misc']['sunrise'], (int(x_size/6 - images['misc']['sunrise'].width/2), 40))
+  image.paste(images['misc']['sunset'], (int(3*x_size/6  - images['misc']['sunset'].width/2), 40))
 
   # Times
   draw.text((x_size/6, y_size-5), parse_sunrise_sunset_time(sunrise), font = fonts['font_sm'], fill = 0, anchor = 'md')

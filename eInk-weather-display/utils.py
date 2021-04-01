@@ -1,9 +1,11 @@
 import sys
+import ctypes
+from PIL import ImageFont
 
-def draw_quantity(draw, mid_point, value, unit, fonts, font='font_sm'):
+def draw_quantity(draw, mid_point, value, unit, fonts, font='font_sm', font_unit='font_xs'):
   (x, y) = mid_point
-  draw.text((x - 3, y), value, font = fonts[font], fill = 0, anchor = 'rm')
-  draw.text((x + 3, y), unit, font = fonts[font], fill = 0, anchor = 'lm')
+  draw.text((x - 7, y), value, font = fonts[font], fill = 0, anchor = 'rs')
+  draw.text((x + 7, y), unit, font = fonts[font_unit], fill = 0, anchor = 'ls')
 
 def check_python_version():
   major = sys.version_info[0]
@@ -30,6 +32,15 @@ def from_8bit_to_2bit(image):
       new_px = px0 | px1 | px2 | px3
       result.append(new_px)
   return bytes(result)
+
+def get_epd_data(config):
+  if(config.get('EPD_MODEL') == '7.8'):
+    if (config.getboolean('FILE_OUTPUT')):
+      return (None, (1872, 1404))
+    else:
+      return (ctypes.CDLL("lib/epd78.so"), (1872, 1404))
+  else:
+    raise Exception(f'Unsupported model: {config.get("EPD_MODEL")}')
 
 
 def get_fonts(config):

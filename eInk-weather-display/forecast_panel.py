@@ -10,21 +10,32 @@ import utils
 def get_forecasts_panel(images, fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating forecast panel')
-  (forecasts, first_position) = get_forecasts(config.get('FMI_LOCATION'), 6, 6)
+  count = 7
+  x_size = 1872
+  y_size = 800
+  (forecasts, first_position) = get_forecasts(config.get('FMI_LOCATION'), count, 6)
   logger.info('Received data: %s', repr(forecasts))
-  x_size = 480
-  y_size = 180
+
   dates = sorted(forecasts.keys())
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
+
+  title_size = (260, 80)
+  draw.rectangle([(0, 0), (title_size[0], title_size[1])], fill=0x00)
+  draw.text((title_size[0]//2, title_size[1]//2), 'FORECAST', fill="white", font=fonts['font_sm'], anchor='mm')
+
+  data_y_base = 100
+
   for date, i in zip(dates, range(len(dates))):
     isDay = get_is_day(first_position, date)
     data = forecasts[date]
     weather_symbol = round(data['WeatherSymbol3'])
     utc_dt = parse(date).replace(tzinfo=pytz.utc)
     date_formatted = utc_dt.astimezone(tz=None).strftime('%-H:%M')
+    x_step = x_size//count
+    x_base = x_step//2
     # Time
-    draw.text((50 + i*75, 10), date_formatted, font = (fonts['font_sm'] if date_formatted != "15:00" else fonts['font_sm_bold']), fill = 0, anchor = 'mt')
+    draw.text((x_base + i*x_step, data_y_base + 10), date_formatted, font = (fonts['font_sm'] if date_formatted != "15:00" else fonts['font_sm_bold']), fill = 0, anchor = 'mt')
     # Icon
     randomize_weather_icons = config.getboolean('RANDOMIZE_WEATHER_ICONS')
     if(weather_symbol in images['forecast'] or randomize_weather_icons):
@@ -36,17 +47,18 @@ def get_forecasts_panel(images, fonts, config):
         weather_icon = image_set['night']
       else:
         weather_icon = image_set['day']
-      image.paste(weather_icon, (int(i*75 + 50 - weather_icon.width/2), 30))
+      image.paste(weather_icon, (int(x_base + i*x_step - weather_icon.width/2), data_y_base + 80))
     else:
-      draw.text((50 + i*75, 70), f'(NA: {weather_symbol})', font = fonts['font_sm'], fill = 0, anchor = 'mm')
+      draw.text((x_base + i*x_step, data_y_base + 200), f'(NA: {weather_symbol})', font = fonts['font_sm'], fill = 0, anchor = 'mm')
 
     # Numeric info
-    utils.draw_quantity(draw, (50 + i*75, 120), str(round(data["Temperature"])), '°C', fonts)
-    utils.draw_quantity(draw, (50 + i*75, 140), str(round(data["WindSpeedMS"])), 'm/s', fonts)
+    utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 350), str(round(data["Temperature"])), '°C', fonts)
   
-    wind_image = images['misc']['wind_arrow'] 
+    # Wind icon
+    wind_image = images['misc']['wind_icon'] 
     wind_image_rot = wind_image.rotate(-data['WindDirection'] + 180, fillcolor = 0xff, resample=Image.BICUBIC)
-    image.paste(wind_image_rot, (int(i*75 + 50 - wind_image.width/2), 150))
+    image.paste(wind_image_rot, (x_base + i*x_step - wind_image_rot.width//2, data_y_base + 360))
+    draw.text((x_base + i*x_step, data_y_base + 360 + wind_image_rot.height//2), str(round(data["WindSpeedMS"])), font=fonts['font_sm'], fill=0, anchor='mm')
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):
