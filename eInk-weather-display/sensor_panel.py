@@ -1,8 +1,17 @@
 from PIL import Image, ImageDraw, ImageOps
-from ruuvitag_sensor.ruuvi_rx import RuuviTagReactive
-import rx
 import logging
 import utils
+
+def get_battery_icon(voltage, images):
+  if (voltage >= 2900):
+    return images['misc']['battery_full']
+  if (voltage >= 2700):
+    return images['misc']['battery_75']
+  if (voltage >= 2500):
+    return images['misc']['battery_50']
+  if (voltage >= 2300):
+    return images['misc']['battery_25']
+  return images['misc']['battery_empty']
 
 def get_sensor_panel(images, fonts, config):
   logger = logging.getLogger(__name__)
@@ -20,6 +29,8 @@ def get_sensor_panel(images, fonts, config):
   sensor_mac = config.get('RUUVITAG_MAC_IN')
   try:
     if (not config.getboolean('FILE_OUTPUT')):
+      from ruuvitag_sensor.ruuvi_rx import RuuviTagReactive
+      import rx
       ruuvi_reactive = RuuviTagReactive([sensor_mac])
       sensor_data = ruuvi_reactive\
         .get_subject()\
@@ -28,19 +39,23 @@ def get_sensor_panel(images, fonts, config):
         .to_blocking()\
         .first()
       ruuvi_reactive.stop() 
+      logger.info('Received data: %s', repr(sensor_data))
     else:
-      sensor_data = {sensor_mac: {"temperature": 22.7, "humidity": 46.7}}
-  except e:
-    logger.error('get_data_for_sensors() failed %s', repr(e))
+      sensor_data = {sensor_mac: {"temperature": 22.7, "humidity": 46.7, "battery": 2350}}
+      logger.info('Using fake data: %s', repr(sensor_data))
+  except Exception as e:
+    logger.error('get_data_for_sensors() failed: %s', repr(e))
     sensor_data = {}
-  logger.info('Received data: %s', repr(sensor_data))
 
   if (sensor_mac in sensor_data):
     data_y_base = 150
     state_in = sensor_data[sensor_mac]
     utils.draw_quantity(draw, (x_size//2 + 150, data_y_base), str(round(state_in['temperature'], 1)), '°C', fonts, 'font_lg', 'font_sm')
     utils.draw_quantity(draw, (x_size//2 + 150, data_y_base + 90), str(round(state_in['humidity'])), '%', fonts, 'font_sm')
+    battery_icon = get_battery_icon(state_in['battery'], images)
+    image.paste(battery_icon, (10, 80), ImageOps.invert(battery_icon))
   else: 
+    logger.info(f'Could not find mac {sensor_mac} in sensor data')
     no_wifi_image = images['misc']['no_wifi']
     image.paste(no_wifi_image, (x_size//2 - no_wifi_image.width//2, y_size//2 - no_wifi_image.height//2), ImageOps.invert(no_wifi_image))
   

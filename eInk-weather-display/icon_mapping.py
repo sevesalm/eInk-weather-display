@@ -80,7 +80,12 @@ misc_icons = [
   ('wind_icon', 200), 
   ('sunrise', 200), 
   ('sunset', 200), 
-  ('no_wifi', 200)
+  ('no_wifi', 200),
+  ('battery_full', 150),
+  ('battery_75', 150),
+  ('battery_50', 150),
+  ('battery_25', 150),
+  ('battery_empty', 150)
 ]
 
 # FMI symbol descriptions: https://www.ilmatieteenlaitos.fi/latauspalvelun-pikaohje
