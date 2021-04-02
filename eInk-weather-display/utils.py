@@ -58,3 +58,7 @@ def get_fonts(config):
     'font_xxs': ImageFont.truetype('fonts/regular.woff', font_mult * 8),
     'font_weather_m': ImageFont.truetype('fonts/weathericons-regular-webfont.woff', font_mult * 52)
   }
+
+def draw_title(draw, title_size, title, fonts):
+  draw.rectangle([(0, 0), (title_size[0], title_size[1])], fill=0x00)
+  draw.text((title_size[0]//2, title_size[1]//2), title, fill="white", font=fonts['font_sm'], anchor='mm')
