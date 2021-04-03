@@ -10,6 +10,8 @@ import utils
 from icons import get_weather_images
 import refresh
 
+CONFIG_FILENAME = 'config.ini'
+
 def main_loop(panel_size, fonts, images, config, epd_so):
   logger = logging.getLogger(__name__)
   logger.info("main_loop() started")
@@ -25,30 +27,35 @@ def main():
   logger.info("App starting")
   try:
     utils.check_python_version()
-    config_parser = configparser.ConfigParser()
-    config_parser.read('config.ini')
-    logger.info('Config: %s', config_parser.items('general'))
-    config = config_parser['general']
+    logger.info(f'Reading config file "{CONFIG_FILENAME}"')
+    with open(CONFIG_FILENAME) as f:
+      config_parser = configparser.ConfigParser()
+      config_parser.read_file(f)
+      logger.info('Config: %s', config_parser.items('general'))
+      config = config_parser['general']
 
-    fonts = utils.get_fonts(config)
-    images = get_weather_images(config)
+      fonts = utils.get_fonts(config)
+      images = get_weather_images(config)
 
-    logger.info('Import epd control library')
-    (epd_so, panel_size) = utils.get_epd_data(config)
+      logger.info('Import epd control library')
+      (epd_so, panel_size) = utils.get_epd_data(config)
 
-    logger.info("Initial refresh")
-    refresh.refresh(panel_size, fonts, images, config, epd_so, True) # Once in the beginning
+      logger.info("Initial refresh")
+      refresh.refresh(panel_size, fonts, images, config, epd_so, True) # Once in the beginning
 
-    logger.info('Starting scheduler')
-    scheduler = BlockingScheduler()
-    scheduler.add_job(lambda: main_loop(panel_size, fonts, images, config, epd_so), 'cron', minute='*/1')
-    scheduler.start()
+      logger.info('Starting scheduler')
+      scheduler = BlockingScheduler()
+      scheduler.add_job(lambda: main_loop(panel_size, fonts, images, config, epd_so), 'cron', minute='*/1')
+      scheduler.start()
+
+  except FileNotFoundError as e:
+    logger.exception(f'Error opening file "{CONFIG_FILENAME}": %s', str(e))
 
   except KeyboardInterrupt:    
     logger.warning("KeyboardInterrupt error")
 
   except Exception as e:
-    logger.exception('Unexpected error')
+    logger.exception('Unexpected error: %s', str(e))
 
 if __name__ == "__main__":
   main()
