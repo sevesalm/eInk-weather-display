@@ -1,4 +1,5 @@
 import random
+import math
 from dateutil.parser import parse
 import pytz
 from PIL import Image, ImageDraw, ImageOps
@@ -12,7 +13,7 @@ def get_forecasts_panel(images, fonts, config):
   logger.info('Generating forecast panel')
   count = 7
   x_size = 1872
-  y_size = 800
+  y_size = 700
   (forecasts, first_position) = get_forecasts(config.get('FMI_LOCATION'), count, 6)
   logger.info('Received data: %s', repr(forecasts))
 
@@ -36,6 +37,7 @@ def get_forecasts_panel(images, fonts, config):
     draw.text((x_base + i*x_step, data_y_base + 10), date_formatted, font = (fonts['font_sm'] if date_formatted != "15:00" else fonts['font_sm_bold']), fill = 0, anchor = 'mt')
     # Icon
     randomize_weather_icons = config.getboolean('RANDOMIZE_WEATHER_ICONS')
+    icon_position = (x_base + i*x_step - config.getint('ICON_WIDTH')//2, data_y_base + 80)
     if(weather_symbol in images['forecast'] or randomize_weather_icons):
       if(not randomize_weather_icons):
         image_set = images['forecast'].get(weather_symbol) 
@@ -45,9 +47,13 @@ def get_forecasts_panel(images, fonts, config):
         weather_icon = image_set['night']
       else:
         weather_icon = image_set['day']
-      image.paste(weather_icon, (int(x_base + i*x_step - weather_icon.width/2), data_y_base + 80))
+      image.paste(weather_icon, icon_position)
     else:
-      draw.text((x_base + i*x_step, data_y_base + 200), f'(NA: {weather_symbol})', font = fonts['font_sm'], fill = 0, anchor = 'mm')
+      image.paste(images['misc']['background'], icon_position)
+      text = 'NaN' if math.isnan(weather_symbol) else str(weather_symbol)
+      draw.text((icon_position[0] + config.getint('ICON_WIDTH')//2, icon_position[1] + config.getint('ICON_WIDTH')//2), text, font = fonts['font_sm'], fill = 0, anchor = 'mm')
+
+      # draw.text((x_base + i*x_step, data_y_base + 200), f'(NA: {weather_symbol})', font = fonts['font_sm'], fill = 0, anchor = 'mm')
 
     # Numeric info
     utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 350), str(round(data["Temperature"])), '°C', fonts)

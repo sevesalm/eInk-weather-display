@@ -38,7 +38,7 @@ def get_observation_panel(location, images, fonts, config):
   latest_date = max(observations.keys())
   isDay = get_is_day(first_position, latest_date)
   x_size = 600
-  y_size = 500
+  y_size = 550
   latest = observations[latest_date]
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
@@ -63,12 +63,13 @@ def get_observation_panel(location, images, fonts, config):
   weather_symbol = latest['wawa']
   cloud_coverage = latest['n_man']
   randomize_weather_icons = config.getboolean('RANDOMIZE_WEATHER_ICONS')
-  if(not math.isnan(weather_symbol) and weather_symbol in images['observation'] or randomize_weather_icons):
+  if((not math.isnan(weather_symbol) and weather_symbol in images['observation']) or randomize_weather_icons):
     weather_icon = get_observation_icon(randomize_weather_icons, cloud_coverage, images, weather_symbol, isDay)
     image.paste(weather_icon, (15, 100))
-    
   else:
-    draw.text((15 + config.getint('ICON_WIDTH')//2, config.getint('ICON_WIDTH')//2), f'(NA: {weather_symbol})', font = fonts['font_sm'], fill = 0, anchor = 'mm')
+    image.paste(images['misc']['background'], (15, 100))
+    text = 'NaN' if math.isnan(weather_symbol) else str(weather_symbol)
+    draw.text((15 + config.getint('ICON_WIDTH')//2, 100 + config.getint('ICON_WIDTH')//2), text, font = fonts['font_sm'], fill = 0, anchor = 'mm')
 
   # Wind direction and speed
   if(not math.isnan(latest['wd_10min'])):
