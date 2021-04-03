@@ -85,7 +85,17 @@ misc_icons = [
   ('battery_75', 150),
   ('battery_50', 150),
   ('battery_25', 150),
-  ('battery_empty', 150)
+  ('battery_empty', 150),
+  ('cloud_cover_0', 80),
+  ('cloud_cover_1', 80),
+  ('cloud_cover_2', 80),
+  ('cloud_cover_3', 80),
+  ('cloud_cover_4', 80),
+  ('cloud_cover_5', 80),
+  ('cloud_cover_6', 80),
+  ('cloud_cover_7', 80),
+  ('cloud_cover_8', 80),
+  ('cloud_cover_9', 80),
 ]
 
 # FMI symbol descriptions: https://www.ilmatieteenlaitos.fi/latauspalvelun-pikaohje
