@@ -1,4 +1,3 @@
-import logging
 import ephem
 import math
 
@@ -14,7 +13,6 @@ def get_is_day(position, utc_datetime):
   return (sunset < sunrise)
 
 def get_sunrise_sunset(position):
-  # location = ephem.city('Helsinki')
   location = ephem.Observer()
   location.lat = str(position[0])
   location.lon = str(position[1])
@@ -34,8 +32,6 @@ def get_moon_phase():
   return (phase, moon.phase)
 
 def map_moon_phase_to_icon(moon_phase_deg):
-  logger = logging.getLogger(__name__)
-  logger.info('Moon phase: %s deg', moon_phase_deg)
   base = 0xf0d0 # 61648
   icon_count = 28
   val = base + math.floor(icon_count/360 * ((moon_phase_deg - 360/2/icon_count) % 360))
