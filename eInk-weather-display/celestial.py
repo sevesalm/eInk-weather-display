@@ -1,5 +1,6 @@
 import ephem
 import math
+import logging
 
 def get_is_day(position, utc_datetime):
   location = ephem.Observer()
@@ -31,8 +32,10 @@ def get_moon_phase():
   phase = int(round(moon.elong.norm*180/ephem.pi))
   return (phase, moon.phase)
 
-def map_moon_phase_to_icon(moon_phase_deg):
-  base = 0xf0d0 # 61648
-  icon_count = 28
-  val = base + math.floor(icon_count/360 * ((moon_phase_deg - 360/2/icon_count) % 360))
-  return(chr(val))
+def get_moon_phase_icon(moon_phase_deg, images):
+  logger = logging.getLogger(__name__)
+  logger.debug("Moon phase: %d", moon_phase_deg)
+  index = (round(moon_phase_deg/15) * 15) % 360
+  icon_name = f'moon_{index}'
+  logger.debug("Moon phase icon name: %s", icon_name)
+  return images['moon'][icon_name]
