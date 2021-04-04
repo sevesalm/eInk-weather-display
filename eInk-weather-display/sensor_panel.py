@@ -20,7 +20,7 @@ def get_sensor_panel(images, fonts, config):
   logger.info('Generating sensor panel')
 
   x_size = 600
-  y_size = 300
+  y_size = 350
 
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
@@ -42,7 +42,7 @@ def get_sensor_panel(images, fonts, config):
       ruuvi_reactive.stop() 
       logger.info('Received data: %s', repr(sensor_data))
     else:
-      sensor_data = {sensor_mac: {"temperature": 22.7, "humidity": 46.7, "battery": 2350}}
+      sensor_data = {sensor_mac: {"temperature": 22.7, "humidity": 46.7, "battery": 2350, "rssi": -69}}
       logger.info('Using fake data: %s', repr(sensor_data))
   except Exception as e:
     logger.error('get_data_for_sensors() failed: %s', repr(e))
@@ -53,9 +53,18 @@ def get_sensor_panel(images, fonts, config):
     state_in = sensor_data[sensor_mac]
     utils.draw_quantity(draw, (x_size//2 + 150, data_y_base), str(round(state_in['temperature'], 1)), '°C', fonts, 'font_lg', 'font_sm')
     utils.draw_quantity(draw, (x_size//2 + 150, data_y_base + 90), str(round(state_in['humidity'])), '%', fonts)
+
+    # Battery level
     battery_icon = get_battery_icon(state_in['battery'], images)
     image.paste(battery_icon, (10, 80), ImageOps.invert(battery_icon))
     utils.draw_quantity(draw, (130, 245), str(round(state_in['battery']/1000, 2)), 'V', fonts, 'font_xs', 'font_xxs')
+
+    # RSSI - not yet part of ruuvitag-sensor
+    # Adding is trivial by editing ruuvitag-sensor package's decoder.py
+    # See: https://github.com/ttu/ruuvitag-sensor/issues/52
+    if ('rssi' in state_in):
+      utils.draw_quantity(draw, (130, 300), str(state_in['rssi']), 'dBm', fonts, 'font_xs', 'font_xxs')
+
   else: 
     logger.info(f'Could not find mac {sensor_mac} in sensor data')
     no_wifi_image = images['misc']['no_wifi']
