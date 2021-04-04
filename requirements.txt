@@ -4,7 +4,6 @@ chardet==4.0.0
 ephem==3.7.7.1
 idna==2.10
 Pillow==8.1.2
-pkg-resources==0.0.0
 ptyprocess==0.7.0
 pyephem==9.99
 python-dateutil==2.8.1
