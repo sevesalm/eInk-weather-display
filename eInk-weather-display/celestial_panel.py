@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw
-from celestial import get_moon_phase, get_sunrise_sunset, map_moon_phase_to_icon, get_moon_phase_icon
+from celestial import get_moon_phase, get_sunrise_sunset, get_moon_phase_icon
 import logging
 import utils
 
