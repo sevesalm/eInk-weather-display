@@ -1,4 +1,6 @@
 from PIL import Image, ImageDraw, ImageOps
+from ruuvitag_sensor.ruuvi_rx import RuuviTagReactive
+import rx
 import logging
 import utils
 
@@ -27,11 +29,9 @@ def get_sensor_panel(images, fonts, config):
 
   sensor_mac = config.get('RUUVITAG_MAC_IN')
   try:
-    if (not config.getboolean('FILE_OUTPUT')):
+    if (not config.getboolean('USE_FAKE_SENSOR_DATA')):
       timeout = config.getint('SENSOR_POLL_TIMEOUT')
       logger.info(f'Fetching sensor data (timeout: {timeout})')
-      from ruuvitag_sensor.ruuvi_rx import RuuviTagReactive
-      import rx
       ruuvi_reactive = RuuviTagReactive([sensor_mac])
       sensor_data = ruuvi_reactive\
         .get_subject()\
