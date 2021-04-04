@@ -56,8 +56,8 @@ def get_sensor_panel(images, fonts, config):
 
     # Battery level
     battery_icon = get_battery_icon(state_in['battery'], images)
-    image.paste(battery_icon, (10, 80), ImageOps.invert(battery_icon))
-    utils.draw_quantity(draw, (130, 245), str(round(state_in['battery']/1000, 2)), 'V', fonts, 'font_xs', 'font_xxs')
+    image.paste(battery_icon, (30, 80), ImageOps.invert(battery_icon))
+    utils.draw_quantity(draw, (130, 235), str(round(state_in['battery']/1000, 2)), 'V', fonts, 'font_xs', 'font_xxs')
 
     # RSSI - not yet part of ruuvitag-sensor
     # Adding is trivial by editing ruuvitag-sensor package's decoder.py
