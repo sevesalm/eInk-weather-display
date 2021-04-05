@@ -1,3 +1,4 @@
+import random
 from PIL import Image, ImageDraw, ImageOps
 from ruuvitag_sensor.ruuvi_rx import RuuviTagReactive
 import rx
@@ -42,7 +43,7 @@ def get_sensor_panel(images, fonts, config):
       ruuvi_reactive.stop() 
       logger.info('Received data: %s', repr(sensor_data))
     else:
-      sensor_data = {sensor_mac: {"temperature": 22.7, "humidity": 46.7, "battery": 2350, "rssi": -69}}
+      sensor_data = {sensor_mac: {"temperature": random.uniform(18, 30), "humidity": random.uniform(20, 80), "battery": random.uniform(2000, 3000), "rssi": random.uniform(-120, -10)}}
       logger.info('Using fake data: %s', repr(sensor_data))
   except Exception as e:
     logger.error('get_data_for_sensors() failed: %s', repr(e))
@@ -63,7 +64,7 @@ def get_sensor_panel(images, fonts, config):
     # Adding is trivial by editing ruuvitag-sensor package's decoder.py
     # See: https://github.com/ttu/ruuvitag-sensor/issues/52
     if ('rssi' in state_in):
-      utils.draw_quantity(draw, (130, 300), str(state_in['rssi']), 'dBm', fonts, 'font_xs', 'font_xxs')
+      utils.draw_quantity(draw, (130, 300), str(round(state_in['rssi'])), 'dBm', fonts, 'font_xs', 'font_xxs')
 
   else: 
     logger.info(f'Could not find mac {sensor_mac} in sensor data')
