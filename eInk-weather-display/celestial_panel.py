@@ -14,7 +14,7 @@ def get_celestial_panel(position, images, fonts, config):
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
 
-  # utils.draw_title(draw, (120, 80), 'SPACE', fonts)
+  utils.draw_title(draw, 'SPACE', fonts['font_sm'])
   
   # Icons
   (sunrise, sunset) = get_sunrise_sunset(position)

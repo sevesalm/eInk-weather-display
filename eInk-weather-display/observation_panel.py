@@ -43,7 +43,7 @@ def get_observation_panel(location, images, fonts, config):
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
 
-  utils.draw_title(draw, (120, 80), 'OUT', fonts)
+  utils.draw_title(draw, 'OUT', fonts['font_sm'])
 
   delimiter_x = 450
   data_y_base = 150

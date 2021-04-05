@@ -21,7 +21,7 @@ def get_forecasts_panel(images, fonts, config):
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
 
-  utils.draw_title(draw, (260, 80), 'FORECAST', fonts)
+  utils.draw_title(draw, 'FORECAST', fonts['font_sm'])
 
   data_y_base = 100
 

@@ -58,6 +58,8 @@ def get_fonts(config):
     'font_xxs': ImageFont.truetype('fonts/regular.woff', font_mult * 8)
   }
 
-def draw_title(draw, title_size, title, fonts):
-  draw.rectangle([(0, 0), (title_size[0], title_size[1])], fill=0x00)
-  draw.text((title_size[0]//2, title_size[1]//2), title, fill="white", font=fonts['font_sm'], anchor='mm')
+def draw_title(draw, title, font):
+  size_width, size_height = draw.textsize(title, font)
+
+  draw.rectangle([(0, 0), (size_width + 20, size_height + 20)], fill=0x00)
+  draw.text(((size_width + 20)//2, (size_height + 20)//2), title, fill="white", font=font, anchor='mm')
