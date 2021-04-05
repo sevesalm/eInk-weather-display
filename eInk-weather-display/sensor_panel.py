@@ -19,7 +19,7 @@ def get_sensor_panel(images, fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating sensor panel')
 
-  x_size = 600
+  x_size = 550
   y_size = 350
 
   image = Image.new('L', (x_size, y_size), 0xff) 
@@ -51,8 +51,8 @@ def get_sensor_panel(images, fonts, config):
   if (sensor_mac in sensor_data):
     data_y_base = 150
     state_in = sensor_data[sensor_mac]
-    utils.draw_quantity(draw, (x_size//2 + 150, data_y_base), str(round(state_in['temperature'], 1)), '°C', fonts, 'font_lg', 'font_sm')
-    utils.draw_quantity(draw, (x_size//2 + 150, data_y_base + 90), str(round(state_in['humidity'])), '%', fonts)
+    utils.draw_quantity(draw, (x_size//2 + 160, data_y_base), str(round(state_in['temperature'], 1)), '°C', fonts, 'font_lg', 'font_sm')
+    utils.draw_quantity(draw, (x_size//2 + 160, data_y_base + 90), str(round(state_in['humidity'])), '%', fonts)
 
     # Battery level
     battery_icon = get_battery_icon(state_in['battery'], images)
