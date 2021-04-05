@@ -77,12 +77,13 @@ def get_observation_panel(location, images, fonts, config):
     wind_image_rot = wind_image.rotate(-latest['wd_10min'] + 180, fillcolor = 0xff, resample=Image.BICUBIC)
     ascent = fonts['font_sm'].getmetrics()[0]
     image.paste(wind_image_rot, (delimiter_x + 30  - wind_image_rot.width//2, data_y_base + 180))
-    draw.text((delimiter_x + 30 , data_y_base + 180 + wind_image_rot.height//2), str(round(latest["ws_10min"])), font=fonts['font_sm'], fill=0, anchor='mm')
+    draw.text((delimiter_x + 30 , data_y_base + 180 + wind_image_rot.height//2 - 3), str(round(latest["ws_10min"])), font=fonts['font_sm'], fill=0, anchor='mm')
 
   # Cloud cover
   if (not math.isnan(cloud_coverage)):
     cloud_cover_icon = images['misc'][f'cloud_cover_{str(round(cloud_coverage))}']  
-    image.paste(cloud_cover_icon, (delimiter_x - 80 - cloud_cover_icon.width, data_y_base + 180 + 100 - cloud_cover_icon.height//2))
+    y_offset = images['misc']['wind_icon'].height//2
+    image.paste(cloud_cover_icon, (delimiter_x - 80 - cloud_cover_icon.width, data_y_base + 180 + y_offset - cloud_cover_icon.height//2))
   else:
     # NaN
     cloud_cover_icon = images['misc'][f'cloud_cover_0']  

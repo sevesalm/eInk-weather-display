@@ -77,7 +77,7 @@ forecast_mapping = {
 }
 
 misc_icons = [
-  ('wind_icon', 200), 
+  ('wind_icon', 160), 
   ('sunrise', 200), 
   ('sunset', 200), 
   ('no_wifi', 200),

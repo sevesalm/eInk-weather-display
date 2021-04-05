@@ -33,9 +33,11 @@ def get_forecasts_panel(images, fonts, config):
     date_formatted = utc_dt.astimezone(tz=None).strftime('%-H:%M')
     x_step = x_size//count
     x_base = x_step//2
+
     # Time
     draw.text((x_base + i*x_step, data_y_base + 10), date_formatted, font = (fonts['font_sm'] if date_formatted != "15:00" else fonts['font_sm_bold']), fill = 0, anchor = 'mt')
-    # Icon
+
+    # Weather icon
     randomize_weather_icons = config.getboolean('RANDOMIZE_WEATHER_ICONS')
     icon_position = (x_base + i*x_step - config.getint('ICON_WIDTH')//2, data_y_base + 80)
     if(weather_symbol in images['forecast'] or randomize_weather_icons):
@@ -53,8 +55,6 @@ def get_forecasts_panel(images, fonts, config):
       text = 'NaN' if math.isnan(weather_symbol) else str(weather_symbol)
       draw.text((icon_position[0] + config.getint('ICON_WIDTH')//2, icon_position[1] + config.getint('ICON_WIDTH')//2), text, font = fonts['font_sm'], fill = 0, anchor = 'mm')
 
-      # draw.text((x_base + i*x_step, data_y_base + 200), f'(NA: {weather_symbol})', font = fonts['font_sm'], fill = 0, anchor = 'mm')
-
     # Numeric info
     utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 350), str(round(data["Temperature"])), '°C', fonts)
   
@@ -62,7 +62,7 @@ def get_forecasts_panel(images, fonts, config):
     wind_image = images['misc']['wind_icon'] 
     wind_image_rot = wind_image.rotate(-data['WindDirection'] + 180, fillcolor = 0xff, resample=Image.BICUBIC)
     image.paste(wind_image_rot, (x_base + i*x_step - wind_image_rot.width//2, data_y_base + 360))
-    draw.text((x_base + i*x_step, data_y_base + 360 + wind_image_rot.height//2), str(round(data["WindSpeedMS"])), font=fonts['font_sm'], fill=0, anchor='mm')
+    draw.text((x_base + i*x_step, data_y_base + 360 + wind_image_rot.height//2 - 3), str(round(data["WindSpeedMS"])), font=fonts['font_sm'], fill=0, anchor='mm')
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):
