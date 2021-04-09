@@ -55,7 +55,8 @@ def get_fonts(config):
     'font_sm': ImageFont.truetype('fonts/regular.woff', font_mult * 18),
     'font_sm_bold': ImageFont.truetype('fonts/bold.woff', font_mult * 18),
     'font_xs': ImageFont.truetype('fonts/regular.woff', font_mult * 14),
-    'font_xxs': ImageFont.truetype('fonts/regular.woff', font_mult * 8)
+    'font_xxs': ImageFont.truetype('fonts/regular.woff', font_mult * 8),
+    'font_misc_md': ImageFont.truetype('fonts/misc.woff', font_mult * 32)
   }
 
 def draw_title(draw, title, font):

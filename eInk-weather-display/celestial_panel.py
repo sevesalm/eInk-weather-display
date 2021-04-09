@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw
-from celestial import get_moon_phase, get_sunrise_sunset, get_moon_phase_icon
+from celestial import get_moon_phase, get_sunrise_sunset, get_moon_phase_chr
 import logging
 import utils
 
@@ -14,7 +14,7 @@ def get_celestial_panel(position, images, fonts, config):
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
 
-  utils.draw_title(draw, 'SPACE', fonts['font_sm'])
+  utils.draw_title(draw, 'SKY', fonts['font_sm'])
   
   # Icons
   (sunrise, sunset) = get_sunrise_sunset(position)
@@ -28,9 +28,11 @@ def get_celestial_panel(position, images, fonts, config):
   draw.text((3*x_size//4, data_y_base), parse_sunrise_sunset_time(sunset), font = fonts['font_sm'], fill = 0, anchor = 'ms')
 
   (moon_phase, percent) = get_moon_phase()
-  moon_icon = get_moon_phase_icon(moon_phase, images)
-  utils.draw_quantity(draw, (3*x_size//4, 20 + moon_icon.height + 70), str(round(percent)), '%', fonts)
-  image.paste(moon_icon, (3*x_size//4 - moon_icon.width//2, 20))
+  moon_font_chr = get_moon_phase_chr(moon_phase)
+  font_moon = fonts['font_misc_md']
+  draw.text((3*x_size//4, 20), moon_font_chr, font=font_moon, fill=0, anchor="ma")
+  ascent, descent = font_moon.getmetrics()
+  utils.draw_quantity(draw, (3*x_size//4, 20 + ascent + descent + 70), str(round(percent)), '%', fonts)
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):

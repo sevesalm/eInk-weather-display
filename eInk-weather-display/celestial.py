@@ -32,10 +32,9 @@ def get_moon_phase():
   phase = int(round(moon.elong.norm*180/ephem.pi))
   return (phase, moon.phase)
 
-def get_moon_phase_icon(moon_phase_deg, images):
+def get_moon_phase_chr(moon_phase_deg):
   logger = logging.getLogger(__name__)
-  logger.debug("Moon phase: %d", moon_phase_deg)
-  index = (round(moon_phase_deg/15) * 15) % 360
-  icon_name = f'moon_{index}'
-  logger.debug("Moon phase icon name: %s", icon_name)
-  return images['moon'][icon_name]
+  base = 0xe900
+  index = round(moon_phase_deg/10) % 36 # 0 - 35
+  logger.debug("Moon phase: %d, index: %d", moon_phase_deg, index)
+  return chr(base + index)

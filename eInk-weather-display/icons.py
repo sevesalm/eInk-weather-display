@@ -23,17 +23,10 @@ def get_weather_images(config):
     misc_images[icon_name] = read_weather_icon(icon_name, icon_size, False)
     misc_images['background'] = read_weather_icon('background', config.getint('ICON_WIDTH'), False)
   
-  moon_icons = {}
-  for i in range(24):
-    degrees = (i * 15)
-    icon_name = f'moon_{degrees}'
-    moon_icons[icon_name] = read_weather_icon(icon_name, config.getint('MOON_ICON_SIZE'), False)
-
   return({ 
     "observation": observation_images, 
     "forecast": forecast_images, 
-    "misc": misc_images,
-    "moon": moon_icons
+    "misc": misc_images
   })
 
 def read_weather_icon(icon_name, width, apply_background):
