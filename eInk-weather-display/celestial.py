@@ -33,8 +33,20 @@ def get_moon_phase():
   return (phase, moon.phase)
 
 def get_moon_phase_chr(moon_phase_deg):
+  """Returns the unicode character base on the moon phase in degrees.
+
+  Note: The font has 40 moon icons spaced evenly based on the cosine of the moonphase. 
+  The mapping has to done likewise using cosine. Cosine mapping done to get even visual 
+  difference between icons.
+  0:   New moon
+  180: Full moon
+  """
   logger = logging.getLogger(__name__)
   base = 0xe900
-  index = round(moon_phase_deg/10) % 36 # 0 - 35
+  delta = round(10 * math.cos(math.radians(moon_phase_deg)))
+  if (moon_phase_deg < 180):
+    index = 10 - delta
+  else:
+    index = (30 + delta) % 40
   logger.debug("Moon phase: %d, index: %d", moon_phase_deg, index)
   return chr(base + index)
