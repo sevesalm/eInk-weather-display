@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-  viewBox="0 0 100 100" width="80" height="80" style="background-color: white" stroke="black" fill="white"
-  stroke-width="01">
-  <path d="M 42 21 L 50 5 L 58 21 z" stroke-width="1" fill="black" />
-  <circle cx="50" cy="50" r="30" stroke="#777" />
+  viewBox="0 0 100 100" width="80" height="80" style="background-color: white">
+  <!-- <path d="M 42 21 L 50 5 L 58 21 z" stroke-width="1" fill="black" /> -->
+  <!-- <circle cx="50" cy="50" r="30" fill="#aaa" /> -->
+  <!-- Radius of 35 -->
+  <path d="M 42 17.98 L 50 1 L 58 17.98 A 30 30 0 0 0 42 17.98" stroke-width="0" fill="black" />
+  <!-- <path d="M 50 15 v 5" stroke-width="2" fill="black" stroke="black" /> -->
+
 </svg>

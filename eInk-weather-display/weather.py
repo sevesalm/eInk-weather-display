@@ -4,10 +4,10 @@ import pytz
 from datetime import datetime, timedelta
 import requests
 
-OBS_PARAMETERS=['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'n_man', 'wawa']
+OBS_PARAMETERS=['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wg_10min','n_man', 'wawa']
 OBS_ID='fmi::observations::weather::timevaluepair'
 OBS_TIMESTEP = 60
-FORECAST_PARAMETERS=['Temperature', 'WindSpeedMS', 'WindDirection', 'WeatherSymbol3']
+FORECAST_PARAMETERS=['Temperature', 'WindSpeedMS', 'WindDirection', 'TotalCloudCover', 'WeatherSymbol3']
 FORECAST_ID='fmi::forecast::harmonie::surface::point::timevaluepair'
 FORECAST_TIMESTEP=360
 MEASUREMENTS=3

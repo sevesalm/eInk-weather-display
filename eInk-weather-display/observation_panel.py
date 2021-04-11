@@ -54,10 +54,10 @@ def get_observation_panel(location, images, fonts, config):
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 90), str(round(latest["rh"])), '%', fonts)
 
   # Barometric pressure
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 170), str(round(latest["p_sea"])), 'hPa', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 160), str(round(latest["p_sea"])), 'hPa', fonts)
   
   # Wind speed
-  # utils.draw_quantity(draw, (delimiter_x, data_y_base + 250), str(round(latest["ws_10min"])), 'm/s', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 230), f'{round(latest["ws_10min"])} – {round(latest["wg_10min"])}', 'm/s', fonts)
 
   # Weather icon
   weather_symbol = latest['wawa']
@@ -71,24 +71,24 @@ def get_observation_panel(location, images, fonts, config):
     text = 'NaN' if math.isnan(weather_symbol) else str(weather_symbol)
     draw.text((15 + config.getint('ICON_WIDTH')//2, 100 + config.getint('ICON_WIDTH')//2), text, font = fonts['font_sm'], fill = 0, anchor = 'mm')
 
-  # Wind direction and speed
-  if(not math.isnan(latest['wd_10min'])):
-    wind_image = images['misc']['wind_icon']
-    wind_image_rot = wind_image.rotate(-latest['wd_10min'] + 180, fillcolor = 0xff, resample=Image.BICUBIC)
-    ascent = fonts['font_sm'].getmetrics()[0]
-    image.paste(wind_image_rot, (delimiter_x + 30  - wind_image_rot.width//2, data_y_base + 180))
-    draw.text((delimiter_x + 30 , data_y_base + 180 + wind_image_rot.height//2 - 3), str(round(latest["ws_10min"])), font=fonts['font_sm'], fill=0, anchor='mm')
+  row_y_base = 200
 
   # Cloud cover
   if (not math.isnan(cloud_coverage)):
     cloud_cover_icon = images['misc'][f'cloud_cover_{str(round(cloud_coverage))}']  
-    y_offset = images['misc']['wind_icon'].height//2
-    image.paste(cloud_cover_icon, (delimiter_x - 80 - cloud_cover_icon.width, data_y_base + 180 + y_offset - cloud_cover_icon.height//2))
+    image.paste(cloud_cover_icon, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + row_y_base))
   else:
     # NaN
     cloud_cover_icon = images['misc'][f'cloud_cover_0']  
-    image.paste(cloud_cover_icon, (delimiter_x - 80 - cloud_cover_icon.width, data_y_base + 180 + 100 - cloud_cover_icon.height//2))
-    draw.text((delimiter_x - 80 - cloud_cover_icon.width//2, data_y_base + 180 + 100), 'NaN', font=fonts['font_xxs'], fill=0, anchor='mm')
+    image.paste(cloud_cover_icon, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + row_y_base + 100 - cloud_cover_icon.height//2))
+    draw.text((15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2//2, data_y_base + row_y_base + 100), 'NaN', font=fonts['font_xxs'], fill=0, anchor='mm')
+
+  # Wind direction
+  w_dir = latest['wd_10min']
+  if(not math.isnan(w_dir)):
+    wind_image = images['misc']['wind_icon']
+    wind_image_rot = wind_image.rotate(-w_dir + 180, fillcolor = 0xff, resample=Image.BICUBIC)
+    image.paste(wind_image_rot, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + row_y_base), ImageOps.invert(wind_image_rot))
 
 
   # Borders

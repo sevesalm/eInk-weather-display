@@ -55,14 +55,19 @@ def get_forecasts_panel(images, fonts, config):
       text = 'NaN' if math.isnan(weather_symbol) else str(weather_symbol)
       draw.text((icon_position[0] + config.getint('ICON_WIDTH')//2, icon_position[1] + config.getint('ICON_WIDTH')//2), text, font = fonts['font_sm'], fill = 0, anchor = 'mm')
 
-    # Numeric info
+    # Temperature
     utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 350), str(round(data["Temperature"])), '°C', fonts)
+    # Wind speed
+    utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 420), str(round(data["WindSpeedMS"])), 'm/s', fonts)
   
-    # Wind icon
+    # Cloud cover
+    cloud_cover_icon = images['misc'][f'cloud_cover_{str(round(data["TotalCloudCover"] / 100 * 8))}']  
+    image.paste(cloud_cover_icon, (x_base + i*x_step - cloud_cover_icon.width//2, data_y_base + 440), )
+
+    # Wind direction
     wind_image = images['misc']['wind_icon'] 
     wind_image_rot = wind_image.rotate(-data['WindDirection'] + 180, fillcolor = 0xff, resample=Image.BICUBIC)
-    image.paste(wind_image_rot, (x_base + i*x_step - wind_image_rot.width//2, data_y_base + 360))
-    draw.text((x_base + i*x_step, data_y_base + 360 + wind_image_rot.height//2 - 3), str(round(data["WindSpeedMS"])), font=fonts['font_sm'], fill=0, anchor='mm')
+    image.paste(wind_image_rot, (x_base + i*x_step - wind_image_rot.width//2, data_y_base + 440), ImageOps.invert(wind_image_rot))
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):
