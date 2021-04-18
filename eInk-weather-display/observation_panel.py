@@ -46,18 +46,19 @@ def get_observation_panel(location, images, fonts, config):
   utils.draw_title(draw, fonts['font_sm'], 'OUT', first_position_name, fonts['font_xxs'])
 
   delimiter_x = 450
-  data_y_base = 150
+  data_y_base = 100
+
   # Temperature
-  utils.draw_quantity(draw, (delimiter_x, data_y_base), str(latest["t2m"]), '°C', fonts, 'font_lg', 'font_sm')
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 120), str(latest["t2m"]), '°C', fonts, 'font_lg', 'font_sm')
 
   # Relative humidity
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 90), str(round(latest["rh"])), '%', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 210), str(round(latest["rh"])), '%', fonts)
 
   # Barometric pressure
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 160), str(round(latest["p_sea"])), 'hPa', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 280), str(round(latest["p_sea"])), 'hPa', fonts)
   
   # Wind speed
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 230), f'{round(latest["ws_10min"])} – {round(latest["wg_10min"])}', 'm/s', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 350), f'{round(latest["ws_10min"])} – {round(latest["wg_10min"])}', 'm/s', fonts)
 
   # Weather icon
   weather_symbol = latest['wawa']
@@ -65,30 +66,30 @@ def get_observation_panel(location, images, fonts, config):
   randomize_weather_icons = config.getboolean('RANDOMIZE_WEATHER_ICONS')
   if((not math.isnan(weather_symbol) and weather_symbol in images['observation']) or randomize_weather_icons):
     weather_icon = get_observation_icon(randomize_weather_icons, cloud_coverage, images, weather_symbol, isDay)
-    image.paste(weather_icon, (15, 100))
+    image.paste(weather_icon, (15, data_y_base))
   else:
-    image.paste(images['misc']['background'], (15, 100))
+    image.paste(images['misc']['background'], (15, data_y_base))
     text = 'NaN' if math.isnan(weather_symbol) else str(weather_symbol)
-    draw.text((15 + config.getint('ICON_WIDTH')//2, 100 + config.getint('ICON_WIDTH')//2), text, font = fonts['font_sm'], fill = 0, anchor = 'mm')
+    draw.text((15 + config.getint('ICON_WIDTH')//2, data_y_base + config.getint('ICON_WIDTH')//2), text, font = fonts['font_sm'], fill = 0, anchor = 'mm')
 
-  row_y_base = 200
+  row_y_base = 100
 
   # Cloud cover
   if (not math.isnan(cloud_coverage)):
     cloud_cover_icon = images['misc'][f'cloud_cover_{str(round(cloud_coverage))}']  
-    image.paste(cloud_cover_icon, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + row_y_base))
+    image.paste(cloud_cover_icon, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + 120 + row_y_base))
   else:
     # NaN
     cloud_cover_icon = images['misc'][f'cloud_cover_0']  
-    image.paste(cloud_cover_icon, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + row_y_base + 100 - cloud_cover_icon.height//2))
-    draw.text((15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2//2, data_y_base + row_y_base + 100), 'NaN', font=fonts['font_xxs'], fill=0, anchor='mm')
+    image.paste(cloud_cover_icon, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + 120 + row_y_base))
+    draw.text((15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2//2, data_y_base + 120 + row_y_base + 100), 'NaN', font=fonts['font_xxs'], fill=0, anchor='mm')
 
   # Wind direction
   w_dir = latest['wd_10min']
   if(not math.isnan(w_dir)):
     wind_image = images['misc']['wind_icon']
     wind_image_rot = wind_image.rotate(-w_dir + 180, fillcolor = 0xff, resample=Image.BICUBIC)
-    image.paste(wind_image_rot, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + row_y_base), ImageOps.invert(wind_image_rot))
+    image.paste(wind_image_rot, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + 120 + row_y_base), ImageOps.invert(wind_image_rot))
 
 
   # Borders

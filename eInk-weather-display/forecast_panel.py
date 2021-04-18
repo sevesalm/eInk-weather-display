@@ -13,6 +13,7 @@ def get_forecasts_panel(images, fonts, config):
   logger.info('Generating forecast panel')
   count = 7
   x_size = 1872
+  y_size = 800
   (forecasts, first_position, first_position_name) = get_forecasts(config.get('FMI_LOCATION'), count, 6)
   logger.info('Received data: %s', repr(forecasts))
 

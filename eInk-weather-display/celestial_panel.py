@@ -10,7 +10,7 @@ def get_celestial_panel(position, images, fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating celestial panel')
   x_size = 400
-  y_size = 450 
+  y_size = 500 
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
 
@@ -30,9 +30,9 @@ def get_celestial_panel(position, images, fonts, config):
   (moon_phase, percent) = get_moon_phase()
   moon_font_chr = get_moon_phase_chr(moon_phase)
   font_moon = fonts['font_misc_md']
-  draw.text((3*x_size//4, 20), moon_font_chr, font=font_moon, fill=0, anchor="ma")
+  draw.text((3*x_size//4, 90), moon_font_chr, font=font_moon, fill=0, anchor="ma")
   ascent, descent = font_moon.getmetrics()
-  utils.draw_quantity(draw, (3*x_size//4, 20 + ascent + descent + 70), str(round(percent)), '%', fonts)
+  utils.draw_quantity(draw, (3*x_size//4, 90 + ascent + descent + 70), str(round(percent)), '%', fonts)
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):
