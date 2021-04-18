@@ -59,8 +59,16 @@ def get_fonts(config):
     'font_misc_md': ImageFont.truetype('fonts/misc.woff', font_mult * 32)
   }
 
-def draw_title(draw, title, font):
-  size_width, size_height = draw.textsize(title, font)
+def draw_title(draw, title_font, title, sub_title=None, sub_title_font=None):
+  size_width, size_height = draw.textsize(title, title_font)
+  x_padding = 20
+  y_padding = 4
 
-  draw.rectangle([(0, 0), (size_width + 20, size_height + 20)], fill=0x00)
-  draw.text(((size_width + 20)//2, (size_height + 20)//2), title, fill="white", font=font, anchor='mm')
+  draw.rectangle([(0, 0), (size_width + x_padding, size_height + y_padding)], fill=0x00)
+  draw.text(((size_width + x_padding)//2, (size_height + y_padding)//2), title, fill="white", font=title_font, anchor='mm')
+  if (sub_title):
+    if (not sub_title_font):
+      sub_title_font = title_font
+    sub_title_size_width, sub_title_size_height = draw.textsize(sub_title, sub_title_font)
+    draw.rectangle([(size_width + x_padding, 0), (size_width + x_padding + sub_title_size_width + 40, size_height + y_padding)], fill=0xff, outline=0, width=4)
+    draw.text(((size_width + x_padding + (sub_title_size_width + 40)//2), (size_height + y_padding)//2), sub_title, fill="black", font=sub_title_font, anchor='mm')

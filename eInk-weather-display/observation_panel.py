@@ -33,7 +33,7 @@ def get_observation_icon(randomize_weather_icons, cloud_coverage, images, weathe
 def get_observation_panel(location, images, fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating observation panel')
-  (observations, first_position) = get_observations(location, 1)
+  (observations, first_position, first_position_name) = get_observations(location, 1)
   logger.info('Received data: %s', repr(observations))
   latest_date = max(observations.keys())
   isDay = get_is_day(first_position, latest_date)
@@ -43,7 +43,7 @@ def get_observation_panel(location, images, fonts, config):
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
 
-  utils.draw_title(draw, 'OUT', fonts['font_sm'])
+  utils.draw_title(draw, fonts['font_sm'], 'OUT', first_position_name, fonts['font_xxs'])
 
   delimiter_x = 450
   data_y_base = 150

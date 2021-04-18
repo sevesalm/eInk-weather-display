@@ -13,15 +13,14 @@ def get_forecasts_panel(images, fonts, config):
   logger.info('Generating forecast panel')
   count = 7
   x_size = 1872
-  y_size = 700
-  (forecasts, first_position) = get_forecasts(config.get('FMI_LOCATION'), count, 6)
+  (forecasts, first_position, first_position_name) = get_forecasts(config.get('FMI_LOCATION'), count, 6)
   logger.info('Received data: %s', repr(forecasts))
 
   dates = sorted(forecasts.keys())
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
 
-  utils.draw_title(draw, 'FORECAST', fonts['font_sm'])
+  utils.draw_title(draw, fonts['font_sm'], 'FORECAST', first_position_name, fonts['font_xxs'])
 
   data_y_base = 100
 

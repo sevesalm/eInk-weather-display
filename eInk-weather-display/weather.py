@@ -50,6 +50,13 @@ def get_first_position(xml_data):
   position_data = elements[0].text.split(' ')[:-1]
   return (position_data[0], position_data[1])
 
+def get_first_position_name(xml_data):
+  ns = {'gml': 'http://www.opengis.net/gml/3.2'}
+  elements = xml_data.findall('.//gml:name', ns)
+  if(len(elements) == 0):
+    raise Exception('Could not find any position name data') 
+  return elements[0].text
+
 def combine(data_sets):
   data = {}
   for data_set in data_sets:
@@ -64,7 +71,8 @@ def get_observations(place, count):
   xml_data = fetch_data(OBS_ID, place, OBS_PARAMETERS)
   observation_data = combine([parse_data(xml_data, parameter, 'obs-obs-1-1-', count, False) for parameter in OBS_PARAMETERS])
   first_position = get_first_position(xml_data)
-  return (observation_data, first_position)
+  first_position_name = get_first_position_name(xml_data)
+  return (observation_data, first_position, first_position_name)
 
 def get_next_forecast_start_timestamp():
   now = datetime.today()
@@ -78,5 +86,6 @@ def get_forecasts(place, count, skip_count, next_timestamp = None):
   xml_data = fetch_data(FORECAST_ID, place, FORECAST_PARAMETERS, next_timestamp)
   forecast_data = combine([parse_data(xml_data, parameter, 'mts-1-1-', count, True, skip_count) for parameter in FORECAST_PARAMETERS])
   first_position = get_first_position(xml_data)
-  return (forecast_data, first_position)
+  first_position_name = get_first_position_name(xml_data)
+  return (forecast_data, first_position, first_position_name)
 

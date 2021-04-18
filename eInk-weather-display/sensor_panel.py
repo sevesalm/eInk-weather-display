@@ -26,7 +26,7 @@ def get_sensor_panel(images, fonts, config):
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
   
-  utils.draw_title(draw, 'IN', fonts['font_sm'])
+  utils.draw_title(draw, fonts['font_sm'], 'IN')
 
   sensor_mac = config.get('RUUVITAG_MAC_IN')
   try:
