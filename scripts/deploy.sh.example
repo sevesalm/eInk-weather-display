@@ -9,7 +9,6 @@ SESSION_NAME=eInk-weather-display
 # This copies all needed files to Raspberry Pi
 rsync -av --delete ./eInk-weather-display $IP_ADDRESS:$DEPLOYMENT_DIRECTORY
 rsync -av  scripts/run.sh $IP_ADDRESS:$DEPLOYMENT_DIRECTORY/eInk-weather-display
-rsync -av  config.ini $IP_ADDRESS:$DEPLOYMENT_DIRECTORY/eInk-weather-display
 
 # The script below deletes the old session if it exists and starts a new one
 ssh $IP_ADDRESS SESSION_NAME=$SESSION_NAME DEPLOYMENT_DIRECTORY=$DEPLOYMENT_DIRECTORY 'bash -s' <<'ENDSSH'

@@ -24,9 +24,11 @@ The prototype hardware:
 1. Create a venv and activate it
 1. Install dependencies: `pip install -r requirements.txt`
 1. Convert the SVG images: `./convert.sh` (install `rsvg-convert` if needed)
-1. Create `config.ini` file (see: [config_example.ini](config_example.ini))
+1. Create `eInk-weather-display/config.ini` file (see: [eInk-weather-display/config_example.ini](eInk-weather-display/config_example.ini))
 1. Create `scripts/run.sh` (see: [scripts/run.sh.example](scripts/run.sh.example))
 1. Start: `./scripts/run.sh`
+
+Note: You also have to make sure you have dependencies of [ruuvitag-sensor](https://github.com/ttu/ruuvitag-sensor) and the [bcm2835 driver](http://www.airspayce.com/mikem/bcm2835) installed properly.
 
 ### Development
 
