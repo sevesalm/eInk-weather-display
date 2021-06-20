@@ -15,4 +15,4 @@ Rx==1.6.1
 six==1.15.0
 spidev==3.5
 tzlocal==2.1
-urllib3==1.26.3
+urllib3==1.26.4
