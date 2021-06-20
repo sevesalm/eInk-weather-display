@@ -37,7 +37,7 @@ def get_observation_panel(location, images, fonts, config):
   logger.info('Received data: %s', repr(observations))
   latest_date = max(observations.keys())
   isDay = get_is_day(first_position, latest_date)
-  x_size = 600
+  x_size = 650
   y_size = 550
   latest = observations[latest_date]
   image = Image.new('L', (x_size, y_size), 0xff) 
@@ -45,7 +45,7 @@ def get_observation_panel(location, images, fonts, config):
 
   utils.draw_title(draw, fonts['font_sm'], 'OUT', first_position_name, fonts['font_xxs'])
 
-  delimiter_x = 450
+  delimiter_x = 525
   data_y_base = 100
 
   # Temperature
