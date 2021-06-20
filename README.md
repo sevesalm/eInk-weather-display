@@ -5,15 +5,16 @@ This application is a project for building a weather data display using [Raspber
 - Current weather observations (temperature, windspeed, humidity etc.)
 - Near term weather forecast
 - Weather data from RuuviTag sensors
+- Sunrise and sunset times
 
-![prototype](images/eInk-weather-display.jpg)
+![prototype](images/eInk-weather-display-7.8-Raspi.jpg)
 
-See a [demo video](https://www.youtube.com/watch?v=xKmcR_p6gKA) on YouTube.
+See a [demo video](https://www.youtube.com/watch?v=s2YX_JOI1VU) on YouTube.
 
-The prototype hardware:
+The current hardware:
 
 - [Raspberry Pi 3 Model B+](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/) computer
-- [Waveshare 3.7" e-Paper HAT](https://www.waveshare.com/product/raspberry-pi/displays/e-paper/3.7inch-e-paper-hat.htm) e-Ink display
+- [Waveshare 7.8" e-Paper HAT](https://www.waveshare.com/product/raspberry-pi/displays/e-paper/7.8inch-e-paper-hat.htm) e-Ink display
 - [RuuviTag](https://ruuvi.com/ruuvitag-specs/) sensors
 
 ## Development and Deployment
