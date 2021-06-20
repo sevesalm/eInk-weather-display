@@ -6,29 +6,27 @@ from weather import get_observations
 from celestial import get_is_day
 import utils
 
-def get_observation_icon(randomize_weather_icons, cloud_coverage, images, weather_symbol, isDay):
-  if(not randomize_weather_icons):
-    # For codes 0 to 3 and 20 to 26, let's use cloud cover to determine the icon set
-    if(((0 <= weather_symbol <= 3) or (20 <= weather_symbol <= 26)) and not math.isnan(cloud_coverage)):
-      if(cloud_coverage <= 1): # Clear sky
-        image_set = images['forecast'].get(1)
-      elif(2 <= cloud_coverage <= 6): # Partially cloudy
-        image_set = images['forecast'].get(2)
-      elif(7 <= cloud_coverage <= 8): # Overcast
-        image_set = images['forecast'].get(3)
-      else: # Lolwut?
-        image_set = images['observation'].get(0)
-    else:
-      image_set = images['observation'].get(weather_symbol)
-  else:
-    image_set = images['observation'][random.choice(list(images['observation'].keys()))]
+def get_observation_icon(wawa, cloud_coverage, isDay, images, fonts, config):
+  if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
+    icon_set = images['observation'][random.choice(list(images['observation'].keys()))]
+    return utils.get_icon_variant(isDay, icon_set)
 
-  if(not isDay and 'night' in image_set):
-    weather_icon = image_set['night']
-  else:
-    weather_icon = image_set['day']
+  if (not wawa in images['observation']):
+    return utils.get_missing_weather_icon_icon(wawa, images, fonts)
 
-  return weather_icon
+  # For codes 0 to 3 and 20 to 26, let's use cloud cover to determine the icon set
+  if(((0 <= wawa <= 3) or (20 <= wawa <= 26)) and not math.isnan(cloud_coverage)):
+    if(cloud_coverage <= 1): # Clear sky
+      icon_set = images['forecast'].get(1)
+    elif(2 <= cloud_coverage <= 6): # Partially cloudy
+      icon_set = images['forecast'].get(2)
+    elif(7 <= cloud_coverage <= 8): # Overcast
+      icon_set = images['forecast'].get(3)
+    else: # Lolwut?
+      icon_set = images['observation'].get(0)
+  else:
+    icon_set = images['observation'].get(wawa)
+  return utils.get_icon_variant(isDay, icon_set)
 
 def get_observation_panel(location, images, fonts, config):
   logger = logging.getLogger(__name__)
@@ -61,28 +59,16 @@ def get_observation_panel(location, images, fonts, config):
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 350), f'{round(latest["ws_10min"])} – {round(latest["wg_10min"])}', 'm/s', fonts)
 
   # Weather icon
-  weather_symbol = latest['wawa']
   cloud_coverage = latest['n_man']
-  randomize_weather_icons = config.getboolean('RANDOMIZE_WEATHER_ICONS')
-  if((not math.isnan(weather_symbol) and weather_symbol in images['observation']) or randomize_weather_icons):
-    weather_icon = get_observation_icon(randomize_weather_icons, cloud_coverage, images, weather_symbol, isDay)
-    image.paste(weather_icon, (15, data_y_base))
-  else:
-    image.paste(images['misc']['background'], (15, data_y_base))
-    text = 'NaN' if math.isnan(weather_symbol) else str(weather_symbol)
-    draw.text((15 + config.getint('ICON_WIDTH')//2, data_y_base + config.getint('ICON_WIDTH')//2), text, font = fonts['font_sm'], fill = 0, anchor = 'mm')
+
+  weather_icon = get_observation_icon(latest['wawa'], cloud_coverage, isDay, images, fonts, config)
+  image.paste(weather_icon, (15, data_y_base))
 
   row_y_base = 100
 
   # Cloud cover
-  if (not math.isnan(cloud_coverage)):
-    cloud_cover_icon = images['misc'][f'cloud_cover_{str(round(cloud_coverage))}']  
-    image.paste(cloud_cover_icon, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + 120 + row_y_base))
-  else:
-    # NaN
-    cloud_cover_icon = images['misc'][f'cloud_cover_0']  
-    image.paste(cloud_cover_icon, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + 120 + row_y_base))
-    draw.text((15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2//2, data_y_base + 120 + row_y_base + 100), 'NaN', font=fonts['font_xxs'], fill=0, anchor='mm')
+  cloud_cover_icon = utils.get_cloud_cover_icon(cloud_coverage, images, fonts, config)
+  image.paste(cloud_cover_icon, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + 120 + row_y_base))
 
   # Wind direction
   w_dir = latest['wd_10min']
