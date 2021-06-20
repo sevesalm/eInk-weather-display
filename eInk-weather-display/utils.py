@@ -1,6 +1,7 @@
 import sys
+import math
 import ctypes
-from PIL import ImageFont
+from PIL import ImageFont, ImageDraw
 
 def draw_quantity(draw, mid_point, value, unit, fonts, font='font_sm', font_unit='font_xs'):
   (x, y) = mid_point
@@ -72,3 +73,30 @@ def draw_title(draw, title_font, title, sub_title=None, sub_title_font=None):
     sub_title_size_width, sub_title_size_height = draw.textsize(sub_title, sub_title_font)
     draw.rectangle([(size_width + x_padding, 0), (size_width + x_padding + sub_title_size_width + 40, size_height + y_padding)], fill=0xff, outline=0, width=4)
     draw.text(((size_width + x_padding + (sub_title_size_width + 40)//2), (size_height + y_padding)//2), sub_title, fill="black", font=sub_title_font, anchor='mm')
+
+def get_icon_variant(isDay, icon_set):
+  if (not isDay and 'night' in icon_set):
+    return icon_set['night']
+  return icon_set['day']
+
+def get_missing_weather_icon_icon(icon_index, images, fonts):
+  icon = images['misc']['background'].copy()
+  draw = ImageDraw.Draw(icon)
+  text = "NaN" if math.isnan(icon_index) else str(icon_index)
+  draw.text((icon.width//2, icon.height//2), text, font = fonts['font_sm'], fill = 0, anchor = 'mm')
+  return icon
+
+def get_cloud_cover_icon(cloud_cover, images, fonts, config):
+  if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
+    icon_index = random.randint(0, 9)
+  else:
+    icon_index = math.nan if math.isnan(cloud_cover) else round(cloud_cover)
+  if (not math.isnan(icon_index) and 0 <= icon_index <= 9):
+    return images['misc'][f'cloud_cover_{icon_index}']  
+  icon = images['misc']['cloud_cover_0']  
+  draw = ImageDraw.Draw(icon)
+  text = "NaN" if math.isnan(icon_index) else str(icon_index)
+  draw.text((icon.width//2, icon.height//2), text, font = fonts['font_xxs'], fill = 0, anchor = 'mm')
+  return icon
+
+
