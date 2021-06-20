@@ -28,7 +28,6 @@ def get_forecasts_panel(images, fonts, config):
   for date, i in zip(dates, range(len(dates))):
     isDay = get_is_day(first_position, date)
     data = forecasts[date]
-    weather_symbol = round(data['WeatherSymbol3'])
     utc_dt = parse(date).replace(tzinfo=pytz.utc)
     date_formatted = utc_dt.astimezone(tz=None).strftime('%-H:%M')
     x_step = x_size//count
@@ -38,22 +37,9 @@ def get_forecasts_panel(images, fonts, config):
     draw.text((x_base + i*x_step, data_y_base + 10), date_formatted, font = (fonts['font_sm'] if date_formatted != "15:00" else fonts['font_sm_bold']), fill = 0, anchor = 'mt')
 
     # Weather icon
-    randomize_weather_icons = config.getboolean('RANDOMIZE_WEATHER_ICONS')
     icon_position = (x_base + i*x_step - config.getint('ICON_WIDTH')//2, data_y_base + 80)
-    if(weather_symbol in images['forecast'] or randomize_weather_icons):
-      if(not randomize_weather_icons):
-        image_set = images['forecast'].get(weather_symbol) 
-      else: 
-        image_set = images['forecast'][random.choice(list(images['forecast'].keys()))]
-      if(not isDay and 'night' in image_set):
-        weather_icon = image_set['night']
-      else:
-        weather_icon = image_set['day']
-      image.paste(weather_icon, icon_position)
-    else:
-      image.paste(images['misc']['background'], icon_position)
-      text = 'NaN' if math.isnan(weather_symbol) else str(weather_symbol)
-      draw.text((icon_position[0] + config.getint('ICON_WIDTH')//2, icon_position[1] + config.getint('ICON_WIDTH')//2), text, font = fonts['font_sm'], fill = 0, anchor = 'mm')
+    weather_icon = get_forecats_weather_icon(data['WeatherSymbol3'], isDay, images, fonts, config)
+    image.paste(weather_icon, icon_position)
 
     # Temperature
     utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 350), str(round(data["Temperature"])), '°C', fonts)
@@ -61,7 +47,9 @@ def get_forecasts_panel(images, fonts, config):
     utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 420), str(round(data["WindSpeedMS"])), 'm/s', fonts)
   
     # Cloud cover
-    cloud_cover_icon = images['misc'][f'cloud_cover_{str(round(data["TotalCloudCover"] / 100 * 8))}']  
+    cloud_cover_raw = data["TotalCloudCover"]
+    cloud_cover = math.nan if math.isnan(cloud_cover_raw) else cloud_cover_raw / 100 * 8
+    cloud_cover_icon = utils.get_cloud_cover_icon(cloud_cover, images, fonts, config)
     image.paste(cloud_cover_icon, (x_base + i*x_step - cloud_cover_icon.width//2, data_y_base + 440), )
 
     # Wind direction
@@ -74,3 +62,15 @@ def get_forecasts_panel(images, fonts, config):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
     
   return (image, first_position)
+
+def get_forecats_weather_icon(weather_symbol_3, isDay, images, fonts, config):
+  if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
+    icon_set = images['forecast'][random.choice(list(images['forecast'].keys()))]
+    return utils.get_icon_variant(isDay, icon_set)
+
+  icon_index = math.nan if math.isnan(weather_symbol_3) else round(weather_symbol_3)
+  if (not icon_index in images['forecast']):
+    return utils.get_missing_weather_icon_icon(icon_index, images, fonts)
+
+  icon_set = images['forecast'].get(icon_index) 
+  return utils.get_icon_variant(isDay, icon_set)
