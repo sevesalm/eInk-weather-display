@@ -16,19 +16,19 @@ def get_battery_icon(voltage, images):
     return images['misc']['battery_25']
   return images['misc']['battery_empty']
 
-def get_sensor_panel(images, fonts, config):
+def get_sensor_panel(sensor_mac, sensor_name, images, fonts, config, draw_title = True):
   logger = logging.getLogger(__name__)
   logger.info('Generating sensor panel')
 
   x_size = 550
-  y_size = 350
+  y_size = 330
 
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
   
-  utils.draw_title(draw, fonts['font_sm'], 'IN')
+  if (draw_title):
+    utils.draw_title(draw, fonts['font_sm'], 'SENSOR', sensor_name, fonts['font_xs'])
 
-  sensor_mac = config.get('RUUVITAG_MAC_IN')
   try:
     if (not config.getboolean('USE_FAKE_SENSOR_DATA')):
       timeout = config.getint('SENSOR_POLL_TIMEOUT')
@@ -50,7 +50,7 @@ def get_sensor_panel(images, fonts, config):
     sensor_data = {}
 
   if (sensor_mac in sensor_data):
-    data_y_base = 100
+    data_y_base = 100 if (draw_title) else 0 
     state_in = sensor_data[sensor_mac]
     utils.draw_quantity(draw, (x_size//2 + 160, data_y_base + 120), str(round(state_in['temperature'], 1)), '°C', fonts, 'font_lg', 'font_sm')
     utils.draw_quantity(draw, (x_size//2 + 160, data_y_base + 210), str(round(state_in['humidity'])), '%', fonts)
