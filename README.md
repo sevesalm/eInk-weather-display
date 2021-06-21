@@ -17,6 +17,14 @@ The current hardware:
 - [Waveshare 7.8" e-Paper HAT](https://www.waveshare.com/product/raspberry-pi/displays/e-paper/7.8inch-e-paper-hat.htm) e-Ink display
 - [RuuviTag](https://ruuvi.com/ruuvitag-specs/) sensors
 
+Note: This device/software is heavily customized to be used with the FMI (Finnish Meteorological Institute) Open API data which - in turn - is heavily targeted for people living in Finland. Other APIs might require extensive changes.
+
+## Weather Display
+
+The image below shows the main items visible on the display. It was a design decision to keep the information density quite high so that one display could show as much relevant information as possible.
+
+![infograph](images/infograph.png)
+
 ## Development and Deployment
 
 ### Deployment
