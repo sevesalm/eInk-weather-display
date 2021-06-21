@@ -43,6 +43,10 @@ def get_forecasts_panel(images, fonts, config):
     weather_icon = icons.get_scaled_image(get_forecats_weather_icon(data['WeatherSymbol3'], isDay, images, fonts, config), icon_width)
     image.paste(weather_icon, icon_position, weather_icon)
 
+    # Warning icon
+    if (data["Temperature"] >= config.getint('HIGH_TEMPERATURE_WARNING_THRESHOLD') or data["Temperature"] <= config.getint('LOW_TEMPERATURE_WARNING_THRESHOLD')):
+      warning_icon = icons.get_scaled_image(images['misc']['warning'], 50)
+      image.paste(warning_icon, (icon_position[0] + weather_icon.width - 2*warning_icon.width//3, icon_position[1] + weather_icon.height - 2*warning_icon.height//3), warning_icon)
 
     # Temperature
     utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 350), str(round(data["Temperature"])), '°C', fonts)
