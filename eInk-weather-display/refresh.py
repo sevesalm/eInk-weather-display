@@ -6,7 +6,6 @@ from info_panel import get_info_panel
 from forecast_panel import get_forecasts_panel
 from celestial_panel import get_celestial_panel
 from sensor_panel import get_sensor_panel
-import utils
 
 def refresh(panel_size, fonts, images, config, epd_so, init):
   logger = logging.getLogger(__name__)
@@ -20,22 +19,22 @@ def refresh(panel_size, fonts, images, config, epd_so, init):
   # Draw individual panels
   logger.info('Drawing panels')
   observation_panel = get_observation_panel(config['FMI_LOCATION'], images, fonts, config)
-  info_panel = get_info_panel(fonts, config)
-  (forecasts_panel, first_position) = get_forecasts_panel(images, fonts, config)
-  celestial_panel = get_celestial_panel(first_position, images, fonts, config)
   sensor_panel_in = get_sensor_panel(config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_IN_NAME'), images, fonts, config)
   sensor_panel_out = get_sensor_panel(config.get('RUUVITAG_MAC_OUT'), config.get('RUUVITAG_MAC_OUT_NAME'), images, fonts, config, False)
+  (forecasts_panel, first_position) = get_forecasts_panel(images, fonts, config)
+  celestial_panel = get_celestial_panel(first_position, images, fonts, config)
+  info_panel = get_info_panel(fonts, config)
 
   # Paste the panels on the main image
   logger.info('Pasting panels')
   full_image.paste(observation_panel, (0, 0))
   full_image.paste(sensor_panel_in, (observation_panel.width, 0))
   full_image.paste(sensor_panel_out, (observation_panel.width, sensor_panel_in.height))
-  full_image.paste(celestial_panel, (observation_panel.width + sensor_panel_in.width, 0))
   full_image.paste(forecasts_panel, (0, panel_size[1] - forecasts_panel.height))
+  full_image.paste(celestial_panel, (observation_panel.width + sensor_panel_in.width, 0))
   full_image.paste(info_panel, (panel_size[0] - info_panel.width, 0))
 
-  if(config.get('DRAW_BORDERS')):
+  if(config.getboolean('DRAW_BORDERS')):
     border_color = 0x80
     draw_width = 2 
     draw.line([0, panel_size[1] - forecasts_panel.height, panel_size[0], panel_size[1] - forecasts_panel.height], fill=border_color, width=draw_width)

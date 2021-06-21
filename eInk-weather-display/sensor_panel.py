@@ -1,9 +1,10 @@
 import random
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw
 from ruuvitag_sensor.ruuvi_rx import RuuviTagReactive
 import rx
 import logging
 import utils
+import icons
 
 def get_battery_icon(voltage, images):
   if (voltage >= 2900):
@@ -56,8 +57,8 @@ def get_sensor_panel(sensor_mac, sensor_name, images, fonts, config, draw_title 
     utils.draw_quantity(draw, (x_size//2 + 160, data_y_base + 210), str(round(state_in['humidity'])), '%', fonts)
 
     # Battery level
-    battery_icon = get_battery_icon(state_in['battery'], images)
-    image.paste(battery_icon, (30, data_y_base - 30), ImageOps.invert(battery_icon))
+    battery_icon = icons.get_scaled_image(get_battery_icon(state_in['battery'], images), 120)
+    image.paste(battery_icon, (30, data_y_base - 30), battery_icon)
     utils.draw_quantity(draw, (130, data_y_base + 125), str(round(state_in['battery']/1000, 2)), 'V', fonts, 'font_xs', 'font_xxs')
 
     # RSSI - not yet part of ruuvitag-sensor
@@ -68,8 +69,8 @@ def get_sensor_panel(sensor_mac, sensor_name, images, fonts, config, draw_title 
 
   else: 
     logger.info(f'Could not find mac {sensor_mac} in sensor data')
-    no_wifi_image = images['misc']['no_wifi']
-    image.paste(no_wifi_image, (x_size//2 - no_wifi_image.width//2, y_size//2 - no_wifi_image.height//2), ImageOps.invert(no_wifi_image))
+    no_wifi_image = icons.get_scaled_image(images['misc']['no_wifi'], 200)
+    image.paste(no_wifi_image, (x_size//2 - no_wifi_image.width//2, y_size//2 - no_wifi_image.height//2), no_wifi_image)
   
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):

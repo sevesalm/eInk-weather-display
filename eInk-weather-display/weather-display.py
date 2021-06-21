@@ -5,7 +5,6 @@ import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
 import log
 import logging
-import ctypes
 import utils
 from icons import get_weather_images
 import refresh
@@ -35,7 +34,7 @@ def main():
       config = config_parser['general']
 
       fonts = utils.get_fonts(config)
-      images = get_weather_images(config)
+      images = get_weather_images()
 
       logger.info('Import epd control library')
       (epd_so, panel_size) = utils.get_epd_data(config)

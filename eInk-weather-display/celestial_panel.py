@@ -2,6 +2,7 @@ from PIL import Image, ImageDraw
 from celestial import get_moon_phase, get_sunrise_sunset, get_moon_phase_chr
 import logging
 import utils
+import icons
 
 def parse_sunrise_sunset_time(val):
   return val.astimezone(tz=None).strftime('%-H:%M')
@@ -18,8 +19,10 @@ def get_celestial_panel(position, images, fonts, config):
   
   # Icons
   (sunrise, sunset) = get_sunrise_sunset(position)
-  image.paste(images['misc']['sunrise'], (x_size//4 - images['misc']['sunrise'].width//2, y_size - 200 ))
-  image.paste(images['misc']['sunset'], (3*x_size//4  - images['misc']['sunset'].width//2, y_size - 200 ))
+  sunrise_icon = icons.get_scaled_image(images['misc']['sunrise'], 200)
+  sunset_icon = icons.get_scaled_image(images['misc']['sunset'], 200)
+  image.paste(sunrise_icon, (x_size//4 - sunrise_icon.width//2, y_size - 200 ), sunrise_icon)
+  image.paste(sunset_icon, (3*x_size//4 - sunset_icon.width//2, y_size - 200 ), sunset_icon)
 
   data_y_base = y_size - 20
 

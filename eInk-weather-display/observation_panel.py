@@ -1,10 +1,11 @@
 import math
 import random
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw
 import logging
 from weather import get_observations
 from celestial import get_is_day
 import utils
+import icons
 
 def get_observation_icon(wawa, cloud_coverage, isDay, images, fonts, config):
   if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
@@ -31,6 +32,7 @@ def get_observation_icon(wawa, cloud_coverage, isDay, images, fonts, config):
 def get_observation_panel(location, images, fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating observation panel')
+  icon_width = config.getint('ICON_WIDTH')
   (observations, first_position, first_position_name) = get_observations(location, 1)
   logger.info('Received data: %s', repr(observations))
   latest_date = max(observations.keys())
@@ -61,21 +63,22 @@ def get_observation_panel(location, images, fonts, config):
   # Weather icon
   cloud_coverage = latest['n_man']
 
-  weather_icon = get_observation_icon(latest['wawa'], cloud_coverage, isDay, images, fonts, config)
-  image.paste(weather_icon, (15, data_y_base))
+  weather_icon = icons.get_scaled_image(get_observation_icon(latest['wawa'], cloud_coverage, isDay, images, fonts, config), icon_width)
+  image.paste(weather_icon, (15, data_y_base), weather_icon)
+
 
   row_y_base = 100
 
   # Cloud cover
-  cloud_cover_icon = utils.get_cloud_cover_icon(cloud_coverage, images, fonts, config)
-  image.paste(cloud_cover_icon, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + 120 + row_y_base))
+  cloud_cover_icon = icons.get_scaled_image(utils.get_cloud_cover_icon(cloud_coverage, images, fonts, config), 160)
+  image.paste(cloud_cover_icon, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + 120 + row_y_base), cloud_cover_icon)
 
   # Wind direction
   w_dir = latest['wd_10min']
   if(not math.isnan(w_dir)):
-    wind_image = images['misc']['wind_icon']
+    wind_image = icons.get_scaled_image(images['misc']['wind_icon'], 160)
     wind_image_rot = wind_image.rotate(-w_dir + 180, fillcolor = 0xff, resample=Image.BICUBIC)
-    image.paste(wind_image_rot, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + 120 + row_y_base), ImageOps.invert(wind_image_rot))
+    image.paste(wind_image_rot, (15 + config.getint('ICON_WIDTH')//2 - cloud_cover_icon.width//2, data_y_base + 120 + row_y_base), wind_image_rot)
 
 
   # Borders

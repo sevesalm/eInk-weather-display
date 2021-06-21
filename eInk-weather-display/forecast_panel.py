@@ -2,15 +2,17 @@ import random
 import math
 from dateutil.parser import parse
 import pytz
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw
 from celestial import get_is_day
 import logging
 from weather import get_forecasts
 import utils
+import icons
 
 def get_forecasts_panel(images, fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating forecast panel')
+  icon_width = config.getint('ICON_WIDTH')
   count = 7
   x_size = 1872
   y_size = 800
@@ -38,8 +40,9 @@ def get_forecasts_panel(images, fonts, config):
 
     # Weather icon
     icon_position = (x_base + i*x_step - config.getint('ICON_WIDTH')//2, data_y_base + 80)
-    weather_icon = get_forecats_weather_icon(data['WeatherSymbol3'], isDay, images, fonts, config)
-    image.paste(weather_icon, icon_position)
+    weather_icon = icons.get_scaled_image(get_forecats_weather_icon(data['WeatherSymbol3'], isDay, images, fonts, config), icon_width)
+    image.paste(weather_icon, icon_position, weather_icon)
+
 
     # Temperature
     utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 350), str(round(data["Temperature"])), '°C', fonts)
@@ -49,13 +52,13 @@ def get_forecasts_panel(images, fonts, config):
     # Cloud cover
     cloud_cover_raw = data["TotalCloudCover"]
     cloud_cover = math.nan if math.isnan(cloud_cover_raw) else cloud_cover_raw / 100 * 8
-    cloud_cover_icon = utils.get_cloud_cover_icon(cloud_cover, images, fonts, config)
-    image.paste(cloud_cover_icon, (x_base + i*x_step - cloud_cover_icon.width//2, data_y_base + 440), )
+    cloud_cover_icon = icons.get_scaled_image(utils.get_cloud_cover_icon(cloud_cover, images, fonts, config), 160)
+    image.paste(cloud_cover_icon, (x_base + i*x_step - cloud_cover_icon.width//2, data_y_base + 440), cloud_cover_icon)
 
     # Wind direction
-    wind_image = images['misc']['wind_icon'] 
+    wind_image = icons.get_scaled_image(images['misc']['wind_icon'] , 160)
     wind_image_rot = wind_image.rotate(-data['WindDirection'] + 180, fillcolor = 0xff, resample=Image.BICUBIC)
-    image.paste(wind_image_rot, (x_base + i*x_step - wind_image_rot.width//2, data_y_base + 440), ImageOps.invert(wind_image_rot))
+    image.paste(wind_image_rot, (x_base + i*x_step - wind_image_rot.width//2, data_y_base + 440), wind_image_rot)
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):
