@@ -1,6 +1,7 @@
 import sys
 import math
 import ctypes
+import random
 from PIL import ImageFont, ImageDraw
 
 def draw_quantity(draw, mid_point, value, unit, fonts, font='font_sm', font_unit='font_xs'):
