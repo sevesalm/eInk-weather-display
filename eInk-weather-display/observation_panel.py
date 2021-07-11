@@ -3,14 +3,14 @@ import random
 from PIL import Image, ImageDraw
 import logging
 from weather import get_observations
-from celestial import get_is_day
+from celestial import get_is_daylight
 import utils
 import icons
 
-def get_observation_icon(wawa, cloud_coverage, isDay, images, fonts, config):
+def get_observation_icon(wawa, cloud_coverage, is_daylight, images, fonts, config):
   if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
     icon_set = images['observation'][random.choice(list(images['observation'].keys()))]
-    return utils.get_icon_variant(isDay, icon_set)
+    return utils.get_icon_variant(is_daylight, icon_set)
 
   if (not wawa in images['observation']):
     return utils.get_missing_weather_icon_icon(wawa, images, fonts)
@@ -27,7 +27,7 @@ def get_observation_icon(wawa, cloud_coverage, isDay, images, fonts, config):
       icon_set = images['observation'].get(0)
   else:
     icon_set = images['observation'].get(wawa)
-  return utils.get_icon_variant(isDay, icon_set)
+  return utils.get_icon_variant(is_daylight, icon_set)
 
 def get_observation_panel(location, images, fonts, config):
   logger = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ def get_observation_panel(location, images, fonts, config):
   # Weather icon
   cloud_coverage = latest['n_man']
 
-  weather_icon = icons.get_scaled_image(get_observation_icon(latest['wawa'], cloud_coverage, isDay, images, fonts, config), icon_width)
+  weather_icon = icons.get_scaled_image(get_observation_icon(latest['wawa'], cloud_coverage, is_daylight, images, fonts, config), icon_width)
   image.paste(weather_icon, (15, data_y_base), weather_icon)
 
   # Warning icon

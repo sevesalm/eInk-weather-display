@@ -3,7 +3,7 @@ import math
 from dateutil.parser import parse
 import pytz
 from PIL import Image, ImageDraw
-from celestial import get_is_day
+from celestial import get_is_daylight
 import logging
 from weather import get_forecasts
 import utils
@@ -28,7 +28,7 @@ def get_forecasts_panel(images, fonts, config):
   data_y_base = 100
 
   for date, i in zip(dates, range(len(dates))):
-    isDay = get_is_day(first_position, date)
+    is_daylight = get_is_daylight(first_position, date)
     data = forecasts[date]
     utc_dt = parse(date).replace(tzinfo=pytz.utc)
     date_formatted = utc_dt.astimezone(tz=None).strftime('%-H:%M')
@@ -40,7 +40,7 @@ def get_forecasts_panel(images, fonts, config):
 
     # Weather icon
     icon_position = (x_base + i*x_step - config.getint('ICON_WIDTH')//2, data_y_base + 80)
-    weather_icon = icons.get_scaled_image(get_forecats_weather_icon(data['WeatherSymbol3'], isDay, images, fonts, config), icon_width)
+    weather_icon = icons.get_scaled_image(get_forecats_weather_icon(data['WeatherSymbol3'], is_daylight, images, fonts, config), icon_width)
     image.paste(weather_icon, icon_position, weather_icon)
 
     # Warning icon
@@ -70,14 +70,14 @@ def get_forecasts_panel(images, fonts, config):
     
   return (image, first_position)
 
-def get_forecats_weather_icon(weather_symbol_3, isDay, images, fonts, config):
+def get_forecats_weather_icon(weather_symbol_3, is_daylight, images, fonts, config):
   if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
     icon_set = images['forecast'][random.choice(list(images['forecast'].keys()))]
-    return utils.get_icon_variant(isDay, icon_set)
+    return utils.get_icon_variant(is_daylight, icon_set)
 
   icon_index = math.nan if math.isnan(weather_symbol_3) else round(weather_symbol_3)
   if (not icon_index in images['forecast']):
     return utils.get_missing_weather_icon_icon(icon_index, images, fonts)
 
   icon_set = images['forecast'].get(icon_index) 
-  return utils.get_icon_variant(isDay, icon_set)
+  return utils.get_icon_variant(is_daylight, icon_set)

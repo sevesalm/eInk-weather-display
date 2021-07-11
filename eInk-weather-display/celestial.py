@@ -2,11 +2,11 @@ import ephem
 import math
 import logging
 
-def get_is_day(position, utc_datetime):
+def get_is_daylight(position, utc_datetime_string):
   location = ephem.Observer()
   location.lat = str(position[0])
   location.lon = str(position[1])
-  location.date = utc_datetime.replace('T', ' ').replace('Z', '')
+  location.date = utc_datetime_string.replace('T', ' ').replace('Z', '')
 
   sun = ephem.Sun()
   sunset = ephem.localtime(location.next_setting(sun))
@@ -21,8 +21,8 @@ def get_sunrise_sunset(position):
   sun = ephem.Sun()
   sunset = ephem.localtime(location.next_setting(sun))
   sunrise = ephem.localtime(location.next_rising(sun))
-  isDay = sunset < sunrise
-  if(not isDay):
+  is_daylight = sunset < sunrise
+  if(not is_daylight):
     return (sunrise, sunset)
   return (ephem.localtime(location.previous_rising(sun)), sunset) # Return the previous if sunset has not happened but sunrise has
 

@@ -75,8 +75,8 @@ def draw_title(draw, title_font, title, sub_title=None, sub_title_font=None):
     draw.rectangle([(size_width + x_padding, 0), (size_width + x_padding + sub_title_size_width + 40, size_height + y_padding)], fill=0xff, outline=0, width=4)
     draw.text(((size_width + x_padding + (sub_title_size_width + 40)//2), (size_height + y_padding)//2), sub_title, fill="black", font=sub_title_font, anchor='mm')
 
-def get_icon_variant(isDay, icon_set):
-  if (not isDay and 'night' in icon_set):
+def get_icon_variant(is_daylight, icon_set):
+  if (not is_daylight and 'night' in icon_set):
     return icon_set['night']
   return icon_set['day']
 
