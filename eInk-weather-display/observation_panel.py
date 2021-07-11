@@ -36,7 +36,8 @@ def get_observation_panel(location, images, fonts, config):
   (observations, first_position, first_position_name) = get_observations(location, 1)
   logger.info('Received data: %s', repr(observations))
   latest_date = max(observations.keys())
-  isDay = get_is_day(first_position, latest_date)
+  latest_date_local = utils.utc_datetime_string_to_local_datetime(latest_date)
+  is_daylight = get_is_daylight(first_position, latest_date)
   x_size = 650
   y_size = 550
   latest = observations[latest_date]
@@ -67,7 +68,7 @@ def get_observation_panel(location, images, fonts, config):
   image.paste(weather_icon, (15, data_y_base), weather_icon)
 
   # Warning icon
-  if (latest["t2m"] >= config.getint('HIGH_TEMPERATURE_WARNING_THRESHOLD') or latest["t2m"] <= config.getint('LOW_TEMPERATURE_WARNING_THRESHOLD')):
+  if (utils.show_temperatur_warning_icon(latest["t2m"], latest_date_local, config)):
     warning_icon = icons.get_scaled_image(images['misc']['warning'], 50)
     image.paste(warning_icon, (15 + weather_icon.width - 2*warning_icon.width//3, data_y_base + weather_icon.height - 2*warning_icon.height//3), warning_icon)
 

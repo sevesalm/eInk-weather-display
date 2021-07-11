@@ -1,8 +1,11 @@
+import datetime
 import sys
 import math
 import ctypes
 import random
 from PIL import ImageFont, ImageDraw
+from dateutil.parser import parse
+import pytz
 
 def draw_quantity(draw, mid_point, value, unit, fonts, font='font_sm', font_unit='font_xs'):
   (x, y) = mid_point
@@ -100,4 +103,18 @@ def get_cloud_cover_icon(cloud_cover, images, fonts, config):
   draw.text((icon.width//2, icon.height//2), text, font = fonts['font_xxs'], fill = 0, anchor = 'mm')
   return icon
 
+def utc_datetime_string_to_local_datetime(date_string):
+  return parse(date_string).replace(tzinfo=pytz.utc).astimezone(tz=None)
 
+
+def show_temperatur_warning_icon(temperature, time, config):
+  if temperature >= config.getint('HIGH_TEMPERATURE_WARNING_THRESHOLD'):
+    return True 
+  
+  if temperature <= config.getint('LOW_TEMPERATURE_WARNING_THRESHOLD'):
+    return True
+
+  if temperature >= config.getint('TROPICAL_NIGHT_TEMPERATURE_WARNING_THRESHOLD') and (time.hour > 21 or time.hour < 8):
+    return True
+  
+  return False

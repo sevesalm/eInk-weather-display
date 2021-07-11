@@ -1,7 +1,5 @@
 import random
 import math
-from dateutil.parser import parse
-import pytz
 from PIL import Image, ImageDraw
 from celestial import get_is_daylight
 import logging
@@ -30,8 +28,8 @@ def get_forecasts_panel(images, fonts, config):
   for date, i in zip(dates, range(len(dates))):
     is_daylight = get_is_daylight(first_position, date)
     data = forecasts[date]
-    utc_dt = parse(date).replace(tzinfo=pytz.utc)
-    date_formatted = utc_dt.astimezone(tz=None).strftime('%-H:%M')
+    date_local = utils.utc_datetime_string_to_local_datetime(date)
+    date_formatted = date_local.strftime('%-H:%M')
     x_step = x_size//count
     x_base = x_step//2
 
@@ -44,7 +42,7 @@ def get_forecasts_panel(images, fonts, config):
     image.paste(weather_icon, icon_position, weather_icon)
 
     # Warning icon
-    if (data["Temperature"] >= config.getint('HIGH_TEMPERATURE_WARNING_THRESHOLD') or data["Temperature"] <= config.getint('LOW_TEMPERATURE_WARNING_THRESHOLD')):
+    if (utils.show_temperatur_warning_icon(data["Temperature"], date_local, config)):
       warning_icon = icons.get_scaled_image(images['misc']['warning'], 50)
       image.paste(warning_icon, (icon_position[0] + weather_icon.width - 2*warning_icon.width//3, icon_position[1] + weather_icon.height - 2*warning_icon.height//3), warning_icon)
 
