@@ -75,7 +75,7 @@ def get_forecats_weather_icon(weather_symbol_3, is_daylight, images, fonts, conf
 
   icon_index = math.nan if math.isnan(weather_symbol_3) else round(weather_symbol_3)
   if (not icon_index in images['forecast']):
-    return utils.get_missing_weather_icon_icon(icon_index, images, fonts)
+    return utils.get_missing_weather_icon_icon(icon_index, is_daylight, images, fonts)
 
   icon_set = images['forecast'].get(icon_index) 
   return utils.get_icon_variant(is_daylight, icon_set)

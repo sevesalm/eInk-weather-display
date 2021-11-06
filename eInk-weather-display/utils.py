@@ -83,11 +83,11 @@ def get_icon_variant(is_daylight, icon_set):
     return icon_set['night']
   return icon_set['day']
 
-def get_missing_weather_icon_icon(icon_index, images, fonts):
-  icon = images['misc']['background'].copy()
+def get_missing_weather_icon_icon(icon_index, is_daylight, images, fonts):
+  icon = images['misc']['background_day'].copy() if is_daylight else images['misc']['background_night'].copy()
   draw = ImageDraw.Draw(icon)
   text = "NaN" if math.isnan(icon_index) else str(icon_index)
-  draw.text((icon.width//2, icon.height//2), text, font = fonts['font_sm'], fill = 0, anchor = 'mm')
+  draw.text((icon.width//2, icon.height//2), text, font = fonts['font_md'], fill="black", anchor = 'mm')
   return icon
 
 def get_cloud_cover_icon(cloud_cover, images, fonts, config):
@@ -97,10 +97,10 @@ def get_cloud_cover_icon(cloud_cover, images, fonts, config):
     icon_index = math.nan if math.isnan(cloud_cover) else round(cloud_cover)
   if (not math.isnan(icon_index) and 0 <= icon_index <= 9):
     return images['misc'][f'cloud_cover_{icon_index}']  
-  icon = images['misc']['cloud_cover_0']  
+  icon = images['misc']['cloud_cover_0'].copy()
   draw = ImageDraw.Draw(icon)
   text = "NaN" if math.isnan(icon_index) else str(icon_index)
-  draw.text((icon.width//2, icon.height//2), text, font = fonts['font_xxs'], fill = 0, anchor = 'mm')
+  draw.text((icon.width//2, icon.height//2), text, font = fonts['font_md'], fill="black", anchor='mm')
   return icon
 
 def utc_datetime_string_to_local_datetime(date_string):

@@ -13,7 +13,7 @@ def get_observation_icon(wawa, cloud_coverage, is_daylight, images, fonts, confi
     return utils.get_icon_variant(is_daylight, icon_set)
 
   if (not wawa in images['observation']):
-    return utils.get_missing_weather_icon_icon(wawa, images, fonts)
+    return utils.get_missing_weather_icon_icon(wawa, is_daylight, images, fonts)
 
   # For codes 0 to 3 and 20 to 26, let's use cloud cover to determine the icon set
   if(((0 <= wawa <= 3) or (20 <= wawa <= 26)) and not math.isnan(cloud_coverage)):
