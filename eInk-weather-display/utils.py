@@ -74,7 +74,7 @@ def draw_title(draw, title_font, title, sub_title=None, sub_title_font=None):
   if (sub_title):
     if (not sub_title_font):
       sub_title_font = title_font
-    sub_title_size_width, sub_title_size_height = draw.textsize(sub_title, sub_title_font)
+    sub_title_size_width, _ = draw.textsize(sub_title, sub_title_font)
     draw.rectangle([(size_width + x_padding, 0), (size_width + x_padding + sub_title_size_width + 40, size_height + y_padding)], fill=0xff, outline=0, width=4)
     draw.text(((size_width + x_padding + (sub_title_size_width + 40)//2), (size_height + y_padding)//2), sub_title, fill="black", font=sub_title_font, anchor='mm')
 
