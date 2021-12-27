@@ -48,7 +48,12 @@ def refresh(panel_size, fonts, images, config, epd_so, init):
     full_image.save(filename)
   else:
     logger.info('Sending image to EPD')
+    if (config.getboolean('MIRROR_HORIZONTAL')):
+      full_image = full_image.transpose(Image.FLIP_LEFT_RIGHT)
     image_bytes = full_image.rotate(0 if not config.getboolean('ROTATE_180') else 180, expand=True).tobytes()
     c_logger = ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_wchar_p)(logging.getLogger('esp.so').log)
-    epd_so.draw_image_8bit(image_bytes, ctypes.c_bool(init), config.getint('BITS_PER_PIXEL'), c_logger)
+    result = epd_so.draw_image_8bit(image_bytes, ctypes.c_bool(init), ctypes.c_int(config.getint('EPD_VOLTAGE')), config.getint('BITS_PER_PIXEL'), c_logger)
+    if(result != 0):
+      logger.error('There was an error when calling draw_image_8bit()')
+
   logger.info('Refresh complete')

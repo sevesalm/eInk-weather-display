@@ -7,6 +7,8 @@ from PIL import ImageFont, ImageDraw
 from dateutil.parser import parse
 import pytz
 
+SUPPORTED_EPD_MODELS = ['7.8', '10.3']
+
 def draw_quantity(draw, mid_point, value, unit, fonts, font='font_sm', font_unit='font_xs'):
   (x, y) = mid_point
   draw.text((x - 7, y), value, font = fonts[font], fill = 0, anchor = 'rs')
@@ -39,7 +41,7 @@ def from_8bit_to_2bit(image):
   return bytes(result)
 
 def get_epd_data(config):
-  if(config.get('EPD_MODEL') == '7.8'):
+  if(is_supported_epd(config.get('EPD_MODEL'))):
     if (config.getboolean('FILE_OUTPUT')):
       return (None, (1872, 1404))
     else:
@@ -49,7 +51,7 @@ def get_epd_data(config):
 
 
 def get_fonts(config):
-  if(config.get('EPD_MODEL') == '7.8'):
+  if(is_supported_epd(config.get('EPD_MODEL'))):
     font_mult = 4
   else:
     raise Exception(f'Unsupported model: {config.get("EPD_MODEL")}')
@@ -118,3 +120,6 @@ def show_temperatur_warning_icon(temperature, time, config):
     return True
   
   return False
+
+def is_supported_epd(epd_model):
+  return epd_model in SUPPORTED_EPD_MODELS
