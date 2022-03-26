@@ -7,9 +7,9 @@ import utils
 import icons
 
 def get_battery_icon(voltage, images):
-  if (voltage >= 2900):
+  if (voltage >= 2850):
     return images['misc']['battery_full']
-  if (voltage >= 2800):
+  if (voltage >= 2750):
     return images['misc']['battery_75']
   if (voltage >= 2600):
     return images['misc']['battery_50']
