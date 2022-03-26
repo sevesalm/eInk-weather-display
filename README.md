@@ -6,6 +6,7 @@ This application is a project for building a weather data display using [Raspber
 - Near term weather forecast
 - Weather data from RuuviTag sensors
 - Sunrise and sunset times
+- Different twilight times: astronomical, nautical and civil dusk and dawn
 
 ![prototype](images/eInk-weather-display-7.8-Raspi.jpg)
 
