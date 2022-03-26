@@ -1,6 +1,13 @@
+# from typing import Final
 import ephem
 import math
 import logging
+import pytz
+import datetime
+
+CIVIL_TWILIGHT_HORIZON = '-6'
+NAUTICAL_TWILIGHT_HORIZON = '-12'
+ASTRONOMICAL_TWILIGHT_HORIZON = '-18'
 
 def get_is_daylight(position, utc_datetime_string):
   location = ephem.Observer()
@@ -13,18 +20,91 @@ def get_is_daylight(position, utc_datetime_string):
   sunrise = ephem.localtime(location.next_rising(sun))
   return (sunset < sunrise)
 
-def get_sunrise_sunset(position):
+def get_observer(position, aware_datetime):
+  observer = ephem.Observer()
+  observer.lat = str(position[0])
+  observer.lon = str(position[1])
+  observer.date = aware_datetime.astimezone(tz=pytz.utc)
+  return observer
+
+def get_twilight(sun):
+  if(sun.alt + sun.radius > 0):
+    return 0
+  if(sun.alt >= ephem.degrees(CIVIL_TWILIGHT_HORIZON)):
+    return 1
+  if(sun.alt >= ephem.degrees(NAUTICAL_TWILIGHT_HORIZON)):
+    return 2
+  if(sun.alt >= ephem.degrees(ASTRONOMICAL_TWILIGHT_HORIZON)):
+    return 3
+  return 4
+
+def get_nearest_sun_transit(position, aware_datetime):
+  observer = get_observer(position, aware_datetime)
+  sun = ephem.Sun()
+
+  next_transit = ephem.localtime(observer.next_transit(sun)).astimezone(tz=None)
+  previous_transit = ephem.localtime(observer.previous_transit(sun)).astimezone(tz=None)
+  is_next_transit_closer = abs(aware_datetime-next_transit) <= abs(aware_datetime-previous_transit)
+  nearest_transit = next_transit if (is_next_transit_closer) else previous_transit
+  observer.date = nearest_transit.astimezone(tz=pytz.utc)
+  sun.compute(observer)
+  transit_twilight = get_twilight(sun)
+  return (nearest_transit, transit_twilight)
+
+def remove_odd(transit_datetime, d):
+  return d if abs(transit_datetime - d) < datetime.timedelta(days=1) else None
+
+def get_previous_rising(location, sun, transit_datetime, use_center=False):
+  try:
+    d = ephem.localtime(location.previous_rising(sun, use_center=use_center)).astimezone(tz=None)
+    return remove_odd(transit_datetime, d)
+  except (ephem.NeverUpError, ephem.AlwaysUpError):
+    return None
+
+def get_next_setting(location, sun, transit_datetime, use_center=False):
+  try:
+    d = ephem.localtime(location.next_setting(sun, use_center=use_center)).astimezone(tz=None)
+    return remove_odd(transit_datetime, d)
+  except (ephem.NeverUpError, ephem.AlwaysUpError):
+    return None
+
+def get_dusks_and_dawns(position, now):
   location = ephem.Observer()
   location.lat = str(position[0])
   location.lon = str(position[1])
-
+  (transit_datetime, transit_twilight) = get_nearest_sun_transit(position, now)
+  location.date = transit_datetime.astimezone(tz=pytz.utc)
+  
   sun = ephem.Sun()
-  sunset = ephem.localtime(location.next_setting(sun))
-  sunrise = ephem.localtime(location.next_rising(sun))
-  is_daylight = sunset < sunrise
-  if(not is_daylight):
-    return (sunrise, sunset)
-  return (ephem.localtime(location.previous_rising(sun)), sunset) # Return the previous if sunset has not happened but sunrise has
+  previous_sunrise = get_previous_rising(location, sun, transit_datetime)
+  next_sunset = get_next_setting(location, sun, transit_datetime)
+
+  location.horizon = CIVIL_TWILIGHT_HORIZON
+  civil_dawn = get_previous_rising(location, sun, transit_datetime, True)
+  civil_dusk = get_next_setting(location, sun, transit_datetime, True)
+
+  location.horizon = NAUTICAL_TWILIGHT_HORIZON
+  nautical_dawn = get_previous_rising(location, sun, transit_datetime, True)
+  nautical_dusk = get_next_setting(location, sun, transit_datetime, True)
+
+  location.horizon = ASTRONOMICAL_TWILIGHT_HORIZON
+  astronomical_dawn = get_previous_rising(location, sun, transit_datetime, True)
+  astronomical_dusk = get_next_setting(location, sun, transit_datetime, True)
+
+  dawns = [x for x in [astronomical_dawn, nautical_dawn, civil_dawn, previous_sunrise] if x != None]
+  dusks = [x for x in [next_sunset, civil_dusk, nautical_dusk, astronomical_dusk] if x != None]
+
+  times = dawns + dusks
+  now_index = sorted(times + [now]).index(now)
+
+  dawn_twilights = list(range(transit_twilight + len(dawns), transit_twilight, -1))
+  dusk_twilights = list(range(transit_twilight, transit_twilight + len(dusks) + 1))
+  twilights = dawn_twilights + dusk_twilights
+
+  return { "now_index": now_index,
+           "times": times,
+           "twilights": twilights }
+  
 
 def get_moon_phase():
   moon = ephem.Moon()
