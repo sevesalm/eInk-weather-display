@@ -28,6 +28,8 @@ The image below shows the main items visible on the display. It was a design dec
 
 ## Development and Deployment
 
+The development can be done on the host machine and the app can be deployed remotely using the provided scripts.
+
 ### Deployment
 
 1. Configure the variables in `scripts/config.env`
@@ -40,7 +42,7 @@ Note: You also have to make sure you have dependencies of [ruuvitag-sensor](http
 
 ### Development
 
-The script [scripts/deploy.sh](scripts/deploy.sh) is a small helper which copies all the files over SSH to Raspberry Pi, activates venv and starts the application remotely using the [scripts/start_tmux_session.sh](scripts/start_tmux_session.sh) script. This is useful if you run your Raspberry Pi in headless mode. The scripts [scripts/pi-compile78.sh](scripts/pi-compile78.sh) (and [scripts/pi-compile37.sh](scripts/pi-compile37.sh)) allows compiling the shared C library on Raspberry Pi.
+The script [scripts/deploy.sh](scripts/deploy.sh) is a small helper which copies all the files over SSH to Raspberry Pi, activates venv and starts the application remotely using the [scripts/start_tmux_session.sh](scripts/start_tmux_session.sh) script. This is useful if you run your Raspberry Pi in headless mode. The script [scripts/compile.sh](scripts/compile.sh) allows compiling the shared C libraries on Raspberry Pi.
 
 The scripts need the variables defined in `scripts/config.env`. Please see [scripts/config.env.example](scripts/config.env.example) for an example.
 

@@ -4,10 +4,13 @@ set -euxo pipefail
 
 source scripts/config.env
 
-rsync -av --delete clib ${HOSTNAME}:${APP_ROOT_DIRECTORY}
+rsync -av --delete clib clib78 ${HOSTNAME}:${APP_ROOT_DIRECTORY}
 ssh ${HOSTNAME} DIRECTORY=${APP_ROOT_DIRECTORY} 'bash -s' <<'ENDSSH'
+  cd ${DIRECTORY}/clib78
+  make
   cd ${DIRECTORY}/clib
   make
 ENDSSH
 
-rsync -v ${HOSTNAME}:${APP_ROOT_DIRECTORY}/clib/epd37.so eInk-weather-display/lib
+rsync -v ${HOSTNAME}:"${APP_ROOT_DIRECTORY}/clib78/epd78.so ${APP_ROOT_DIRECTORY}/clib/epd37.so" eInk-weather-display/lib
+
