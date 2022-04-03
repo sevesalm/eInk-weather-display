@@ -30,21 +30,19 @@ The image below shows the main items visible on the display. It was a design dec
 
 ### Deployment
 
-1. Clone this repository on Raspberry Pi
-1. Create a venv and activate it
-1. Install dependencies: `pip install -r requirements.txt`
+1. Configure the variables in `scripts/config.env`
+1. Create virtual env and install dependencies: `./scripts/install_deps.sh`
 1. Convert the SVG images: `./convert.sh` (install `rsvg-convert` if needed)
 1. Create `eInk-weather-display/config.ini` file (see: [eInk-weather-display/config_example.ini](eInk-weather-display/config_example.ini))
-1. Create `scripts/run.sh` (see: [scripts/run.sh.example](scripts/run.sh.example))
-1. Start: `./scripts/run.sh`
+1. Deploy and enjoy: `./scripts/deploy.sh`
 
-Note: You also have to make sure you have dependencies of [ruuvitag-sensor](https://github.com/ttu/ruuvitag-sensor) and the [bcm2835 driver](http://www.airspayce.com/mikem/bcm2835) installed properly.
+Note: You also have to make sure you have dependencies of [ruuvitag-sensor](https://github.com/ttu/ruuvitag-sensor) and the [bcm2835 driver](http://www.airspayce.com/mikem/bcm2835) installed properly. `tmux` also has to be installed on Rasbperry.
 
 ### Development
 
-The script [scripts/deploy.sh.example](scripts/deploy.sh.example) is a small helper which copies all the files over SSH to Raspberry Pi, activates venv and starts the application remotely using the [scripts/run.sh.example](scripts/run.sh.example) script. This is useful if you run your Raspberry Pi in headless mode. The script [scripts/pi-compile.sh.example](scripts/pi-compile.sh.example) allows compiling the shared C library on Raspberry Pi.
+The script [scripts/deploy.sh](scripts/deploy.sh) is a small helper which copies all the files over SSH to Raspberry Pi, activates venv and starts the application remotely using the [scripts/start_tmux_session.sh](scripts/start_tmux_session.sh) script. This is useful if you run your Raspberry Pi in headless mode. The scripts [scripts/pi-compile78.sh](scripts/pi-compile78.sh) (and [scripts/pi-compile37.sh](scripts/pi-compile37.sh)) allows compiling the shared C library on Raspberry Pi.
 
-Example scripts are provided. Please edit them to suit your needs.
+The scripts need the variables defined in `scripts/config.env`. Please see [scripts/config.env.example](scripts/config.env.example) for an example.
 
 ## Observations and forecast data
 
