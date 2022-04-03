@@ -3,10 +3,7 @@ logger.log
 .ideas
 .vscode/
 __pycache__/
-deploy.sh
-run.sh
-pi-compile37.sh
-pi-compile78.sh
+config.env
 logger.log
 .DS_Store
 config.ini
