@@ -13,4 +13,3 @@ ssh ${HOSTNAME} DIRECTORY=${APP_ROOT_DIRECTORY} 'bash -s' <<'ENDSSH'
 ENDSSH
 
 rsync -v ${HOSTNAME}:"${APP_ROOT_DIRECTORY}/clib78/epd78.so ${APP_ROOT_DIRECTORY}/clib/epd37.so" eInk-weather-display/lib
-
