@@ -1,11 +1,13 @@
 import logging
-import http.client
-import logging
-import os.path
 
 DEFAULT_FILENAME = 'logger.log'
 
+def set_module_log_levels():
+    logging.getLogger('ruuvitag_sensor').setLevel(logging.INFO)
+    logging.getLogger('PIL').setLevel(logging.INFO)
+
 def setup(loglevel = logging.DEBUG):
+    set_module_log_levels()
     fileHandler = logging.FileHandler(DEFAULT_FILENAME)
     fileHandler.setLevel(logging.WARN)
     handlers = [fileHandler]

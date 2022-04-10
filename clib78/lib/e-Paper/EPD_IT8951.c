@@ -42,7 +42,8 @@ UBYTE A2_Mode = 6;
 function :	Software reset
 parameter:
 ******************************************************************************/
-static void EPD_IT8951_Reset(void) {
+static void EPD_IT8951_Reset(t_logger logger) {
+  logger(LOG_LEVEL_DEBUG, L"EPD_IT8951_Reset()");
   DEV_Digital_Write(EPD_RST_PIN, HIGH);
   DEV_Delay_ms(200);
   DEV_Digital_Write(EPD_RST_PIN, LOW);
@@ -299,6 +300,8 @@ parameter:
 static void EPD_IT8951_GetSystemInfo(void *Buf, t_logger logger) {
   IT8951_Dev_Info *Dev_Info;
 
+  logger(LOG_LEVEL_DEBUG, L"EPD_IT8951_GetSystemInfo()");
+
   EPD_IT8951_WriteCommand(USDEF_I80_CMD_GET_DEV_INFO);
 
   EPD_IT8951_ReadMultiData((UWORD *)Buf, sizeof(IT8951_Dev_Info) / 2);
@@ -535,7 +538,10 @@ void Enhance_Driving_Capability(void) {
 function :	Cmd1 SYS_RUN
 parameter:  Run the system
 ******************************************************************************/
-void EPD_IT8951_SystemRun(void) { EPD_IT8951_WriteCommand(IT8951_TCON_SYS_RUN); }
+void EPD_IT8951_SystemRun(t_logger logger) { 
+  logger(LOG_LEVEL_DEBUG, L"EPD_IT8951_SystemRun()");
+  EPD_IT8951_WriteCommand(IT8951_TCON_SYS_RUN); 
+}
 
 /******************************************************************************
 function :	Cmd2 STANDBY
@@ -547,7 +553,10 @@ void EPD_IT8951_Standby(void) { EPD_IT8951_WriteCommand(IT8951_TCON_STANDBY); }
 function :	Cmd3 SLEEP
 parameter:  Sleep
 ******************************************************************************/
-void EPD_IT8951_Sleep(void) { EPD_IT8951_WriteCommand(IT8951_TCON_SLEEP); }
+void EPD_IT8951_Sleep(t_logger logger) { 
+  logger(LOG_LEVEL_INFO, L"EPD_IT8951_Sleep()");
+  EPD_IT8951_WriteCommand(IT8951_TCON_SLEEP); 
+}
 
 /******************************************************************************
 function :	EPD_IT8951_Init
@@ -556,9 +565,11 @@ parameter:
 IT8951_Dev_Info EPD_IT8951_Init(UWORD VCOM, t_logger logger) {
   IT8951_Dev_Info Dev_Info;
 
-  EPD_IT8951_Reset();
+  logger(LOG_LEVEL_INFO, L"EPD_IT8951_Init()");
 
-  EPD_IT8951_SystemRun();
+  EPD_IT8951_Reset(logger);
+
+  EPD_IT8951_SystemRun(logger);
 
   EPD_IT8951_GetSystemInfo(&Dev_Info, logger);
 

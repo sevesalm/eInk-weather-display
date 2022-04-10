@@ -181,11 +181,11 @@ void EPD_IT8951_Display_1bp(UWORD X, UWORD Y, UWORD W, UWORD H, UWORD Mode,UDOUB
 
 void Enhance_Driving_Capability(void);
 
-void EPD_IT8951_SystemRun(void);
+void EPD_IT8951_SystemRun(t_logger logger);
 
 void EPD_IT8951_Standby(void);
 
-void EPD_IT8951_Sleep(void);
+void EPD_IT8951_Sleep(t_logger logger);
 
 IT8951_Dev_Info EPD_IT8951_Init(UWORD VCOM, t_logger logger);
 

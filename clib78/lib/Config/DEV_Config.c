@@ -128,6 +128,10 @@ Info:
 ******************************************************************************/
 UBYTE DEV_Module_Init(t_logger logger)
 {
+	// See: https://www.airspayce.com/mikem/bcm2835/group__constants.html#gaf2e0ca069b8caef24602a02e8a00884e
+	const uint16_t bcm2835_spi_clock_divider = BCM2835_SPI_CLOCK_DIVIDER_32; 
+	log_fmt(logger, LOG_LEVEL_DEBUG, L"SPI Clock Divider = %d", bcm2835_spi_clock_divider);
+
 	if (!bcm2835_init())
 	{
 		logger(LOG_LEVEL_ERROR, L"bcm2835_init() failed");
@@ -137,8 +141,7 @@ UBYTE DEV_Module_Init(t_logger logger)
 	bcm2835_spi_begin();																		 //Start spi interface, set spi pin for the reuse function
 	bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST); //High first transmission
 	bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);							 //spi mode 0
-	//bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_16);   //For RPi3/3B/3B+
-	bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_32); //For RPi 4
+	bcm2835_spi_setClockDivider(bcm2835_spi_clock_divider); 
 	/* SPI clock reference link：*/
 	/*http://www.airspayce.com/mikem/bcm2835/group__constants.html#gaf2e0ca069b8caef24602a02e8a00884e*/
 

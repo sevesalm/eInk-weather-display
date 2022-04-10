@@ -8,7 +8,6 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
     return 1;
   }
 
-  logger(LOG_LEVEL_INFO, L"EPD_IT8951_Init()");
   IT8951_Dev_Info Dev_Info = EPD_IT8951_Init(voltage, logger);
 
   // get some important info from Dev_Info structure
@@ -27,7 +26,6 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
   }
 
   if (init == true) {
-    logger(LOG_LEVEL_INFO, L"EPD_IT8951_Init_Refresh()");
     EPD_IT8951_Init_Refresh(Dev_Info, Memory_Addr, true);
   }
 
@@ -67,8 +65,7 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
 
   logger(LOG_LEVEL_INFO, L"EPD_IT8951_WaitForDisplayReady()");
   EPD_IT8951_WaitForDisplayReady();
-  logger(LOG_LEVEL_INFO, L"EPD_IT8951_Sleep()");
-  EPD_IT8951_Sleep();
+  EPD_IT8951_Sleep(logger);
   DEV_Module_Exit();
   return 0;
 }
