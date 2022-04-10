@@ -28,13 +28,8 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
 
   if (init == true) {
     logger(LOG_LEVEL_INFO, L"EPD_IT8951_Init_Refresh()");
-    EPD_IT8951_Init_Refresh(Dev_Info, Memory_Addr);
+    EPD_IT8951_Init_Refresh(Dev_Info, Memory_Addr, true);
   }
-
-  // logger(LOG_LEVEL_INFO, L"20 first data:");
-  // for (size_t i = 0; i < 20; i++) {
-  //   log_fmt(logger, LOG_LEVEL_DEBUG, L"Data = %X", image_8bit[i]);
-  // }
 
   const size_t panel_size = Panel_Width * Panel_Height;
 
@@ -45,7 +40,7 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
     logger(LOG_LEVEL_INFO, L"from_8bit_to_4bit()");
     UBYTE *image_4bit = from_8bit_to_4bit(image_8bit, panel_size);
     logger(LOG_LEVEL_INFO, L"EPD_IT8951_4bp_Refresh()");
-    EPD_IT8951_4bp_Refresh(image_4bit, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr, false);
+    EPD_IT8951_4bp_Refresh(image_4bit, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr, true);
     if (image_4bit != NULL) {
       free(image_4bit);
     }
@@ -53,7 +48,7 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
     logger(LOG_LEVEL_INFO, L"from_8bit_to_2bit()");
     UBYTE *image_2bit = from_8bit_to_2bit(image_8bit, panel_size);
     logger(LOG_LEVEL_INFO, L"EPD_IT8951_2bp_Refresh()");
-    EPD_IT8951_2bp_Refresh(image_2bit, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr, false);
+    EPD_IT8951_2bp_Refresh(image_2bit, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr, true);
     if (image_2bit != NULL) {
       free(image_2bit);
     }
@@ -61,8 +56,7 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
     logger(LOG_LEVEL_INFO, L"from_8bit_to_1bit()");
     UBYTE *image_1bit = from_8bit_to_1bit(image_8bit, panel_size);
     logger(LOG_LEVEL_INFO, L"EPD_IT8951_1bp_Refresh()");
-    EPD_IT8951_1bp_Refresh(image_1bit, 0, 0, Panel_Width, Panel_Height, GC16_Mode, Memory_Addr,
-                           false);
+    EPD_IT8951_1bp_Refresh(image_1bit, 0, 0, Panel_Width, Panel_Height, GC16_Mode, Memory_Addr, true);
     if (image_1bit != NULL) {
       free(image_1bit);
     }

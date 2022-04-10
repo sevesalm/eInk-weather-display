@@ -113,7 +113,7 @@ static void EPD_IT8951_WriteData(UWORD Data) {
 function :	write multi data
 parameter:  data
 ******************************************************************************/
-static void EPD_IT8951_WriteMuitiData(UWORD *Data_Buf, UDOUBLE Length) {
+static void EPD_IT8951_WriteMultiData(UWORD *Data_Buf, UDOUBLE Length) {
   // Set Preamble for Write Command
   UWORD Write_Preamble = 0x0000;
 
@@ -356,7 +356,7 @@ static void EPD_IT8951_HostAreaPackedPixelWrite_1bp(IT8951_Load_Img_Info *Load_I
   Source_Buffer_Length = Source_Buffer_Width * Source_Buffer_Height;
 
   if (Packed_Write == true) {
-    EPD_IT8951_WriteMuitiData(Source_Buffer, Source_Buffer_Length);
+    EPD_IT8951_WriteMultiData(Source_Buffer, Source_Buffer_Length);
   } else {
     for (UDOUBLE i = 0; i < Source_Buffer_Height; i++) {
       for (UDOUBLE j = 0; j < Source_Buffer_Width; j++) {
@@ -384,12 +384,12 @@ static void EPD_IT8951_HostAreaPackedPixelWrite_2bp(IT8951_Load_Img_Info *Load_I
   EPD_IT8951_LoadImgAreaStart(Load_Img_Info, Area_Img_Info);
 
   // from byte to word
-  Source_Buffer_Width = (Area_Img_Info->Area_W * 2 / 8) / 2;
+  Source_Buffer_Width = Area_Img_Info->Area_W / 8;
   Source_Buffer_Height = Area_Img_Info->Area_H;
   Source_Buffer_Length = Source_Buffer_Width * Source_Buffer_Height;
 
   if (Packed_Write == true) {
-    EPD_IT8951_WriteMuitiData(Source_Buffer, Source_Buffer_Length);
+    EPD_IT8951_WriteMultiData(Source_Buffer, Source_Buffer_Length);
   } else {
     for (UDOUBLE i = 0; i < Source_Buffer_Height; i++) {
       for (UDOUBLE j = 0; j < Source_Buffer_Width; j++) {
@@ -417,12 +417,12 @@ static void EPD_IT8951_HostAreaPackedPixelWrite_4bp(IT8951_Load_Img_Info *Load_I
   EPD_IT8951_LoadImgAreaStart(Load_Img_Info, Area_Img_Info);
 
   // from byte to word
-  Source_Buffer_Width = (Area_Img_Info->Area_W * 4 / 8) / 2;
+  Source_Buffer_Width = Area_Img_Info->Area_W / 4;
   Source_Buffer_Height = Area_Img_Info->Area_H;
   Source_Buffer_Length = Source_Buffer_Width * Source_Buffer_Height;
 
   if (Packed_Write == true) {
-    EPD_IT8951_WriteMuitiData(Source_Buffer, Source_Buffer_Length);
+    EPD_IT8951_WriteMultiData(Source_Buffer, Source_Buffer_Length);
   } else {
     for (UDOUBLE i = 0; i < Source_Buffer_Height; i++) {
       for (UDOUBLE j = 0; j < Source_Buffer_Width; j++) {
@@ -449,7 +449,7 @@ static void EPD_IT8951_HostAreaPackedPixelWrite_8bp(IT8951_Load_Img_Info *Load_I
   EPD_IT8951_LoadImgAreaStart(Load_Img_Info, Area_Img_Info);
 
   // from byte to word
-  Source_Buffer_Width = (Area_Img_Info->Area_W * 8 / 8) / 2;
+  Source_Buffer_Width = Area_Img_Info->Area_W / 2;
   Source_Buffer_Height = Area_Img_Info->Area_H;
 
   for (UDOUBLE i = 0; i < Source_Buffer_Height; i++) {
@@ -578,7 +578,7 @@ IT8951_Dev_Info EPD_IT8951_Init(UWORD VCOM, t_logger logger) {
 function :	EPD_IT8951_Init_Fresh
 parameter:
 ******************************************************************************/
-void EPD_IT8951_Init_Refresh(IT8951_Dev_Info Dev_Info, UDOUBLE Target_Memory_Addr) {
+void EPD_IT8951_Init_Refresh(IT8951_Dev_Info Dev_Info, UDOUBLE Target_Memory_Addr, bool Packed_Write) {
   UDOUBLE ImageSize = ((Dev_Info.Panel_W * 4 % 8 == 0) ? (Dev_Info.Panel_W * 4 / 8)
                                                        : (Dev_Info.Panel_W * 4 / 8 + 1)) *
                       Dev_Info.Panel_H;
@@ -601,7 +601,7 @@ void EPD_IT8951_Init_Refresh(IT8951_Dev_Info Dev_Info, UDOUBLE Target_Memory_Add
   Area_Img_Info.Area_W = Dev_Info.Panel_W;
   Area_Img_Info.Area_H = Dev_Info.Panel_H;
 
-  EPD_IT8951_HostAreaPackedPixelWrite_4bp(&Load_Img_Info, &Area_Img_Info, false);
+  EPD_IT8951_HostAreaPackedPixelWrite_4bp(&Load_Img_Info, &Area_Img_Info, Packed_Write);
 
   EPD_IT8951_Display_Area(0, 0, Dev_Info.Panel_W, Dev_Info.Panel_H, INIT_Mode);
 
