@@ -15,7 +15,7 @@ MSG = -g -O0 -Wall
 DEBUG = -D USE_DEBUG
 STD = # -std=c99 <--- Removed for off_t error
 
-CFLAGS += $(MSG) $(DEBUG) $(STD)
+CFLAGS += $(MSG) $(DEBUG) $(STD) -fPIC 
 
 LIB = -lbcm2835 -lm -lrt -lpthread
 

@@ -73,7 +73,7 @@
 **/
 #define UBYTE uint8_t
 #define UWORD uint16_t
-#define UDOUBLE uint32_t
+#define UDOUBLE uint64_t
 
 /*------------------------------------------------------------------------------------------------------*/
 void DEV_Digital_Write(UWORD Pin, UBYTE Value);
