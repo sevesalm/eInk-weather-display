@@ -6,6 +6,7 @@ from info_panel import get_info_panel
 from forecast_panel import get_forecasts_panel
 from celestial_panel import get_celestial_panel
 from sensor_panel import get_sensor_panel
+from timeit import default_timer as timer
 
 def refresh(panel_size, fonts, images, config, epd_so, init):
   logger = logging.getLogger(__name__)
@@ -13,6 +14,7 @@ def refresh(panel_size, fonts, images, config, epd_so, init):
     logger.info('Full refresh started')
   else:
     logger.info('Partial refresh started')
+  start_time = timer()
   full_image = Image.new('L', (panel_size[0], panel_size[1]), 0xff)
   draw = ImageDraw.Draw(full_image)
 
@@ -46,14 +48,19 @@ def refresh(panel_size, fonts, images, config, epd_so, init):
     filename = config.get('OUTPUT_FILENAME')
     logger.info(f'Saving image to {filename}')
     full_image.save(filename)
+    elapsed_refresh_time = 0
   else:
     logger.info('Sending image to EPD')
     if (config.getboolean('MIRROR_HORIZONTAL')):
       full_image = full_image.transpose(Image.FLIP_LEFT_RIGHT)
     image_bytes = full_image.rotate(0 if not config.getboolean('ROTATE_180') else 180, expand=True).tobytes()
     c_logger = ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_wchar_p)(logging.getLogger('esp.so').log)
+    start_refresh_time = timer()
     result = epd_so.draw_image_8bit(image_bytes, ctypes.c_bool(init), ctypes.c_int(config.getint('EPD_VOLTAGE')), config.getint('BITS_PER_PIXEL'), c_logger)
+    elapsed_refresh_time = timer() - start_refresh_time
     if(result != 0):
       logger.error('There was an error when calling draw_image_8bit()')
 
+  elapsed_time = timer() - start_time
+  logger.info(f'Total time: {round(elapsed_time, 1)} s, refresh: {round(elapsed_refresh_time, 1)} s')
   logger.info('Refresh complete')
