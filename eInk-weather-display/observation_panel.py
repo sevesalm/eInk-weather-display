@@ -6,6 +6,7 @@ from weather import get_observations
 from celestial import get_is_daylight
 import utils
 import icons
+from feels_like_temperature import get_feels_like_temperature
 
 def get_observation_icon(wawa, cloud_coverage, is_daylight, images, fonts, config):
   if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
@@ -33,7 +34,7 @@ def get_observation_panel(location, images, fonts, config):
   logger = logging.getLogger(__name__)
   logger.info('Generating observation panel')
   icon_size = 280
-  (observations, first_position, first_position_name) = get_observations(location, 1)
+  (observations, first_position, first_position_name) = get_observations(location)
   logger.info('Received data: %s', repr(observations))
   latest_date = max(observations.keys())
   latest_date_local = utils.utc_datetime_string_to_local_datetime(latest_date)
@@ -52,14 +53,20 @@ def get_observation_panel(location, images, fonts, config):
   # Temperature
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 120), str(latest["t2m"]), '°C', fonts, 'font_lg', 'font_sm')
 
+  # Feels like
+  temp_feels = get_feels_like_temperature(latest["t2m"], latest["ws_10min"], 0, latest["rh"]/100)
+  
+  # temp_feels = get_feels_like_temperature(latest["t2m"], latest["ws_10min"], latest['dir_1min'], latest["rh"]/100)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 210), str(round(temp_feels)), '°C', fonts)
+
   # Relative humidity
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 210), str(round(latest["rh"])), '%', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 280), str(round(latest["rh"])), '%', fonts)
 
   # Barometric pressure
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 280), str(round(latest["p_sea"])), 'hPa', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 350), str(round(latest["p_sea"])), 'hPa', fonts)
   
   # Wind speed
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 350), f'{round(latest["ws_10min"])} – {round(latest["wg_10min"])}', 'm/s', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 420), f'{round(latest["ws_10min"])} – {round(latest["wg_10min"])}', 'm/s', fonts)
 
   # Weather icon
   cloud_coverage = latest['n_man']

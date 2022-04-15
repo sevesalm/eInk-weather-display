@@ -3,10 +3,11 @@
 This application is a project for building a weather data display using [Raspberry Pi](https://www.raspberrypi.org/products/), [Waveshare e-Paper Display](https://www.waveshare.com/product/raspberry-pi/displays/e-paper.htm) and [RuuviTag sensors](https://ruuvi.com/ruuvitag-specs/). The goal of the project is to have an e-Ink display showing:
 
 - Current weather observations (temperature, windspeed, humidity etc.)
-- Near term weather forecast
+- 48h weather forecast
 - Weather data from RuuviTag sensors
 - Sunrise and sunset times
 - Different twilight times: astronomical, nautical and civil dusk and dawn
+- "Feels like" temperature
 
 ![prototype](images/eInk-weather-display-7.8-Raspi.jpg)
 
