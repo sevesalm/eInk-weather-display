@@ -5,6 +5,7 @@ DEFAULT_FILENAME = 'logger.log'
 def set_module_log_levels() -> None:
     logging.getLogger('ruuvitag_sensor').setLevel(logging.INFO)
     logging.getLogger('PIL').setLevel(logging.INFO)
+    logging.getLogger('Rx').setLevel(logging.INFO)
 
 def setup(loglevel = logging.DEBUG) -> None:
     set_module_log_levels()
