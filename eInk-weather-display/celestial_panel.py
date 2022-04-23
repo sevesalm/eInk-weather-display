@@ -51,18 +51,20 @@ def get_celestial_panel(position: Position, fonts: Fonts, config: SectionProxy) 
   arrow_width = 25
 
   y_position = y_base
-  for shade, new_threshold in zip(dusks_and_dawns["twilights"], dusks_and_dawns["times"] + [None]):
-    if (new_threshold != None):
-      (hours, minutes) = parse_sunrise_sunset_hour_minute(new_threshold)
-      draw.text((x_base - 60, y_position+tick_height), ":", font = fonts['font_xs'], fill = 0, anchor = 'mm')
-      draw.text((x_base - 53, y_position+tick_height), minutes, font = fonts['font_xs'], fill = 0, anchor = 'lm')
-      draw.text((x_base - 67 , y_position+tick_height), hours, font = fonts['font_xs'], fill = 0, anchor = 'rm')
-
-      draw.rectangle([(x_base + 10, y_position + tick_height - 1), (x_base + 20, y_position + tick_height + 1)], "#000")
+  for shade in dusks_and_dawns["twilights"]:
     color = get_shade_color(shade)
-    draw.rectangle([(x_base + tick_gap, y_position), (x_base + tick_gap + tick_width, y_position + tick_height)], color)
+    draw.rectangle(((x_base + tick_gap, y_position), (x_base + tick_gap + tick_width, y_position + tick_height)), color)
     y_position += tick_height
-
+  
+  y_position = y_base
+  for new_threshold in dusks_and_dawns["times"]:
+    (hours, minutes) = parse_sunrise_sunset_hour_minute(new_threshold)
+    draw.text((x_base - 60, y_position+tick_height), ":", font = fonts['font_xs'], fill = 0, anchor = 'mm')
+    draw.text((x_base - 53, y_position+tick_height), minutes, font = fonts['font_xs'], fill = 0, anchor = 'lm')
+    draw.text((x_base - 67 , y_position+tick_height), hours, font = fonts['font_xs'], fill = 0, anchor = 'rm')
+    draw.rectangle(((x_base + 10, y_position + tick_height - 1), (x_base + 20, y_position + tick_height + 1)), "#000")
+    y_position += tick_height
+  
   arrow_offset = y_base + dusks_and_dawns["now_index"] * tick_height + tick_height//2
   draw.polygon([(x_base + tick_gap + tick_width + arrow_gap + arrow_width, -10 + arrow_offset), (x_base + tick_gap + tick_width + arrow_gap, arrow_offset), (x_base + tick_gap + tick_width + arrow_gap + arrow_width, 10 + arrow_offset)], "#000")
 
