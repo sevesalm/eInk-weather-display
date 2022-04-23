@@ -574,9 +574,11 @@ IT8951_Dev_Info EPD_IT8951_Init(UWORD VCOM, t_logger logger) {
   EPD_IT8951_GetSystemInfo(&Dev_Info, logger);
 
   // Enable Pack write
+  logger(LOG_LEVEL_INFO, L"Enable pack write...");
   EPD_IT8951_WriteReg(I80CPCR, 0x0001);
 
   // Set VCOM by handle
+  logger(LOG_LEVEL_INFO, L"Set VCOM...");
   if (VCOM != EPD_IT8951_GetVCOM()) {
     EPD_IT8951_SetVCOM(VCOM);
   }

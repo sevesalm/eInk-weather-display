@@ -5,6 +5,7 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
   logger(LOG_LEVEL_INFO, L"DEV_Module_Init()");
 
   if (DEV_Module_Init(logger) != 0) {
+    logger(LOG_LEVEL_ERROR, L"DEV_Module_Init() failed");
     return 1;
   }
 
@@ -67,6 +68,7 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
   EPD_IT8951_WaitForDisplayReady();
   EPD_IT8951_Sleep(logger);
   DEV_Module_Exit();
+  logger(LOG_LEVEL_INFO, L"Exiting cleanly");
   return 0;
 }
 
