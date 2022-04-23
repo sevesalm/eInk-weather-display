@@ -7,8 +7,11 @@ from forecast_panel import get_forecasts_panel
 from celestial_panel import get_celestial_panel
 from sensor_panel import get_sensor_panel
 from timeit import default_timer as timer
+from configparser import SectionProxy
+from typing import Optional
+from type_alias import Icons, Fonts
 
-def refresh(panel_size, fonts, images, config, epd_so, init):
+def refresh(panel_size: tuple[int, int], fonts: Fonts, images: DusksAndDawns, config: SectionProxy, epd_so: Optional[ctypes.CDLL], init: bool, error_count: int) -> None:
   logger = logging.getLogger(__name__)
   if (init == True):
     logger.info('Full refresh started')
@@ -24,8 +27,7 @@ def refresh(panel_size, fonts, images, config, epd_so, init):
   sensor_panel_in = get_sensor_panel(config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_IN_NAME'), images, fonts, config)
   sensor_panel_out = get_sensor_panel(config.get('RUUVITAG_MAC_OUT'), config.get('RUUVITAG_MAC_OUT_NAME'), images, fonts, config, False)
   (forecasts_panel, first_position) = get_forecasts_panel(images, fonts, config)
-  celestial_panel = get_celestial_panel(first_position, images, fonts, config)
-  info_panel = get_info_panel(fonts, config)
+  celestial_panel = get_celestial_panel(first_position, fonts, config)
 
   # Paste the panels on the main image
   logger.info('Pasting panels')

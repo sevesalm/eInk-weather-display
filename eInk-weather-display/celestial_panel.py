@@ -2,18 +2,19 @@ from PIL import Image, ImageDraw
 from celestial import get_moon_phase, get_moon_phase_chr, get_dusks_and_dawns
 import logging
 import utils
-import icons
 import datetime
+from configparser import SectionProxy
+from type_alias import Fonts, Position, Datetime
 
-def parse_sunrise_sunset_time(val):
-  if(val == None):
+def parse_sunrise_sunset_time(datetime: Datetime) -> str:
+  if(datetime == None):
     return 'N/A'
-  return val.astimezone(tz=None).strftime('%-H:%M')
+  return datetime.astimezone(tz=None).strftime('%-H:%M')
 
-def parse_sunrise_sunset_hour_minute(val):
-  return (val.astimezone(tz=None).strftime('%-H'), val.astimezone(tz=None).strftime('%M'))
+def parse_sunrise_sunset_hour_minute(datetime: Datetime) -> tuple[str, str]:
+  return (datetime.astimezone(tz=None).strftime('%-H'), datetime.astimezone(tz=None).strftime('%M'))
 
-def get_shade_color(shade):
+def get_shade_color(shade: int) -> str:
   if (shade == 0):
     return "#eee"
   elif (shade == 1):
@@ -24,9 +25,10 @@ def get_shade_color(shade):
     return "#444"
   elif (shade == 4):
     return "#000"
+  raise Exception('Unsupported shade')
 
 
-def get_celestial_panel(position, images, fonts, config):
+def get_celestial_panel(position: Position, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating celestial panel')
   x_size = 400

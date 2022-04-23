@@ -1,27 +1,29 @@
-import datetime
 import sys
 import math
 import ctypes
 import random
-from PIL import ImageFont, ImageDraw
+from PIL import ImageFont, ImageDraw, Image
 from dateutil.parser import parse
 import pytz
+from configparser import SectionProxy
+from typing import Optional, Union
+from type_alias import Datetime, Fonts, Icons, DayNightIcons
 
 SUPPORTED_EPD_MODELS = ['7.8', '10.3']
 
-def draw_quantity(draw, mid_point, value, unit, fonts, font='font_sm', font_unit='font_xs'):
+def draw_quantity(draw: ImageDraw.ImageDraw, mid_point: tuple[int, int], value: str, unit: str, fonts: Fonts, font:str='font_sm', font_unit:str='font_xs') -> None:
   (x, y) = mid_point
   draw.text((x - 7, y), value, font = fonts[font], fill = 0, anchor = 'rs')
   draw.text((x + 7, y), unit, font = fonts[font_unit], fill = 0, anchor = 'ls')
 
-def check_python_version():
+def check_python_version() -> None:
   major = sys.version_info[0]
   minor = sys.version_info[1]
   if major < 3 or minor < 7:
     raise Exception('Python 3.7 or newer required')
 
 # Converts a 8-bit image into a packed 2-bit image which can be fed to EPD
-def from_8bit_to_2bit(image):
+def from_8bit_to_2bit(image: Image.Image) -> bytes:
   if(image.mode != 'L'):
     raise Exception('Image mode must be \'L\'')
   if(image.width % 4 != 0):
@@ -40,7 +42,7 @@ def from_8bit_to_2bit(image):
       result.append(new_px)
   return bytes(result)
 
-def get_epd_data(config):
+def get_epd_data(config: SectionProxy) -> tuple[Optional[ctypes.CDLL], tuple[int, int]]:
   if(is_supported_epd(config.get('EPD_MODEL'))):
     if (config.getboolean('FILE_OUTPUT')):
       return (None, (1872, 1404))
@@ -50,7 +52,7 @@ def get_epd_data(config):
     raise Exception(f'Unsupported model: {config.get("EPD_MODEL")}')
 
 
-def get_fonts(config):
+def get_fonts(config: SectionProxy) -> Fonts:
   if(is_supported_epd(config.get('EPD_MODEL'))):
     font_mult = 4
   else:
@@ -66,33 +68,33 @@ def get_fonts(config):
     'font_misc_md': ImageFont.truetype('fonts/misc.woff', font_mult * 32)
   }
 
-def draw_title(draw, title_font, title, sub_title=None, sub_title_font=None):
+def draw_title(draw: ImageDraw.ImageDraw, title_font: ImageFont.FreeTypeFont, title: str, sub_title: Optional[str]=None, sub_title_font:Optional[ImageFont.FreeTypeFont]=None) -> None:
   size_width, size_height = draw.textsize(title, title_font)
   x_padding = 20
   y_padding = 4
 
-  draw.rectangle([(0, 0), (size_width + x_padding, size_height + y_padding)], fill=0x00)
+  draw.rectangle(((0, 0), (size_width + x_padding, size_height + y_padding)), fill=0x00)
   draw.text(((size_width + x_padding)//2, (size_height + y_padding)//2), title, fill="white", font=title_font, anchor='mm')
   if (sub_title):
     if (not sub_title_font):
       sub_title_font = title_font
     sub_title_size_width, _ = draw.textsize(sub_title, sub_title_font)
-    draw.rectangle([(size_width + x_padding, 0), (size_width + x_padding + sub_title_size_width + 40, size_height + y_padding)], fill=0xff, outline=0, width=4)
+    draw.rectangle(((size_width + x_padding, 0), (size_width + x_padding + sub_title_size_width + 40, size_height + y_padding)), fill=0xff, outline=0, width=4)
     draw.text(((size_width + x_padding + (sub_title_size_width + 40)//2), (size_height + y_padding)//2), sub_title, fill="black", font=sub_title_font, anchor='mm')
 
-def get_icon_variant(is_daylight, icon_set):
+def get_icon_variant(is_daylight: bool, icon_set: DayNightIcons) -> Image.Image:
   if (not is_daylight and 'night' in icon_set):
     return icon_set['night']
   return icon_set['day']
 
-def get_missing_weather_icon_icon(icon_index, is_daylight, images, fonts):
+def get_missing_weather_icon_icon(icon_index: Union[float, int], is_daylight: bool, images: Icons, fonts: Fonts) -> Image.Image:
   icon = images['misc']['background_day'].copy() if is_daylight else images['misc']['background_night'].copy()
   draw = ImageDraw.Draw(icon)
   text = "NaN" if math.isnan(icon_index) else str(icon_index)
   draw.text((icon.width//2, icon.height//2), text, font = fonts['font_md'], fill="black", anchor = 'mm')
   return icon
 
-def get_cloud_cover_icon(cloud_cover, images, fonts, config):
+def get_cloud_cover_icon(cloud_cover: float, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
     icon_index = random.randint(0, 9)
   else:
@@ -105,11 +107,11 @@ def get_cloud_cover_icon(cloud_cover, images, fonts, config):
   draw.text((icon.width//2, icon.height//2), text, font = fonts['font_md'], fill="black", anchor='mm')
   return icon
 
-def utc_datetime_string_to_local_datetime(date_string):
+def utc_datetime_string_to_local_datetime(date_string: str) -> Datetime:
   return parse(date_string).replace(tzinfo=pytz.utc).astimezone(tz=None)
 
 
-def show_temperatur_warning_icon(temperature, time, config):
+def show_temperatur_warning_icon(temperature: float, time: Datetime, config: SectionProxy) -> bool:
   if temperature >= config.getint('HIGH_TEMPERATURE_WARNING_THRESHOLD'):
     return True 
   
@@ -121,5 +123,5 @@ def show_temperatur_warning_icon(temperature, time, config):
   
   return False
 
-def is_supported_epd(epd_model):
+def is_supported_epd(epd_model: str) -> bool:
   return epd_model in SUPPORTED_EPD_MODELS

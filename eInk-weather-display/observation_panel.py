@@ -7,8 +7,10 @@ from celestial import get_is_daylight
 import utils
 import icons
 from feels_like_temperature import get_feels_like_temperature
+from configparser import SectionProxy
+from type_alias import Icons, Fonts
 
-def get_observation_icon(wawa, cloud_coverage, is_daylight, images, fonts, config):
+def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
     icon_set = images['observation'][random.choice(list(images['observation'].keys()))]
     return utils.get_icon_variant(is_daylight, icon_set)
@@ -27,10 +29,12 @@ def get_observation_icon(wawa, cloud_coverage, is_daylight, images, fonts, confi
     else: # Lolwut?
       icon_set = images['observation'].get(0)
   else:
-    icon_set = images['observation'].get(wawa)
+    icon_set = images['observation'].get(int(wawa))
+  if (icon_set == None): 
+    raise Exception('icon_set not found')
   return utils.get_icon_variant(is_daylight, icon_set)
 
-def get_observation_panel(location, images, fonts, config):
+def get_observation_panel(location: str, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating observation panel')
   icon_size = 280

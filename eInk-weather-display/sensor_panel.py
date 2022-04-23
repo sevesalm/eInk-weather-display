@@ -1,3 +1,4 @@
+from configparser import SectionProxy
 import random
 from PIL import Image, ImageDraw
 from ruuvitag_sensor.ruuvi_rx import RuuviTagReactive
@@ -5,8 +6,9 @@ import rx
 import logging
 import utils
 import icons
+from type_alias import Fonts, Icons
 
-def get_battery_icon(voltage, images):
+def get_battery_icon(voltage: int, images: Icons) -> Image.Image:
   if (voltage >= 2850):
     return images['misc']['battery_full']
   if (voltage >= 2750):
@@ -17,7 +19,7 @@ def get_battery_icon(voltage, images):
     return images['misc']['battery_25']
   return images['misc']['battery_empty']
 
-def get_sensor_panel(sensor_mac, sensor_name, images, fonts, config, draw_title = True):
+def get_sensor_panel(sensor_mac: str, sensor_name: str, images: Icons, fonts: Fonts, config: SectionProxy, draw_title:bool = True) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating sensor panel')
 

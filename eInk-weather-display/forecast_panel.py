@@ -6,8 +6,10 @@ import logging
 from weather import get_forecasts
 import utils
 import icons
+from configparser import SectionProxy
+from type_alias import Fonts, Icons
 
-def get_forecasts_panel(images, fonts, config):
+def get_forecasts_panel(images: Icons, fonts: Fonts, config: SectionProxy) -> tuple[Image.Image, tuple[str, str]]:
   logger = logging.getLogger(__name__)
   logger.info('Generating forecast panel')
   icon_width = config.getint('ICON_WIDTH')
@@ -68,14 +70,17 @@ def get_forecasts_panel(images, fonts, config):
     
   return (image, first_position)
 
-def get_forecats_weather_icon(weather_symbol_3, is_daylight, images, fonts, config):
+def get_forecats_weather_icon(weather_symbol_3, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
     icon_set = images['forecast'][random.choice(list(images['forecast'].keys()))]
     return utils.get_icon_variant(is_daylight, icon_set)
 
-  icon_index = math.nan if math.isnan(weather_symbol_3) else round(weather_symbol_3)
+  if (math.isnan(weather_symbol_3)):
+    return utils.get_missing_weather_icon_icon(math.nan, is_daylight, images, fonts)
+
+  icon_index = round(weather_symbol_3)
   if (not icon_index in images['forecast']):
     return utils.get_missing_weather_icon_icon(icon_index, is_daylight, images, fonts)
 
-  icon_set = images['forecast'].get(icon_index) 
+  icon_set = images['forecast'][icon_index] 
   return utils.get_icon_variant(is_daylight, icon_set)

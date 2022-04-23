@@ -8,10 +8,13 @@ import logging
 import utils
 from icons import get_weather_images
 import refresh
+import ctypes
+from typing import Optional
+from type_alias import Icons, Fonts
 
 CONFIG_FILENAME = 'config.ini'
 
-def main_loop(panel_size, fonts, images, config, epd_so):
+def main_loop(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: configparser.SectionProxy, epd_so: Optional[ctypes.CDLL]) -> None:
   logger = logging.getLogger(__name__)
   logger.info("main_loop() started")
   wakeup_time = datetime.datetime.now()

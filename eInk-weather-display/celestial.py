@@ -4,30 +4,37 @@ import math
 import logging
 import pytz
 import datetime
+from typing import Optional, TypedDict
+from type_alias import Datetime, Position
+
+class DusksAndDawns(TypedDict):
+    now_index: int
+    times: list[Datetime]
+    twilights: list[int]
 
 CIVIL_TWILIGHT_HORIZON = '-6'
 NAUTICAL_TWILIGHT_HORIZON = '-12'
 ASTRONOMICAL_TWILIGHT_HORIZON = '-18'
 
-def get_is_daylight(position, utc_datetime_string):
+def get_is_daylight(position: Position, utc_datetime_string: str) -> bool:
   location = ephem.Observer()
-  location.lat = str(position[0])
-  location.lon = str(position[1])
+  location.lat = position[0]
+  location.lon = position[1]
   location.date = utc_datetime_string.replace('T', ' ').replace('Z', '')
 
-  sun = ephem.Sun()
+  sun = ephem.Sun()   # type: ignore
   sunset = ephem.localtime(location.next_setting(sun))
   sunrise = ephem.localtime(location.next_rising(sun))
   return (sunset < sunrise)
 
-def get_observer(position, aware_datetime):
+def get_observer(position: Position, aware_datetime: Datetime) -> ephem.Observer:
   observer = ephem.Observer()
-  observer.lat = str(position[0])
-  observer.lon = str(position[1])
+  observer.lat = position[0]
+  observer.lon = position[1]
   observer.date = aware_datetime.astimezone(tz=pytz.utc)
   return observer
 
-def get_twilight(sun):
+def get_twilight(sun: ephem._sun) -> int:
   if(sun.alt + sun.radius > 0):
     return 0
   if(sun.alt >= ephem.degrees(CIVIL_TWILIGHT_HORIZON)):
@@ -38,9 +45,9 @@ def get_twilight(sun):
     return 3
   return 4
 
-def get_nearest_sun_transit(position, aware_datetime):
+def get_nearest_sun_transit(position: Position, aware_datetime: Datetime) -> tuple[Datetime, int]:
   observer = get_observer(position, aware_datetime)
-  sun = ephem.Sun()
+  sun = ephem.Sun()  # type: ignore
 
   next_transit = ephem.localtime(observer.next_transit(sun)).astimezone(tz=None)
   previous_transit = ephem.localtime(observer.previous_transit(sun)).astimezone(tz=None)
@@ -51,31 +58,31 @@ def get_nearest_sun_transit(position, aware_datetime):
   transit_twilight = get_twilight(sun)
   return (nearest_transit, transit_twilight)
 
-def remove_odd(transit_datetime, d):
+def remove_odd(transit_datetime: Datetime, d: Datetime) -> Optional[Datetime]:
   return d if abs(transit_datetime - d) < datetime.timedelta(days=1) else None
 
-def get_previous_rising(location, sun, transit_datetime, use_center=False):
+def get_previous_rising(location: ephem.Observer, sun: ephem._sun, transit_datetime: Datetime, use_center: bool =False) -> Optional[Datetime]:
   try:
     d = ephem.localtime(location.previous_rising(sun, use_center=use_center)).astimezone(tz=None)
     return remove_odd(transit_datetime, d)
   except (ephem.NeverUpError, ephem.AlwaysUpError):
     return None
 
-def get_next_setting(location, sun, transit_datetime, use_center=False):
+def get_next_setting(location: ephem.Observer, sun: ephem._sun, transit_datetime: Datetime, use_center: bool =False) -> Optional[Datetime]:
   try:
     d = ephem.localtime(location.next_setting(sun, use_center=use_center)).astimezone(tz=None)
     return remove_odd(transit_datetime, d)
   except (ephem.NeverUpError, ephem.AlwaysUpError):
     return None
 
-def get_dusks_and_dawns(position, now):
+def get_dusks_and_dawns(position: Position, now: Datetime) -> DusksAndDawns:
   location = ephem.Observer()
-  location.lat = str(position[0])
-  location.lon = str(position[1])
+  location.lat = position[0]
+  location.lon = position[1]
   (transit_datetime, transit_twilight) = get_nearest_sun_transit(position, now)
   location.date = transit_datetime.astimezone(tz=pytz.utc)
   
-  sun = ephem.Sun()
+  sun = ephem.Sun()  # type: ignore
   previous_sunrise = get_previous_rising(location, sun, transit_datetime)
   next_sunset = get_next_setting(location, sun, transit_datetime)
 
@@ -104,15 +111,14 @@ def get_dusks_and_dawns(position, now):
   return { "now_index": now_index,
            "times": times,
            "twilights": twilights }
-  
 
-def get_moon_phase():
+def get_moon_phase() -> tuple[int, float]:
   moon = ephem.Moon()
   moon.compute()
   phase = int(round(moon.elong.norm*180/ephem.pi))
   return (phase, moon.phase)
 
-def get_moon_phase_chr(moon_phase_deg):
+def get_moon_phase_chr(moon_phase_deg: float) -> str:
   """Returns the unicode character base on the moon phase in degrees.
 
   Note: The font has 40 moon icons spaced evenly based on the cosine of the moonphase. 
