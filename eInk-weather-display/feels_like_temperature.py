@@ -13,7 +13,6 @@ def get_d_temp_sun(radiation: float, wind: float) -> float:
 
 # Reference: https://tietopyynto.fi/tietopyynto/ilmatieteen-laitoksen-kayttama-tuntuu-kuin-laskentakaava/
 def get_feels_like_temperature(temp: float, wind: float, radiation: float, humidity: float) -> float:
-  print(temp, wind, radiation, humidity)
   temp_chill = get_temp_chill(temp, wind)
   temp_heat = get_temp_heat(temp, humidity)
   d_temp_sun = get_d_temp_sun(radiation, wind)
