@@ -22,3 +22,5 @@ jobs:
         run: |
           pip install flake8
           flake8
+      - name: Run tests
+        run: python -m unittest discover -s eInk-weather-display
