@@ -16,7 +16,7 @@ See a [demo video](https://www.youtube.com/watch?v=s2YX_JOI1VU) on YouTube.
 The current hardware:
 
 - [Raspberry Pi 3 Model B+](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/) computer
-- [Waveshare 7.8" e-Paper HAT](https://www.waveshare.com/product/raspberry-pi/displays/e-paper/7.8inch-e-paper-hat.htm) e-Ink display
+- [Waveshare 10.3" e-Paper HAT](https://www.waveshare.com/product/raspberry-pi/displays/e-paper/10.3inch-e-paper-hat.htm) e-Ink display (also works with the similar 7.8" display)
 - [RuuviTag](https://ruuvi.com/ruuvitag-specs/) sensors
 
 Note: This device/software is heavily customized to be used with the FMI (Finnish Meteorological Institute) Open API data which - in turn - is heavily targeted for people living in Finland. Other APIs might require extensive changes.
