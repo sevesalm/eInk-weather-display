@@ -1,15 +1,14 @@
 import unittest
 import celestial
 from datetime import datetime
-import pytz
 import pprint
 
 class TestCelestial(unittest.TestCase):
-  HELSINKI_LOCATION = (60.192059, 24.945831)
-  IVALO_LOCATION = (68.6576, 27.5397)
-  QUAANAAK_LOCATION = (77.4670, -69.2285)
-  MCMURDO_LOCATION = (-77.8419, 166.6863)
-  MOUNT_ELLSWORTH_LOCATION = (-85.75, -161)
+  HELSINKI_LOCATION = ('60.192059', '24.945831')
+  IVALO_LOCATION = ('68.6576', '27.5397')
+  QUAANAAK_LOCATION = ('77.4670', '-69.2285')
+  MCMURDO_LOCATION = ('-77.8419', '166.6863')
+  MOUNT_ELLSWORTH_LOCATION = ('-85.75', '-161')
   pp = pprint.PrettyPrinter(indent=2)
   def test_get_nearest_sun_transit_prev(self):
     """
@@ -17,7 +16,7 @@ class TestCelestial(unittest.TestCase):
     """
     now = datetime.fromisoformat('2021-12-28T00:21:00+02:00')
     (nearest_transit, _) = celestial.get_nearest_sun_transit(self.HELSINKI_LOCATION, now)
-    self.assertEqual(nearest_transit.isoformat(), '2021-12-27T12:21:18.440452+02:00')
+    self.assertEqual(nearest_transit.isoformat(), '2021-12-27T12:21:18.435578+02:00')
 
   def test_get_nearest_sun_transit_next(self):
     """
@@ -25,7 +24,7 @@ class TestCelestial(unittest.TestCase):
     """
     now = datetime.fromisoformat('2021-12-28T00:22:00+02:00')
     (nearest_transit, _) = celestial.get_nearest_sun_transit(self.HELSINKI_LOCATION, now)
-    self.assertEqual(nearest_transit.isoformat(), '2021-12-28T12:21:47.852356+02:00')
+    self.assertEqual(nearest_transit.isoformat(), '2021-12-28T12:21:47.847482+02:00')
 
   def test_get_dusks_and_dawns_helsinki_winter_noon(self):
     now = datetime.fromisoformat('2021-12-21T12:00:00+02:00')
