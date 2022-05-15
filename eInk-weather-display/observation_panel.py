@@ -2,13 +2,12 @@ import math
 import random
 from PIL import Image, ImageDraw
 import logging
-from weather import get_observations
 from celestial import get_is_daylight
 import utils
 import icons
 from feels_like_temperature import get_feels_like_temperature
 from configparser import SectionProxy
-from type_alias import Icons, Fonts
+from type_alias import Icons, Fonts, WeatherData
 
 def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
@@ -34,22 +33,21 @@ def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, 
     raise Exception('icon_set not found')
   return utils.get_icon_variant(is_daylight, icon_set)
 
-def get_observation_panel(location: str, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_observation_panel(observation_data: WeatherData, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating observation panel')
   icon_size = 280
-  (observations, first_position, first_position_name) = get_observations(location)
-  logger.info('Received data: %s', repr(observations))
+  (observations, position, position_name) = observation_data
   latest_date = max(observations.keys())
   latest_date_local = utils.utc_datetime_string_to_local_datetime(latest_date)
-  is_daylight = get_is_daylight(first_position, latest_date)
+  is_daylight = get_is_daylight(position, latest_date)
   x_size = 650
   y_size = 550
   latest = observations[latest_date]
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
 
-  utils.draw_title(draw, fonts['font_sm'], 'OUT', first_position_name, fonts['font_xxs'])
+  utils.draw_title(draw, fonts['font_sm'], 'OUT', position_name, fonts['font_xxs'])
 
   delimiter_x = 525
   data_y_base = 100

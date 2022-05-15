@@ -3,32 +3,31 @@ import math
 from PIL import Image, ImageDraw
 from celestial import get_is_daylight
 import logging
-from weather import get_forecasts
 import utils
 import icons
 from configparser import SectionProxy
-from type_alias import Fonts, Icons
+from type_alias import Fonts, Icons, WeatherData
 
-def get_forecasts_panel(images: Icons, fonts: Fonts, config: SectionProxy) -> tuple[Image.Image, tuple[str, str]]:
+def get_forecasts_panel(forecast_data: WeatherData, images: Icons, fonts: Fonts, config: SectionProxy) -> tuple[Image.Image, tuple[str, str]]:
   logger = logging.getLogger(__name__)
   logger.info('Generating forecast panel')
   icon_width = config.getint('ICON_WIDTH')
-  count = 7
   x_size = 1872
   y_size = 800
-  (forecasts, first_position, first_position_name) = get_forecasts(config.get('FMI_LOCATION'), count, 6)
+  (forecasts, position, position_name) = forecast_data
+  count = len(forecasts.keys())
   logger.info('Received data: %s', repr(forecasts))
 
   dates = sorted(forecasts.keys())
   image = Image.new('L', (x_size, y_size), 0xff) 
   draw = ImageDraw.Draw(image)
 
-  utils.draw_title(draw, fonts['font_sm'], 'FORECAST', first_position_name, fonts['font_xxs'])
+  utils.draw_title(draw, fonts['font_sm'], 'FORECAST', position_name, fonts['font_xxs'])
 
   data_y_base = 100
 
   for date, i in zip(dates, range(len(dates))):
-    is_daylight = get_is_daylight(first_position, date)
+    is_daylight = get_is_daylight(position, date)
     data = forecasts[date]
     date_local = utils.utc_datetime_string_to_local_datetime(date)
     date_formatted = date_local.strftime('%-H:%M')
@@ -68,7 +67,7 @@ def get_forecasts_panel(images: Icons, fonts: Fonts, config: SectionProxy) -> tu
   if (config.getboolean('DRAW_PANEL_BORDERS')):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
     
-  return (image, first_position)
+  return (image, position)
 
 def get_forecats_weather_icon(weather_symbol_3, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):

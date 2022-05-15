@@ -11,6 +11,7 @@ from configparser import SectionProxy
 from typing import Optional
 from type_alias import Icons, Fonts
 from multiprocessing import Process
+from weather import get_observation_data, get_forecast_data
 
 PROCESS_TIMEOPUT = 10 # In seconds
 
@@ -21,12 +22,18 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
   else:
     logger.info('Partial refresh started')
   start_time = timer()
+  # Fetch data
+  observation_data = get_observation_data(config['FMI_LOCATION'], logger)
+  forecast_data = get_forecast_data(config.get('FMI_LOCATION'), 7, 6, logger)
   sensor_data = get_sensor_data(logger, config, [config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_OUT')])
 
   # Draw individual panels
   logger.info('Drawing panels')
+  observation_panel = get_observation_panel(observation_data, images, fonts, config)
   sensor_panel_in = get_sensor_panel(config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_IN_NAME'), sensor_data, images, fonts, config)
   sensor_panel_out = get_sensor_panel(config.get('RUUVITAG_MAC_OUT'), config.get('RUUVITAG_MAC_OUT_NAME'), sensor_data, images, fonts, config, False)
+  (forecasts_panel, position) = get_forecasts_panel(forecast_data, images, fonts, config)
+  celestial_panel = get_celestial_panel(position, fonts, config)
   info_panel = get_info_panel(fonts, config)
 
   # Paste the panels on the main image
