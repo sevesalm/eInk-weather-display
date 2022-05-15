@@ -5,7 +5,7 @@ from observation_panel import get_observation_panel
 from info_panel import get_info_panel
 from forecast_panel import get_forecasts_panel
 from celestial_panel import get_celestial_panel
-from sensor_panel import get_sensor_panel
+from sensor_panel import get_sensor_panel, get_sensor_data
 from timeit import default_timer as timer
 from configparser import SectionProxy
 from typing import Optional
@@ -14,17 +14,19 @@ from multiprocessing import Process
 
 PROCESS_TIMEOPUT = 10 # In seconds
 
+def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: SectionProxy, epd_so: Optional[ctypes.CDLL], init: bool) -> None:
   logger = logging.getLogger(__name__)
   if (init == True):
     logger.info('Full refresh started')
   else:
     logger.info('Partial refresh started')
   start_time = timer()
-  full_image = Image.new('L', (panel_size[0], panel_size[1]), 0xff)
-  draw = ImageDraw.Draw(full_image)
+  sensor_data = get_sensor_data(logger, config, [config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_OUT')])
 
   # Draw individual panels
   logger.info('Drawing panels')
+  sensor_panel_in = get_sensor_panel(config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_IN_NAME'), sensor_data, images, fonts, config)
+  sensor_panel_out = get_sensor_panel(config.get('RUUVITAG_MAC_OUT'), config.get('RUUVITAG_MAC_OUT_NAME'), sensor_data, images, fonts, config, False)
   info_panel = get_info_panel(fonts, config)
 
   # Paste the panels on the main image
