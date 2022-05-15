@@ -126,6 +126,8 @@ static void EPD_IT8951_WriteMultiData(UWORD *Data_Buf, UDOUBLE Length) {
   DEV_SPI_WriteByte(Write_Preamble);
 
   EPD_IT8951_ReadBusy();
+  // bcm2835_spi_transfern((char *) buffer, Length);
+  // DEV_SPI_Write_nByte(Data_Buf, Length);
 
   for (UDOUBLE i = 0; i < Length; i++) {
     DEV_SPI_WriteByte(Data_Buf[i] >> 8);

@@ -74,6 +74,12 @@ UBYTE DEV_SPI_ReadByte()
 	return Read_Value;
 }
 
+void DEV_SPI_Write_nByte(UWORD *pData, UDOUBLE Len)
+{
+	char rData[Len];
+	bcm2835_spi_transfernb((char *) pData,rData,Len); // Cast added
+}
+
 /******************************************************************************
 function:	Time delay for ms
 parameter:

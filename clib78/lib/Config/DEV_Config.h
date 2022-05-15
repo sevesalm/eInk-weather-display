@@ -88,4 +88,6 @@ void DEV_Delay_us(UDOUBLE xus);
 UBYTE DEV_Module_Init(t_logger logger);
 void DEV_Module_Exit(void);
 
+void DEV_SPI_Write_nByte(UWORD *pData, UDOUBLE Len);
+
 #endif
