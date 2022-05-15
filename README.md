@@ -31,21 +31,11 @@ The image below shows the main items visible on the display. It was a design dec
 
 The development can be done on the host machine and the app can be deployed remotely using the provided scripts.
 
-### Deployment
+For detailed instructions on how to setup RaspberryPi and install all dependencies, please see [Full Instructions](full_install.md). If you have Raspberry Pi up and running, skip to section [Install base dependencies](full_install.md#install-base-dependencies).
 
-1. Configure the variables in `scripts/config.env`
-1. Create virtual env and install dependencies: `./scripts/install_deps.sh`
-1. Convert the SVG images: `./convert.sh` (install `rsvg-convert` if needed)
-1. Create `eInk-weather-display/config.ini` file (see: [eInk-weather-display/config_example.ini](eInk-weather-display/config_example.ini))
-1. Deploy and enjoy: `./scripts/deploy.sh`
+The script [scripts/deploy.sh](scripts/deploy.sh) is a small helper which copies all the files over SSH to Raspberry Pi, activates venv and starts the application remotely. The script [scripts/compile.sh](scripts/compile.sh) allows compiling the shared C libraries on Raspberry Pi. The script [scripts/convert.sh](scripts/convert.sh) allows converting SVG icons to PNG format to be used by the application.
 
-Note: You also have to make sure you have dependencies of [ruuvitag-sensor](https://github.com/ttu/ruuvitag-sensor) and the [bcm2835 driver](http://www.airspayce.com/mikem/bcm2835) installed properly. `tmux` also has to be installed on Rasbperry.
-
-### Development
-
-The script [scripts/deploy.sh](scripts/deploy.sh) is a small helper which copies all the files over SSH to Raspberry Pi, activates venv and starts the application remotely using the [scripts/start_tmux_session.sh](scripts/start_tmux_session.sh) script. This is useful if you run your Raspberry Pi in headless mode. The script [scripts/compile.sh](scripts/compile.sh) allows compiling the shared C libraries on Raspberry Pi.
-
-The scripts need the variables defined in `scripts/config.env`. Please see [scripts/config.env.example](scripts/config.env.example) for an example.
+Note: Scripts won't work unless dependencies are installed.
 
 ## Observations and forecast data
 
