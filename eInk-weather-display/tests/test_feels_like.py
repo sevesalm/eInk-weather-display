@@ -1,6 +1,7 @@
 import unittest
 from feels_like_temperature import get_temp_chill, get_temp_heat, get_d_temp_sun
 
+
 class TestCelestial(unittest.TestCase):
   def test_get_temp_chill_1(self):
     temp_chill = get_temp_chill(-10, 0)
@@ -37,6 +38,7 @@ class TestCelestial(unittest.TestCase):
   def test_get_d_temp_sun_3(self):
     d_temp_sun = get_d_temp_sun(250, 15)
     self.assertAlmostEqual(d_temp_sun, 0.2, places=1)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -9,29 +9,31 @@ from feels_like_temperature import get_feels_like_temperature
 from configparser import SectionProxy
 from type_alias import Icons, Fonts, WeatherData
 
+
 def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
     icon_set = images['observation'][random.choice(list(images['observation'].keys()))]
     return utils.get_icon_variant(is_daylight, icon_set)
 
-  if (not wawa in images['observation']):
+  if (wawa not in images['observation']):
     return utils.get_missing_weather_icon_icon(wawa, is_daylight, images, fonts)
 
   # For codes 0 to 3 and 20 to 26, let's use cloud cover to determine the icon set
   if(((0 <= wawa <= 3) or (20 <= wawa <= 26)) and not math.isnan(cloud_coverage)):
-    if(cloud_coverage <= 1): # Clear sky
+    if(cloud_coverage <= 1):  # Clear sky
       icon_set = images['forecast'].get(1)
-    elif(2 <= cloud_coverage <= 6): # Partially cloudy
+    elif(2 <= cloud_coverage <= 6):  # Partially cloudy
       icon_set = images['forecast'].get(2)
-    elif(7 <= cloud_coverage <= 8): # Overcast
+    elif(7 <= cloud_coverage <= 8):  # Overcast
       icon_set = images['forecast'].get(3)
-    else: # Lolwut?
+    else:  # Lolwut?
       icon_set = images['observation'].get(0)
   else:
     icon_set = images['observation'].get(int(wawa))
-  if (icon_set == None): 
+  if (icon_set is None):
     raise Exception('icon_set not found')
   return utils.get_icon_variant(is_daylight, icon_set)
+
 
 def get_observation_panel(observation_data: WeatherData, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
@@ -44,7 +46,7 @@ def get_observation_panel(observation_data: WeatherData, images: Icons, fonts: F
   x_size = 650
   y_size = 550
   latest = observations[latest_date]
-  image = Image.new('L', (x_size, y_size), 0xff) 
+  image = Image.new('L', (x_size, y_size), 0xff)
   draw = ImageDraw.Draw(image)
 
   utils.draw_title(draw, fonts['font_sm'], 'OUT', position_name, fonts['font_xxs'])
@@ -57,7 +59,7 @@ def get_observation_panel(observation_data: WeatherData, images: Icons, fonts: F
 
   # Feels like
   temp_feels = get_feels_like_temperature(latest["t2m"], latest["ws_10min"], 0, latest["rh"]/100)
-  
+
   # temp_feels = get_feels_like_temperature(latest["t2m"], latest["ws_10min"], latest['dir_1min'], latest["rh"]/100)
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 210), str(round(temp_feels)), '°C', fonts)
 
@@ -66,7 +68,7 @@ def get_observation_panel(observation_data: WeatherData, images: Icons, fonts: F
 
   # Barometric pressure
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 350), str(round(latest["p_sea"])), 'hPa', fonts)
-  
+
   # Wind speed
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 420), f'{round(latest["ws_10min"])} – {round(latest["wg_10min"])}', 'm/s', fonts)
 
@@ -92,12 +94,11 @@ def get_observation_panel(observation_data: WeatherData, images: Icons, fonts: F
   w_dir = latest['wd_10min']
   if(not math.isnan(w_dir)):
     wind_image = icons.get_scaled_image(images['misc']['wind_icon'], 160)
-    wind_image_rot = wind_image.rotate(-w_dir + 180, fillcolor = 0xff, resample=Image.BICUBIC)
+    wind_image_rot = wind_image.rotate(-w_dir + 180, fillcolor=0xff, resample=Image.BICUBIC)
     image.paste(wind_image_rot, (margin + icon_size//2 - cloud_cover_icon.width//2, row_y_base), wind_image_rot)
-
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
-    
+
   return image

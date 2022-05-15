@@ -13,7 +13,8 @@ from type_alias import Icons, Fonts
 from multiprocessing import Process
 from weather import get_observation_data, get_forecast_data
 
-PROCESS_TIMEOPUT = 10 # In seconds
+PROCESS_TIMEOPUT = 10  # In seconds
+
 
 def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: SectionProxy, epd_so: Optional[ctypes.CDLL], init: bool) -> None:
   logger = logging.getLogger(__name__)
@@ -53,13 +54,13 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
 
   if(config.getboolean('DRAW_BORDERS')):
     border_color = 0x80
-    draw_width = 2 
+    draw_width = 2
     draw = ImageDraw.Draw(full_image)
     draw.line([0, panel_size[1] - forecasts_panel.height, panel_size[0], panel_size[1] - forecasts_panel.height], fill=border_color, width=draw_width)
     draw.line([observation_panel.width, 0, observation_panel.width, observation_panel.height - panel_size[1]//20], fill=border_color, width=draw_width)
     draw.line([observation_panel.width + sensor_panel_in.width, 0, observation_panel.width + sensor_panel_in.width, observation_panel.height - panel_size[1]//20], fill=border_color, width=draw_width)
     draw.line([observation_panel.width + sensor_panel_in.width + celestial_panel.width, 0, observation_panel.width + sensor_panel_in.width + celestial_panel.width, observation_panel.height - panel_size[1]//20], fill=border_color, width=draw_width)
-  
+
   if (config.getboolean('FILE_OUTPUT')):
     filename = config.get('OUTPUT_FILENAME')
     logger.info(f'Saving image to {filename}')
@@ -78,7 +79,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
         p.start()
         p.join(PROCESS_TIMEOPUT)
         logger.debug(f'Exit code: {p.exitcode}')
-        if (p.exitcode == None):
+        if (p.exitcode is None):
           logger.error('An error occured during draw_image_8bit()')
         p.terminate()
       except Exception as e:
@@ -89,7 +90,5 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
       raise Exception('epd_so not defined')
 
   elapsed_time = timer() - start_time
-  logger.info(f'Fetch time: ')
-  logger.info(f'Sensor time: ')
   logger.info(f'Total time: {round(elapsed_time, 1)} s, refresh: {round(elapsed_refresh_time, 1)} s, API fetch: {round(elapsed_fetch_time, 1)} s, sensor poll: {round(elapsed_sensor_time, 1)}, draw time: {round(elapsed_draw_time, 1)} s')
   logger.info('Refresh complete')

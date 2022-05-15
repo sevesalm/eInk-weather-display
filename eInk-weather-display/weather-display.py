@@ -14,6 +14,7 @@ from type_alias import Icons, Fonts
 
 CONFIG_FILENAME = 'config.ini'
 
+
 def main_loop(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: configparser.SectionProxy, epd_so: Optional[ctypes.CDLL]) -> None:
   logger = logging.getLogger(__name__)
   logger.info("main_loop() started")
@@ -22,6 +23,7 @@ def main_loop(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: 
     refresh.refresh(panel_size, fonts, images, config, epd_so, True)
   elif(wakeup_time.minute % config.getint('REFRESH_PARTIAL_INTERVAL') == 0):
     refresh.refresh(panel_size, fonts, images, config, epd_so, False)
+
 
 def main():
   log.setup()
@@ -43,7 +45,7 @@ def main():
       (epd_so, panel_size) = utils.get_epd_data(config)
 
       logger.info("Initial refresh")
-      refresh.refresh(panel_size, fonts, images, config, epd_so, True) # Once in the beginning
+      refresh.refresh(panel_size, fonts, images, config, epd_so, True)  # Once in the beginning
 
       logger.info('Starting scheduler')
       scheduler = BlockingScheduler()
@@ -53,11 +55,12 @@ def main():
   except FileNotFoundError as e:
     logger.exception(f'Error opening file "{CONFIG_FILENAME}": %s', str(e))
 
-  except KeyboardInterrupt:    
+  except KeyboardInterrupt:
     logger.warning("KeyboardInterrupt error")
 
   except Exception as e:
     logger.exception('Unexpected error: %s', str(e))
+
 
 if __name__ == "__main__":
   main()

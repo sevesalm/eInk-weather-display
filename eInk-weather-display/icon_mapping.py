@@ -6,7 +6,7 @@ observation_mapping = {
   22: {'day': 'drizzle'},
   23: {'day': 'rain'},
   24: {'day': 'snow'},
-  25: {'day': 'rain_icing'}, 
+  25: {'day': 'rain_icing'},
   30: {'day': 'fog'},
   31: {'day': 'fog'},
   32: {'day': 'fog'},
@@ -77,9 +77,9 @@ forecast_mapping = {
 }
 
 misc_icons = [
-  'wind_icon', 
-  'sunrise', 
-  'sunset', 
+  'wind_icon',
+  'sunrise',
+  'sunset',
   'no_wifi',
   'battery_full',
   'battery_75',

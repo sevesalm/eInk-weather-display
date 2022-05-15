@@ -6,3 +6,4 @@ requests==2.27.1
 RPi.GPIO==0.7.1
 ruuvitag-sensor==1.2.0
 spidev==3.5
+flake8==4.0.1
