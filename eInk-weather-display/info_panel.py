@@ -4,7 +4,7 @@ import logging
 from configparser import SectionProxy
 from type_alias import Fonts
 
-def get_info_panel(error_count: int, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_info_panel(fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating info panel')
   x_size = 260

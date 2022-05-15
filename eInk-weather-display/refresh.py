@@ -25,11 +25,7 @@ PROCESS_TIMEOPUT = 10 # In seconds
 
   # Draw individual panels
   logger.info('Drawing panels')
-  observation_panel = get_observation_panel(config['FMI_LOCATION'], images, fonts, config)
-  sensor_panel_in = get_sensor_panel(config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_IN_NAME'), images, fonts, config)
-  sensor_panel_out = get_sensor_panel(config.get('RUUVITAG_MAC_OUT'), config.get('RUUVITAG_MAC_OUT_NAME'), images, fonts, config, False)
-  (forecasts_panel, first_position) = get_forecasts_panel(images, fonts, config)
-  celestial_panel = get_celestial_panel(first_position, fonts, config)
+  info_panel = get_info_panel(fonts, config)
 
   # Paste the panels on the main image
   logger.info('Pasting panels')
