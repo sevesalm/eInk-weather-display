@@ -16,3 +16,7 @@ class Icons(TypedDict):
 Fonts = Mapping[str, ImageFont.FreeTypeFont]
 
 Position = tuple[str, str]
+
+ApiData = Mapping[str, Mapping[str, float]]
+
+WeatherData = tuple[ApiData, tuple[str, str], str]
