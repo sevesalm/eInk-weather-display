@@ -2,6 +2,7 @@ from configparser import SectionProxy
 import random
 from PIL import Image, ImageDraw
 from ruuvitag_sensor.ruuvi_rx import RuuviTagReactive
+from reactivex import operators as ops
 import logging
 import utils
 import icons
@@ -36,20 +37,21 @@ def get_sensor_data(logger: logging.Logger, config: SectionProxy, macs: list[str
     if (not config.getboolean('USE_FAKE_SENSOR_DATA')):
       ruuvis = RuuviTagReactive(macs)
       ruuvi_emissions = ruuvis.get_subject()
-      missing_data = (ruuvi_emissions
-                      .map(lambda x: x[0])  # type: ignore # Only the mac address
-                      .buffer_with_time(config.getint('SENSOR_POLL_TIMEOUT'))  # Buffer for some time
-                      .map(lambda x: set(x))  # Convert macs into a set
-                      .first()
-                      .flat_map(lambda x: list(set(macs).difference(x)))  # Emit once per each missing mac
-                      .map(lambda x: (x, None)))
+      missing_data = ruuvi_emissions.pipe(
+                        ops.map(lambda x: x[0]),  # Only the mac address
+                        ops.buffer_with_time(config.getint('SENSOR_POLL_TIMEOUT')),  # Buffer for some time
+                        ops.map(lambda x: set(x)),  # Convert macs into a set
+                        ops.first(),
+                        ops.flat_map(lambda x: list(set(macs).difference(x))),  # type: ignore # Emit once per each missing mac
+                        ops.map(lambda x: (x, None))
+                      )
 
-      sensor_data = (ruuvi_emissions
-                     .merge(missing_data)  # type: ignore
-                     .scan(lambda acc, x: {**acc, **{x[0]: x[1]}}, {})
-                     .filter(lambda x: len(x.keys()) == len(macs))
-                     .to_blocking()
-                     .first())
+      sensor_data = ruuvi_emissions.pipe(
+                      ops.merge(missing_data),
+                      ops.scan(lambda acc, x: {**acc, **{x[0]: x[1]}}, {}),
+                      ops.filter(lambda x: len(x.keys()) == len(macs)),
+                      ops.first()
+                    ).run()
 
       ruuvis.stop()
       logger.info('Sensor data received: %s', repr(sensor_data))
