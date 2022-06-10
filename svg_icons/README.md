@@ -94,6 +94,11 @@ This is a set of custom made icons to be used with FMI observation and forecast 
 ![sunset.svg](sunset.svg)
 ![wind_icon.svg](wind_icon.svg)
 ![no_wifi.svg](no_wifi.svg)
+![temperature.svg](temperature.svg)
+![humidity.svg](humidity.svg)
+![wind.svg](wind.svg)
+![pressure.svg](pressure.svg)
+![warning.svg](warning.svg)
 
 ## Battery icons
 
