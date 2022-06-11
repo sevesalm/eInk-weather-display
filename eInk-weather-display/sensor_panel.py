@@ -48,7 +48,7 @@ def get_sensor_data(logger: logging.Logger, config: SectionProxy, macs: list[str
 
       sensor_data = ruuvi_emissions.pipe(
                       ops.merge(missing_data),
-                      ops.scan(lambda acc, x: {**acc, **{x[0]: x[1]}}, {}),
+                      ops.scan(lambda acc, x: acc | {x[0]: x[1]}, {}),
                       ops.filter(lambda x: len(x.keys()) == len(macs)),
                       ops.first()
                     ).run()
