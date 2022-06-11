@@ -2,8 +2,8 @@
 import ephem
 import math
 import logging
-import pytz
 import datetime
+from zoneinfo import ZoneInfo
 from typing import Optional, TypedDict
 from type_alias import Datetime, Position
 
@@ -23,7 +23,7 @@ def get_is_daylight(position: Position, utc_datetime_string: str) -> bool:
   location = ephem.Observer()
   location.lat = position[0]
   location.lon = position[1]
-  location.date = utc_datetime_string.replace('T', ' ').replace('Z', '')
+  location.date = utc_datetime_string.replace('T', ' ').replace('+00:00', '').replace('Z', '')
 
   sun = ephem.Sun()   # type: ignore
   sunset = ephem.localtime(location.next_setting(sun))
@@ -35,7 +35,7 @@ def get_observer(position: Position, aware_datetime: Datetime) -> ephem.Observer
   observer = ephem.Observer()
   observer.lat = position[0]
   observer.lon = position[1]
-  observer.date = aware_datetime.astimezone(tz=pytz.utc)
+  observer.date = aware_datetime.astimezone(tz=ZoneInfo('UTC'))
   return observer
 
 
@@ -59,7 +59,7 @@ def get_nearest_sun_transit(position: Position, aware_datetime: Datetime) -> tup
   previous_transit = ephem.localtime(observer.previous_transit(sun)).astimezone(tz=None)
   is_next_transit_closer = abs(aware_datetime-next_transit) <= abs(aware_datetime-previous_transit)
   nearest_transit = next_transit if (is_next_transit_closer) else previous_transit
-  observer.date = nearest_transit.astimezone(tz=pytz.utc)
+  observer.date = nearest_transit.astimezone(tz=ZoneInfo('UTC'))
   sun.compute(observer)
   transit_twilight = get_twilight(sun)
   return (nearest_transit, transit_twilight)
@@ -90,7 +90,7 @@ def get_dusks_and_dawns(position: Position, now: Datetime) -> DusksAndDawns:
   location.lat = position[0]
   location.lon = position[1]
   (transit_datetime, transit_twilight) = get_nearest_sun_transit(position, now)
-  location.date = transit_datetime.astimezone(tz=pytz.utc)
+  location.date = transit_datetime.astimezone(tz=ZoneInfo('UTC'))
 
   sun = ephem.Sun()  # type: ignore
   previous_sunrise = get_previous_rising(location, sun, transit_datetime)

@@ -4,7 +4,7 @@ import ctypes
 import random
 from PIL import ImageFont, ImageDraw, Image
 from dateutil.parser import parse
-import pytz
+from zoneinfo import ZoneInfo
 from configparser import SectionProxy
 from typing import Optional, Union
 from type_alias import Datetime, Fonts, Icons, DayNightIcons
@@ -118,7 +118,7 @@ def get_cloud_cover_icon(cloud_cover: float, images: Icons, fonts: Fonts, config
 
 
 def utc_datetime_string_to_local_datetime(date_string: str) -> Datetime:
-  return parse(date_string).replace(tzinfo=pytz.utc).astimezone(tz=None)
+  return parse(date_string).replace(tzinfo=ZoneInfo('UTC')).astimezone(tz=None)
 
 
 def show_temperatur_warning_icon(temperature: float, time: Datetime, config: SectionProxy) -> bool:
