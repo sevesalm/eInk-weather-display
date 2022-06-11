@@ -69,7 +69,7 @@ def get_sensor_panel(sensor_mac: str, sensor_name: str, sensor_data: SensorData,
   logger = logging.getLogger(__name__)
   logger.info('Generating sensor panel')
 
-  x_size = 550
+  x_size = 400
   y_size = 330
 
   image = Image.new('L', (x_size, y_size), 0xff)
@@ -81,13 +81,14 @@ def get_sensor_panel(sensor_mac: str, sensor_name: str, sensor_data: SensorData,
   if (sensor_mac in sensor_data):
     data_y_base = 100 if (draw_title) else 0
     state_in = sensor_data[sensor_mac]
-    utils.draw_quantity(draw, (x_size//2 + 160, data_y_base + 120), str(round(state_in['temperature'], 1)), '°C', fonts, 'font_lg', 'font_sm')
-    utils.draw_quantity(draw, (x_size//2 + 160, data_y_base + 210), str(round(state_in['humidity'])), '%', fonts)
+    utils.draw_quantity(draw, (x_size//2 + 110, data_y_base + 120), str(round(state_in['temperature'], 1)), '°C', fonts, 'font_lg', 'font_sm')
+    humidity_icon = icons.get_scaled_image(images['misc']['humidity'], 70)
+    image.paste(humidity_icon, (x_size//2 - 50, data_y_base + 150), humidity_icon)
+    utils.draw_quantity(draw, (x_size//2 + 110, data_y_base + 210), str(round(state_in['humidity'])), '%', fonts)
 
     # Battery level
-    battery_icon = icons.get_scaled_image(get_battery_icon(state_in['battery'], images), 120)
-    image.paste(battery_icon, (30, data_y_base - 30), battery_icon)
-    utils.draw_quantity(draw, (130, data_y_base + 125), str(round(state_in['battery']/1000, 2)), 'V', fonts, 'font_xs', 'font_xxs')
+    battery_icon = icons.get_scaled_image(get_battery_icon(state_in['battery'], images), 60)
+    image.paste(battery_icon, (x_size//2 + 120, data_y_base - 10), battery_icon)
 
     # RSSI - not yet part of ruuvitag-sensor
     # Adding is trivial by editing ruuvitag-sensor package's decoder.py

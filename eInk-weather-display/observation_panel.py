@@ -43,7 +43,7 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
   latest_date = max(observations.keys())
   latest_date_local = utils.utc_datetime_string_to_local_datetime(latest_date)
   is_daylight = get_is_daylight(position, latest_date)
-  x_size = 650
+  x_size = 700
   y_size = 550
   latest = observations[latest_date]
   image = Image.new('L', (x_size, y_size), 0xff)
@@ -51,11 +51,8 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
 
   utils.draw_title(draw, fonts['font_sm'], 'OUT', position_name, fonts['font_xxs'])
 
-  delimiter_x = 525
+  delimiter_x = 290
   data_y_base = 100
-
-  # Temperature
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 120), str(latest["t2m"]), '°C', fonts, 'font_lg', 'font_sm')
 
   # Feels like
   if(radiation_data):
@@ -66,42 +63,53 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
 
   temp_feels = get_feels_like_temperature(latest["t2m"], latest["ws_10min"], latest_dir_1min, latest["rh"]/100.0)
 
-  # temp_feels = get_feels_like_temperature(latest["t2m"], latest["ws_10min"], latest['dir_1min'], latest["rh"]/100)
+  # Temperature
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 120), str(latest["t2m"]), '°C', fonts, 'font_lg', 'font_sm')
+
+  # Feels like temperature
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 210), str(round(temp_feels)), '°C', fonts)
+  temperature_feel_icon = icons.get_scaled_image_by_height(images['misc']['temperature_feel'], 70)
+  image.paste(temperature_feel_icon, (10, data_y_base + 210-65), temperature_feel_icon)
 
   # Relative humidity
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 280), str(round(latest["rh"])), '%', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 290), str(round(latest["rh"])), '%', fonts)
+  humidity_icon = icons.get_scaled_image(images['misc']['humidity'], 70)
+  image.paste(humidity_icon, (10, data_y_base + 290-65), humidity_icon)
 
   # Barometric pressure
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 350), str(round(latest["p_sea"])), 'hPa', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 370), str(round(latest["p_sea"])), 'hPa', fonts)
+  pressure_icon = icons.get_scaled_image(images['misc']['pressure'], 70)
+  image.paste(pressure_icon, (10, data_y_base + 370-65), pressure_icon)
 
   # Wind speed
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 420), f'{round(latest["ws_10min"])} – {round(latest["wg_10min"])}', 'm/s', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 450), f'{round(latest["ws_10min"])} – {round(latest["wg_10min"])}', 'm/s', fonts)
+  wind_icon = icons.get_scaled_image(images['misc']['wind'], 70)
+  image.paste(wind_icon, (10, data_y_base + 450-65), wind_icon)
 
-  # Weather icon
+  # Cloud cover
   cloud_coverage = latest['n_man']
   margin = 15
-  y_top = y_size - icon_size - margin
-
-  weather_icon = icons.get_scaled_image(get_observation_icon(latest['wawa'], cloud_coverage, is_daylight, images, fonts, config), icon_size)
-  image.paste(weather_icon, (margin, y_top), weather_icon)
-
-  # Warning icon
-  if (utils.show_temperatur_warning_icon(latest["t2m"], latest_date_local, config)):
-    warning_icon = icons.get_scaled_image(images['misc']['warning'], 60)
-    image.paste(warning_icon, (margin + weather_icon.width - 2*warning_icon.width//3, y_top + weather_icon.height - 2*warning_icon.height//3), warning_icon)
-
-  row_y_base = data_y_base
-  # Cloud cover
+  right_column_x_base = x_size//2 + margin + 30
   cloud_cover_icon = icons.get_scaled_image(utils.get_cloud_cover_icon(cloud_coverage, images, fonts, config), 160)
-  image.paste(cloud_cover_icon, (margin + icon_size//2 - cloud_cover_icon.width//2, row_y_base), cloud_cover_icon)
+  image.paste(cloud_cover_icon, (right_column_x_base + icon_size//2 - cloud_cover_icon.width//2, data_y_base), cloud_cover_icon)
 
   # Wind direction
   w_dir = latest['wd_10min']
   if(not math.isnan(w_dir)):
     wind_image = icons.get_scaled_image(images['misc']['wind_icon'], 160)
     wind_image_rot = wind_image.rotate(-w_dir + 180, fillcolor=0xff, resample=Image.BICUBIC)
-    image.paste(wind_image_rot, (margin + icon_size//2 - cloud_cover_icon.width//2, row_y_base), wind_image_rot)
+    image.paste(wind_image_rot, (right_column_x_base + icon_size//2 - cloud_cover_icon.width//2, data_y_base), wind_image_rot)
+
+  # Weather icon
+  y_top = y_size - icon_size - margin
+
+  weather_icon = icons.get_scaled_image(get_observation_icon(latest['wawa'], cloud_coverage, is_daylight, images, fonts, config), icon_size)
+  image.paste(weather_icon, (right_column_x_base, y_top), weather_icon)
+
+  # Warning icon
+  if (utils.show_temperatur_warning_icon(latest["t2m"], latest_date_local, config)):
+    warning_icon = icons.get_scaled_image(images['misc']['warning'], 60)
+    image.paste(warning_icon, (right_column_x_base + weather_icon.width - 2*warning_icon.width//3, y_top + weather_icon.height - 2*warning_icon.height//3), warning_icon)
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):

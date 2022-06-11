@@ -78,6 +78,11 @@ forecast_mapping = {
 
 misc_icons = [
   'wind_icon',
+  'wind',
+  'temperature',
+  'temperature_feel',
+  'humidity',
+  'pressure',
   'sunrise',
   'sunset',
   'no_wifi',

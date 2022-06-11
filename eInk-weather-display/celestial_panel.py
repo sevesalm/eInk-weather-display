@@ -34,7 +34,7 @@ def get_shade_color(shade: int) -> str:
 def get_celestial_panel(position: Position, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating celestial panel')
-  x_size = 400
+  x_size = 500
   y_size = 600
   image = Image.new('L', (x_size, y_size), 0xff)
   draw = ImageDraw.Draw(image)

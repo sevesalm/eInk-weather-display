@@ -55,3 +55,9 @@ def read_weather_icon(icon_name: str, background: Optional[Image.Image]) -> Imag
 def get_scaled_image(image: Image.Image, new_width: int) -> Image.Image:
   height = int(image.height/image.width * new_width)
   return image.resize((new_width, height))
+
+
+def get_scaled_image_by_height(image: Image.Image, new_height: int) -> Image.Image:
+  width = int(image.width/image.height * new_height)
+  print(image.width, image.height, width, new_height)
+  return image.resize((width, new_height))
