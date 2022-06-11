@@ -11,7 +11,7 @@ def get_temp_heat(temp: float, humidity: float) -> float:
 
 def get_d_temp_sun(radiation: float, wind: float) -> float:
   c_abs = 0.07
-  return 0.7 * c_abs * radiation / (wind + 10) - 0.25
+  return 0.7 * c_abs * max(radiation, 0) / (wind + 10) - 0.25
 
 
 # Reference: https://tietopyynto.fi/tietopyynto/ilmatieteen-laitoksen-kayttama-tuntuu-kuin-laskentakaava/
