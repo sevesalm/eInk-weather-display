@@ -2,64 +2,77 @@ import xml.etree.ElementTree as et
 from datetime import datetime, timedelta
 import requests
 from logging import Logger
-from typing import Optional
+from typing import Optional, Dict, List
 from type_alias import ApiData, WeatherData
+from itertools import zip_longest
+from zoneinfo import ZoneInfo
 
-OBS_PARAMETERS = ['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wg_10min', 'n_man', 'wawa']
-# OBS_PARAMETERS=['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wg_10min','n_man', 'dir_1min', 'wawa']
-OBS_ID = 'fmi::observations::weather::timevaluepair'
-FORECAST_PARAMETERS = ['Temperature', 'WindSpeedMS', 'WindDirection', 'TotalCloudCover', 'WeatherSymbol3']
-FORECAST_ID = 'fmi::forecast::harmonie::surface::point::timevaluepair'
 FMI_API_URL = 'http://opendata.fmi.fi/wfs/eng'
+OBS_PARAMETERS = ['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wg_10min', 'n_man', 'wawa']
+OBS_QUERY = 'fmi::observations::weather::multipointcoverage'
+FORECAST_PARAMETERS = ['Temperature', 'WindSpeedMS', 'WindDirection', 'TotalCloudCover', 'WeatherSymbol3']
+FORECAST_QUERY = 'fmi::forecast::harmonie::surface::point::multipointcoverage'
 
 
-def fetch_data(query_type: str, place: str, parameters: list[str], start_time: Optional[str] = None, timestep: Optional[str] = None) -> et.Element:
-  params = {
+def split_in_chunks(data: List, size: int):
+    if (len(data) % size != 0):
+      raise Exception('Bad multicoverage data')
+    args = [iter(data)] * size
+    return zip_longest(*args)
+
+
+def fetch_data(query_type: str, extra_params: Dict[str, str] = {}) -> et.Element:
+  base_params = {
     'service': 'WFS',
     'version': '2.0.0',
     'request': 'GetFeature',
     'storedQuery_id': query_type,
-    'place': place,
-    'parameters': ','.join(parameters),
-    'starttime': start_time,
-    'timestep': timestep
     }
+
+  params = base_params | extra_params
+
   response = requests.get(FMI_API_URL, params=params)
   return et.fromstring(response.content)
 
 
-def parse_data(xml_data: et.Element, parameter: str, prefix: str, count: int, reversed: bool, skip_count: Optional[int] = 1) -> ApiData:
-  ns = {'wml2': 'http://www.opengis.net/waterml/2.0', 'gml32': 'http://www.opengis.net/gml/3.2'}
-  elements = xml_data.findall(f'.//wml2:MeasurementTimeseries[@gml32:id="{prefix}{parameter}"]//wml2:MeasurementTVP', ns)
-  data = {}
-  if(reversed):
-    wanted_elements = elements[::skip_count][:count]
-  else:
-    wanted_elements = elements[::skip_count][-count:]
-  for el in wanted_elements:
-    el_data = {}
-    for child in el:
-      _, _, postfix = child.tag.partition('}')
-      el_data[postfix] = child.text
-    data[el_data['time']] = {parameter: float(el_data['value'])}
-  return data
+def parse_multipoint_data(xml_data: et.Element, count: int, skip_count: Optional[int] = 1, reversed: bool = False) -> ApiData:
+  ns = {'gml': 'http://www.opengis.net/gml/3.2', 'gmlcov': 'http://www.opengis.net/gmlcov/1.0', 'swe': 'http://www.opengis.net/swe/2.0'}
+  parameter_element = xml_data.find('.//swe:DataRecord', ns)
+  pos_element = xml_data.find('.//gmlcov:positions', ns)
+  data_element = xml_data.find('.//gml:doubleOrNilReasonTupleList', ns)
+  result = {}
+  if parameter_element is not None and pos_element is not None and pos_element.text is not None and data_element is not None and data_element.text is not None:
+    params = [row.attrib["name"] for row in parameter_element]
+    positions = pos_element.text.strip().split('\n')
+    times = [datetime.fromtimestamp(int(row.split()[2]), ZoneInfo('UTC')) for row in positions]
+    datas = data_element.text.strip().split()
+    data_chunks = list(split_in_chunks(datas, len(params)))
+    if not reversed:
+      time_data = list(zip(times, data_chunks))[::skip_count][-count:]
+    else:
+      time_data = list(zip(times, data_chunks))[::skip_count][:count]
+    for time, data_tuple in time_data:
+      param_data = zip(params, data_tuple)
+      data = {param: float(data) for param, data in param_data}
+      result[time.isoformat()] = data
+  return result
 
 
-def get_position(xml_data) -> tuple[str, str]:
+def get_position(xml_data: et.Element) -> tuple[str, str]:
   ns = {'gml': 'http://www.opengis.net/gml/3.2'}
-  elements = xml_data.findall('.//gml:pos', ns)
-  if(len(elements) == 0):
+  element = xml_data.find('.//gml:pos', ns)
+  if(element is None or element.text is None):
     raise Exception('Could not find any position data')
-  position_data = elements[0].text.split(' ')[:-1]
+  position_data = element.text.split(' ')[:-1]
   return (position_data[0], position_data[1])
 
 
 def get_position_name(xml_data: et.Element) -> str:
   ns = {'gml': 'http://www.opengis.net/gml/3.2'}
-  elements = xml_data.findall('.//gml:name', ns)
-  if(len(elements) == 0 or elements[0].text is None):
+  element = xml_data.find('.//gml:name', ns)
+  if(element is None or element.text is None):
     raise Exception('Could not find any position name data')
-  return elements[0].text
+  return element.text
 
 
 def combine(data_sets: list[ApiData]) -> ApiData:
@@ -81,9 +94,12 @@ def get_next_forecast_start_timestamp() -> str:
 
 
 def get_observation_data(place: str, logger: Logger) -> WeatherData:
-  xml_data = fetch_data(OBS_ID, place, OBS_PARAMETERS, None, None)
-  # xml_data = fetch_data(OBS_ID, place, OBS_PARAMETERS, None, 10)
-  observation_data = combine([parse_data(xml_data, parameter, 'obs-obs-1-1-', 1, False) for parameter in OBS_PARAMETERS])
+  params = {
+    'place': place,
+    'parameters': ','.join(OBS_PARAMETERS)
+  }
+  xml_data = fetch_data(OBS_QUERY, params)
+  observation_data = parse_multipoint_data(xml_data, 1)
   position = get_position(xml_data)
   position_name = get_position_name(xml_data)
   result = (observation_data, position, position_name)
@@ -91,11 +107,14 @@ def get_observation_data(place: str, logger: Logger) -> WeatherData:
   return result
 
 
-def get_forecast_data(place: str, count: int, skip_count: Optional[int], logger: Logger, next_timestamp: Optional[str] = None) -> WeatherData:
-  if (next_timestamp is None):
-    next_timestamp = get_next_forecast_start_timestamp()
-  xml_data = fetch_data(FORECAST_ID, place, FORECAST_PARAMETERS, next_timestamp)
-  forecast_data = combine([parse_data(xml_data, parameter, 'mts-1-1-', count, True, skip_count) for parameter in FORECAST_PARAMETERS])
+def get_forecast_data(place: str, count: int, skip_count: Optional[int], logger: Logger) -> WeatherData:
+  params = {
+    'place': place,
+    'parameters': ','.join(FORECAST_PARAMETERS),
+    'starttime': get_next_forecast_start_timestamp()
+  }
+  xml_data = fetch_data(FORECAST_QUERY, params)
+  forecast_data = parse_multipoint_data(xml_data, count, skip_count, True)
   position = get_position(xml_data)
   position_name = get_position_name(xml_data)
   result = (forecast_data, position, position_name)
