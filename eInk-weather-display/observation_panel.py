@@ -7,7 +7,7 @@ import utils
 import icons
 from feels_like_temperature import get_feels_like_temperature
 from configparser import SectionProxy
-from type_alias import Icons, Fonts, WeatherData
+from type_alias import Icons, Fonts, WeatherData, ApiData
 
 
 def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
@@ -35,11 +35,11 @@ def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, 
   return utils.get_icon_variant(is_daylight, icon_set)
 
 
-def get_observation_panel(observation_data: WeatherData, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating observation panel')
   icon_size = 280
-  (observations, position, position_name) = observation_data
+  (observations, position, position_name, _) = observation_data
   latest_date = max(observations.keys())
   latest_date_local = utils.utc_datetime_string_to_local_datetime(latest_date)
   is_daylight = get_is_daylight(position, latest_date)
@@ -58,7 +58,13 @@ def get_observation_panel(observation_data: WeatherData, images: Icons, fonts: F
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 120), str(latest["t2m"]), '°C', fonts, 'font_lg', 'font_sm')
 
   # Feels like
-  temp_feels = get_feels_like_temperature(latest["t2m"], latest["ws_10min"], 0, latest["rh"]/100)
+  if(radiation_data):
+    latest_radiation_date = max(radiation_data.keys())
+    latest_dir_1min = radiation_data[latest_radiation_date]["dir_1min"]
+  else:
+    latest_dir_1min = 0.0
+
+  temp_feels = get_feels_like_temperature(latest["t2m"], latest["ws_10min"], latest_dir_1min, latest["rh"]/100.0)
 
   # temp_feels = get_feels_like_temperature(latest["t2m"], latest["ws_10min"], latest['dir_1min'], latest["rh"]/100)
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 210), str(round(temp_feels)), '°C', fonts)

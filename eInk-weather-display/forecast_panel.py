@@ -15,7 +15,7 @@ def get_forecasts_panel(forecast_data: WeatherData, images: Icons, fonts: Fonts,
   icon_width = config.getint('ICON_WIDTH')
   x_size = 1872
   y_size = 800
-  (forecasts, position, position_name) = forecast_data
+  (forecasts, position, position_name, _) = forecast_data
   count = len(forecasts.keys())
   logger.info('Received data: %s', repr(forecasts))
 

@@ -22,4 +22,4 @@ Position = tuple[str, str]
 
 ApiData = Mapping[str, Mapping[str, float]]
 
-WeatherData = tuple[ApiData, tuple[str, str], str]
+WeatherData = tuple[ApiData, tuple[str, str], str, str]

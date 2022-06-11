@@ -11,7 +11,7 @@ from configparser import SectionProxy
 from typing import Optional
 from type_alias import Icons, Fonts
 from multiprocessing import Process
-from weather import get_observation_data, get_forecast_data
+from weather import get_observation_data, get_forecast_data, get_radiation_data
 
 PROCESS_TIMEOPUT = 10  # In seconds
 
@@ -24,6 +24,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
   # Fetch data
   start_fetch_time = timer()
   observation_data = get_observation_data(config['FMI_LOCATION'], logger)
+  radiation_data = get_radiation_data(observation_data[3], logger)
   forecast_data = get_forecast_data(config.get('FMI_LOCATION'), 7, 6, logger)
   elapsed_fetch_time = timer() - start_fetch_time
 
@@ -34,7 +35,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
   # Draw individual panels
   logger.info('Drawing panels')
   start_draw_time = timer()
-  observation_panel = get_observation_panel(observation_data, images, fonts, config)
+  observation_panel = get_observation_panel(observation_data, radiation_data, images, fonts, config)
   sensor_panel_in = get_sensor_panel(config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_IN_NAME'), sensor_data, images, fonts, config)
   sensor_panel_out = get_sensor_panel(config.get('RUUVITAG_MAC_OUT'), config.get('RUUVITAG_MAC_OUT_NAME'), sensor_data, images, fonts, config, False)
   (forecasts_panel, position) = get_forecasts_panel(forecast_data, images, fonts, config)

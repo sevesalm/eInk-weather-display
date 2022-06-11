@@ -69,6 +69,14 @@ def get_position(xml_data: et.Element) -> tuple[str, str]:
   return (position_data[0], position_data[1])
 
 
+def get_fmisid(xml_data: et.Element) -> str:
+  ns = {'gml': 'http://www.opengis.net/gml/3.2'}
+  element = xml_data.find('.//gml:identifier', ns)
+  if(element is None or element.text is None):
+    raise Exception('Could not find any fmisid data')
+  return element.text
+
+
 def get_position_name(xml_data: et.Element) -> str:
   ns = {'gml': 'http://www.opengis.net/gml/3.2'}
   element = xml_data.find('.//gml:name', ns)
@@ -116,7 +124,8 @@ def get_observation_data(place: str, logger: Logger) -> WeatherData:
   observation_data = parse_multipoint_data(xml_data, 1)
   position = get_position(xml_data)
   position_name = get_position_name(xml_data)
-  result = (observation_data, position, position_name)
+  fmisid = get_fmisid(xml_data)
+  result = (observation_data, position, position_name, fmisid)
   logger.info('Received observation data: %s', repr(result))
   return result
 
@@ -131,6 +140,7 @@ def get_forecast_data(place: str, count: int, skip_count: Optional[int], logger:
   forecast_data = parse_multipoint_data(xml_data, count, skip_count, True)
   position = get_position(xml_data)
   position_name = get_position_name(xml_data)
-  result = (forecast_data, position, position_name)
+  fmisid = get_fmisid(xml_data)
+  result = (forecast_data, position, position_name, fmisid)
   logger.info('Received forecast data: %s', repr(result))
   return result
