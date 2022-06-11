@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-  viewBox="0 0 100 100" width="80" height="80" style="background-color: white" stroke="black" fill="white"
+  viewBox="0 0 100 100" style="background-color: white" stroke="black" fill="white"
   stroke-width="6" stroke-linecap="round">
   <g transform="rotate(-90 50 50)">
     <circle cx="30" cy="50" r="2" fill="black" stroke="black" />

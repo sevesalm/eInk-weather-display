@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-  viewBox="0 0 100 100" width="80" height="80" style="background-color: white" stroke="black" fill="white"
+  viewBox="0 0 100 100" style="background-color: white" stroke="black" fill="white"
   stroke-width="6" stroke-linecap="round">
-  <path d="M 58 65 a16 16 0 1 1 -16 0 v -50 a8 8 0 0 1 16 0 v 50" stroke-linejoin="round" />
-  <circle cx="50" cy="78.9" r="7" fill="black" /> 
-  <path d="M50 72.3 v-40" stroke-linecap="butt" stroke-width="4"/>
-  <g stroke-width="3">
-    <path d="M 65 57 h 10" />
-    <path d="M 65 50 h 5" />
-    <path d="M 65 43 h 10" />
-    <path d="M 65 36 h 5" />
-    <path d="M 65 29 h 10" />
-    <path d="M 65 22 h 5" />
-    <path d="M 65 15 h 10" />
+  <path d="M 60 58 a20 20 0 1 1 -20 0 v -43 a10 10 0 0 1 20 0 v 43" stroke-linejoin="round" />
+  <circle cx="50" cy="75.5" r="7" fill="black" /> 
+  <path d="M50 72.3 v-40" stroke-linecap="butt" stroke-width="5"/>
+  <g stroke-width="6">
+    <path d="M 70 53 h 14" />
+    <path d="M 70 43 h 5" />
+    <path d="M 70 33 h 14" />
+    <path d="M 70 23 h 5" />
+    <path d="M 70 13 h 14" />
   </g>
 </svg>
