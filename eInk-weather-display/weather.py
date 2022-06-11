@@ -12,6 +12,8 @@ OBS_PARAMETERS = ['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wg_10min', 'n_m
 OBS_QUERY = 'fmi::observations::weather::multipointcoverage'
 FORECAST_PARAMETERS = ['Temperature', 'WindSpeedMS', 'WindDirection', 'TotalCloudCover', 'WeatherSymbol3']
 FORECAST_QUERY = 'fmi::forecast::harmonie::surface::point::multipointcoverage'
+RADIATION_QUERY = 'fmi::observations::radiation::multipointcoverage'
+RADIATION_PARAMETERS = ['dir_1min']
 
 
 def split_in_chunks(data: List, size: int):
@@ -91,6 +93,18 @@ def get_next_forecast_start_timestamp() -> str:
   new_hour = ((now.hour-3)//6 + 1) * 6 + 3
   new_time = (now + timedelta(hours=new_hour - now.hour)).replace(minute=0, second=0, microsecond=0).astimezone(tz=None).isoformat()
   return new_time
+
+
+def get_radiation_data(fmisid: str, logger: Logger) -> ApiData:
+  params = {
+    'fmisid': fmisid,
+    'parameters': ','.join(RADIATION_PARAMETERS)
+  }
+  xml_data = fetch_data(RADIATION_QUERY, params)
+  radiation_data = parse_multipoint_data(xml_data, 1)
+  result = (radiation_data)
+  logger.info('Received radiation data: %s', repr(result))
+  return result
 
 
 def get_observation_data(place: str, logger: Logger) -> WeatherData:
