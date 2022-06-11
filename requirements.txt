@@ -4,6 +4,6 @@ pyephem==9.99
 python-dateutil==2.8.2
 requests==2.27.1
 RPi.GPIO==0.7.1
-ruuvitag-sensor==1.2.0
+git+https://github.com/ttu/ruuvitag-sensor.git
 spidev==3.5
 flake8==4.0.1
