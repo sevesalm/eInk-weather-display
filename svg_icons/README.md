@@ -51,6 +51,9 @@ This is a set of custom made icons to be used with FMI observation and forecast 
 
 ### Sleet
 
+![sleet_mild.svg](sleet_mild.svg)
+![sleet.svg](sleet.svg)
+![sleet_strong.svg](sleet_strong.svg)
 ![partially_cloudy_sleet_mild.svg](partially_cloudy_sleet_mild.svg)
 ![partially_cloudy_sleet_mild_night.svg](partially_cloudy_sleet_mild_night.svg)
 ![partially_cloudy_sleet.svg](partially_cloudy_sleet.svg)
@@ -60,6 +63,9 @@ This is a set of custom made icons to be used with FMI observation and forecast 
 
 ### Snow
 
+![snow_mild.svg](snow_mild.svg)
+![snow.svg](snow.svg)
+![snow_strong.svg](snow_strong.svg)
 ![partially_cloudy_snow_mild.svg](partially_cloudy_snow_mild.svg)
 ![partially_cloudy_snow_mild_night.svg](partially_cloudy_snow_mild_night.svg)
 ![partially_cloudy_snow.svg](partially_cloudy_snow.svg)
@@ -75,18 +81,6 @@ This is a set of custom made icons to be used with FMI observation and forecast 
 ![partially_cloudy_thunder_night.svg](partially_cloudy_thunder_night.svg)
 ![partially_cloudy_thunder_strong.svg](partially_cloudy_thunder_strong.svg)
 ![partially_cloudy_thunder_strong_night.svg](partially_cloudy_thunder_strong_night.svg)
-
-### Snow
-
-![snow_mild.svg](snow_mild.svg)
-![snow.svg](snow.svg)
-![snow_strong.svg](snow_strong.svg)
-
-### Sleet
-
-![sleet_mild.svg](sleet_mild.svg)
-![sleet.svg](sleet.svg)
-![sleet_strong.svg](sleet_strong.svg)
 
 ## Miscellaneous
 
