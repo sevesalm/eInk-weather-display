@@ -25,9 +25,9 @@ Note: This device/software is heavily customized to be used with the FMI (Finnis
 
 ## Weather Display
 
-The image below shows the main items visible on the display. It was a design decision to keep the information density quite high so that one display could show as much relevant information as possible.
+The image below shows the display with fake data. It was a design decision to keep the information density quite high so that one display could show as much relevant information as possible.
 
-![infograph](images/infograph.png)
+![example_display.bmp](images/example_display.bmp)
 
 ## Development and Deployment
 
