@@ -159,7 +159,8 @@ def get_random_coordinates() -> Tuple[str, str]:
 
 def get_random_observation_data(logger: Logger) -> WeatherData:
   ws_10min = random.uniform(0, 20)
-  observation_data: ApiData = {'2022-01-01T13:00:00Z': {
+  now = datetime.today().isoformat()
+  observation_data: ApiData = {now: {
     't2m': random.uniform(-30, 40),
     'rh': random.uniform(10, 90),
     'p_sea': random.uniform(900, 1100),
