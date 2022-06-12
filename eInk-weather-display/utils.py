@@ -1,7 +1,6 @@
 import sys
 import math
 import ctypes
-import random
 from PIL import ImageFont, ImageDraw, Image
 from dateutil.parser import parse
 from zoneinfo import ZoneInfo
@@ -104,10 +103,7 @@ def get_missing_weather_icon_icon(icon_index: Union[float, int], is_daylight: bo
 
 
 def get_cloud_cover_icon(cloud_cover: float, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
-  if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
-    icon_index = random.randint(0, 9)
-  else:
-    icon_index = math.nan if math.isnan(cloud_cover) else round(cloud_cover)
+  icon_index = math.nan if math.isnan(cloud_cover) else round(cloud_cover)
   if (not math.isnan(icon_index) and 0 <= icon_index <= 9):
     return images['misc'][f'cloud_cover_{icon_index}']
   icon = images['misc']['cloud_cover_0'].copy()

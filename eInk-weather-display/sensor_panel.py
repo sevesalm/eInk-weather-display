@@ -1,23 +1,9 @@
 from configparser import SectionProxy
-import random
 from PIL import Image, ImageDraw
-from ruuvitag_sensor.ruuvi_rx import RuuviTagReactive
-from reactivex import operators as ops
 import logging
 import utils
 import icons
-from typing import TypedDict, Mapping
-from type_alias import Fonts, Icons
-
-
-class SingleSensorData(TypedDict):
-  temperature: float
-  humidity: float
-  battery: float
-  rssi: float
-
-
-SensorData = Mapping[str, SingleSensorData]
+from type_alias import Fonts, Icons, SensorData
 
 
 def get_battery_icon(voltage: float, images: Icons) -> Image.Image:
@@ -30,39 +16,6 @@ def get_battery_icon(voltage: float, images: Icons) -> Image.Image:
   if (voltage >= 2400):
     return images['misc']['battery_25']
   return images['misc']['battery_empty']
-
-
-def get_sensor_data(logger: logging.Logger, config: SectionProxy, macs: list[str]) -> SensorData:
-  try:
-    if (not config.getboolean('USE_FAKE_SENSOR_DATA')):
-      ruuvis = RuuviTagReactive(macs)
-      ruuvi_emissions = ruuvis.get_subject()
-      missing_data = ruuvi_emissions.pipe(
-                        ops.map(lambda x: x[0]),  # Only the mac address
-                        ops.buffer_with_time(config.getint('SENSOR_POLL_TIMEOUT')),  # Buffer for some time
-                        ops.map(lambda x: set(x)),  # Convert macs into a set
-                        ops.first(),
-                        ops.flat_map(lambda x: list(set(macs).difference(x))),  # type: ignore # Emit once per each missing mac
-                        ops.map(lambda x: (x, None))
-                      )
-
-      sensor_data = ruuvi_emissions.pipe(
-                      ops.merge(missing_data),
-                      ops.scan(lambda acc, x: acc | {x[0]: x[1]}, {}),
-                      ops.filter(lambda x: len(x.keys()) == len(macs)),
-                      ops.first()
-                    ).run()
-
-      ruuvis.stop()
-      logger.info('Sensor data received: %s', repr(sensor_data))
-      return {k: v for k, v in sensor_data.items() if v is not None}
-    else:
-      sensor_data: SensorData = {mac: {"temperature": random.uniform(18, 30), "humidity": random.uniform(20, 80), "battery": random.uniform(2000, 3000), "rssi": random.uniform(-120, -10)} for mac in macs}
-      logger.info('Using fake data: %s', repr(sensor_data))
-      return sensor_data
-  except Exception as e:
-    logger.error('get_sensor_data() failed: %s', repr(e))
-    return {}
 
 
 def get_sensor_panel(sensor_mac: str, sensor_name: str, sensor_data: SensorData, images: Icons, fonts: Fonts, config: SectionProxy, draw_title: bool = True) -> Image.Image:
@@ -93,8 +46,8 @@ def get_sensor_panel(sensor_mac: str, sensor_name: str, sensor_data: SensorData,
     # RSSI - not yet part of ruuvitag-sensor
     # Adding is trivial by editing ruuvitag-sensor package's decoder.py
     # See: https://github.com/ttu/ruuvitag-sensor/issues/52
-    if ('rssi' in state_in):
-      utils.draw_quantity(draw, (130, data_y_base + 190), str(round(state_in['rssi'])), 'dBm', fonts, 'font_xs', 'font_xxs')
+    # if ('rssi' in state_in):
+    #   utils.draw_quantity(draw, (100, data_y_base + 210), str(round(state_in['rssi'])), 'dBm', fonts, 'font_xs', 'font_xxs')
 
   else:
     logger.info(f'Could not find mac {sensor_mac} in sensor data')

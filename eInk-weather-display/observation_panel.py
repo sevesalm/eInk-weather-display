@@ -1,5 +1,4 @@
 import math
-import random
 from PIL import Image, ImageDraw
 import logging
 from celestial import get_is_daylight
@@ -11,10 +10,6 @@ from type_alias import Icons, Fonts, WeatherData, ApiData
 
 
 def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
-  if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
-    icon_set = images['observation'][random.choice(list(images['observation'].keys()))]
-    return utils.get_icon_variant(is_daylight, icon_set)
-
   if (wawa not in images['observation']):
     return utils.get_missing_weather_icon_icon(wawa, is_daylight, images, fonts)
 
@@ -64,7 +59,7 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
   temp_feels = get_feels_like_temperature(latest["t2m"], latest["ws_10min"], latest_dir_1min, latest["rh"]/100.0)
 
   # Temperature
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 120), str(latest["t2m"]), '°C', fonts, 'font_lg', 'font_sm')
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 120), str(round(latest["t2m"], 1)), '°C', fonts, 'font_lg', 'font_sm')
 
   # Feels like temperature
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 210), str(round(temp_feels)), '°C', fonts)

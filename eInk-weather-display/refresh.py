@@ -5,7 +5,8 @@ from observation_panel import get_observation_panel
 from info_panel import get_info_panel
 from forecast_panel import get_forecasts_panel
 from celestial_panel import get_celestial_panel
-from sensor_panel import get_sensor_panel, get_sensor_data
+from sensor_panel import get_sensor_panel
+from sensor_data import get_sensor_data
 from timeit import default_timer as timer
 from configparser import SectionProxy
 from typing import Optional
@@ -23,9 +24,9 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
 
   # Fetch data
   start_fetch_time = timer()
-  observation_data = get_observation_data(config['FMI_LOCATION'], logger)
+  observation_data = get_observation_data(config, logger)
   radiation_data = get_radiation_data(observation_data[3], logger)
-  forecast_data = get_forecast_data(config.get('FMI_LOCATION'), 7, 6, logger)
+  forecast_data = get_forecast_data(config, 7, 6, logger)
   elapsed_fetch_time = timer() - start_fetch_time
 
   start_sensor_time = timer()

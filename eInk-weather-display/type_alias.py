@@ -23,3 +23,13 @@ Position = tuple[str, str]
 ApiData = Mapping[str, Mapping[str, float]]
 
 WeatherData = tuple[ApiData, tuple[str, str], str, str]
+
+
+class SingleSensorData(TypedDict):
+  temperature: float
+  humidity: float
+  battery: float
+  rssi: float
+
+
+SensorData = Mapping[str, SingleSensorData]

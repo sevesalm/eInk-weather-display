@@ -1,4 +1,3 @@
-import random
 import math
 from PIL import Image, ImageDraw
 from celestial import get_is_daylight
@@ -78,10 +77,6 @@ def get_forecasts_panel(forecast_data: WeatherData, images: Icons, fonts: Fonts,
 
 
 def get_forecats_weather_icon(weather_symbol_3, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
-  if (config.getboolean('RANDOMIZE_WEATHER_ICONS')):
-    icon_set = images['forecast'][random.choice(list(images['forecast'].keys()))]
-    return utils.get_icon_variant(is_daylight, icon_set)
-
   if (math.isnan(weather_symbol_3)):
     return utils.get_missing_weather_icon_icon(math.nan, is_daylight, images, fonts)
 
