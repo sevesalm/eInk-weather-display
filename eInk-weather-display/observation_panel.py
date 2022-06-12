@@ -38,7 +38,7 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
   latest_date = max(observations.keys())
   latest_date_local = utils.utc_datetime_string_to_local_datetime(latest_date)
   is_daylight = get_is_daylight(position, latest_date)
-  x_size = 700
+  x_size = 710
   y_size = 550
   latest = observations[latest_date]
   image = Image.new('L', (x_size, y_size), 0xff)
@@ -46,7 +46,7 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
 
   utils.draw_title(draw, fonts['font_sm'], 'OUT', position_name, fonts['font_xxs'])
 
-  delimiter_x = 290
+  delimiter_x = 300
   data_y_base = 100
 
   # Feels like
@@ -82,7 +82,6 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
   image.paste(wind_icon, (10, data_y_base + 450-65), wind_icon)
 
   margin = 15
-  y_top = y_size - weather_icon_size - margin
   right_column_x_base = x_size//2 + margin + 30
   cloud_coverage = latest['n_man']
 
@@ -104,7 +103,7 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
   # Warning icon
   if (utils.show_temperatur_warning_icon(latest["t2m"], latest_date_local, config)):
     warning_icon = icons.get_scaled_image(images['misc']['warning'], 60)
-    image.paste(warning_icon, (right_column_x_base + weather_icon.width - 2*warning_icon.width//3, y_top + weather_icon.height - 2*warning_icon.height//3), warning_icon)
+    image.paste(warning_icon, (right_column_x_base + weather_icon.width - 2*warning_icon.width//3, data_y_base + weather_icon.height - 2*warning_icon.height//3), warning_icon)
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):
