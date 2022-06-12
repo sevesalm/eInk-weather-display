@@ -20,15 +20,15 @@ ASTRONOMICAL_TWILIGHT_HORIZON = '-18'
 
 
 def get_is_daylight(position: Position, utc_datetime_string: str) -> bool:
-  location = ephem.Observer()
-  location.lat = position[0]
-  location.lon = position[1]
-  location.date = utc_datetime_string.replace('T', ' ').replace('+00:00', '').replace('Z', '')
+  observer = ephem.Observer()
+  observer.lat = position[0]
+  observer.lon = position[1]
+  observer.date = utc_datetime_string.replace('T', ' ').replace('+00:00', '').replace('Z', '')
 
   sun = ephem.Sun()   # type: ignore
-  sunset = ephem.localtime(location.next_setting(sun))
-  sunrise = ephem.localtime(location.next_rising(sun))
-  return (sunset < sunrise)
+  sun.compute(observer)
+  is_above_horizon = sun.alt + sun.radius > 0
+  return is_above_horizon
 
 
 def get_observer(position: Position, aware_datetime: Datetime) -> ephem.Observer:
