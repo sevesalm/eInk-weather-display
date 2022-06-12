@@ -33,7 +33,7 @@ def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, 
 def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating observation panel')
-  icon_size = 280
+  weather_icon_size = 280
   (observations, position, position_name, _) = observation_data
   latest_date = max(observations.keys())
   latest_date_local = utils.utc_datetime_string_to_local_datetime(latest_date)
@@ -81,25 +81,25 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
   wind_icon = icons.get_scaled_image(images['misc']['wind'], 70)
   image.paste(wind_icon, (10, data_y_base + 450-65), wind_icon)
 
-  # Cloud cover
-  cloud_coverage = latest['n_man']
   margin = 15
+  y_top = y_size - weather_icon_size - margin
   right_column_x_base = x_size//2 + margin + 30
+  cloud_coverage = latest['n_man']
+
+  # Weather icon
+  weather_icon = icons.get_scaled_image(get_observation_icon(latest['wawa'], cloud_coverage, is_daylight, images, fonts, config), weather_icon_size)
+  image.paste(weather_icon, (right_column_x_base, data_y_base), weather_icon)
+
+  # Cloud cover icon
   cloud_cover_icon = icons.get_scaled_image(utils.get_cloud_cover_icon(cloud_coverage, images, fonts, config), 160)
-  image.paste(cloud_cover_icon, (right_column_x_base + icon_size//2 - cloud_cover_icon.width//2, data_y_base), cloud_cover_icon)
+  image.paste(cloud_cover_icon, (right_column_x_base + weather_icon_size//2 - cloud_cover_icon.width//2, data_y_base + weather_icon.height + margin), cloud_cover_icon)
 
   # Wind direction
   w_dir = latest['wd_10min']
   if(not math.isnan(w_dir)):
     wind_image = icons.get_scaled_image(images['misc']['wind_icon'], 160)
     wind_image_rot = wind_image.rotate(-w_dir + 180, fillcolor=0xff, resample=Image.BICUBIC)
-    image.paste(wind_image_rot, (right_column_x_base + icon_size//2 - cloud_cover_icon.width//2, data_y_base), wind_image_rot)
-
-  # Weather icon
-  y_top = y_size - icon_size - margin
-
-  weather_icon = icons.get_scaled_image(get_observation_icon(latest['wawa'], cloud_coverage, is_daylight, images, fonts, config), icon_size)
-  image.paste(weather_icon, (right_column_x_base, y_top), weather_icon)
+    image.paste(wind_image_rot, (right_column_x_base + weather_icon_size//2 - cloud_cover_icon.width//2, data_y_base + weather_icon.height + margin), wind_image_rot)
 
   # Warning icon
   if (utils.show_temperatur_warning_icon(latest["t2m"], latest_date_local, config)):

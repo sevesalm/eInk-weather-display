@@ -27,7 +27,7 @@ Note: This device/software is heavily customized to be used with the FMI (Finnis
 
 The image below shows the display with fake data. It was a design decision to keep the information density quite high so that one display could show as much relevant information as possible.
 
-![example_display.bmp](images/example_display.bmp)
+![example_display.bmp](images/example_display.png)
 
 ## Development and Deployment
 
