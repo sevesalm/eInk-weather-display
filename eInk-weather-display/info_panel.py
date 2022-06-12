@@ -9,12 +9,15 @@ def get_info_panel(fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating info panel')
   x_size = 260
-  y_size = 200
+  y_size = 400
   image = Image.new('L', (x_size, y_size), 0xff)
   draw = ImageDraw.Draw(image)
 
   draw.text((x_size//2, 20), f'{time.strftime("%-H:%M")}', fill="black", font=fonts['font_md'], anchor='mt')
-  draw.text((x_size//2, y_size - 20), f'{time.strftime("%-d.%-m.%Y")}', fill="black", font=fonts['font_sm'], anchor='ms')
+  draw.text((x_size//2, 180), f'{time.strftime("%-d.%-m.%Y")}', fill="black", font=fonts['font_sm'], anchor='ms')
+
+  if (config.getboolean('USE_RANDOM_DATA')):
+    draw.text((x_size//2, 250), '(Fake data)', fill="black", font=fonts['font_xxs'], anchor='ms')
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):
