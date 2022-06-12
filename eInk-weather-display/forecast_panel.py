@@ -11,7 +11,7 @@ from type_alias import Fonts, Icons, WeatherData
 def get_forecasts_panel(forecast_data: WeatherData, images: Icons, fonts: Fonts, config: SectionProxy) -> tuple[Image.Image, tuple[str, str]]:
   logger = logging.getLogger(__name__)
   logger.info('Generating forecast panel')
-  icon_width = config.getint('ICON_WIDTH')
+  icon_width = 200
   x_size = 1872
   y_size = 800
   (forecasts, position, position_name, _) = forecast_data
@@ -44,7 +44,7 @@ def get_forecasts_panel(forecast_data: WeatherData, images: Icons, fonts: Fonts,
     draw.text((x_base + i*x_step, data_y_base + 10), date_formatted, font=(fonts['font_sm'] if date_formatted != "15:00" else fonts['font_sm_bold']), fill=0, anchor='mt')
 
     # Weather icon
-    icon_position = (x_base + i*x_step - config.getint('ICON_WIDTH')//2, data_y_base + 80)
+    icon_position = (x_base + i*x_step - icon_width//2, data_y_base + 80)
     weather_icon = icons.get_scaled_image(get_forecats_weather_icon(data['WeatherSymbol3'], is_daylight, images, fonts, config), icon_width)
     image.paste(weather_icon, icon_position, weather_icon)
 
