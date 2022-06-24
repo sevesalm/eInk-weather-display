@@ -49,7 +49,7 @@ def get_forecasts_panel(forecast_data: WeatherData, images: Icons, fonts: Fonts,
     image.paste(weather_icon, icon_position, weather_icon)
 
     # Warning icon
-    if (utils.show_temperatur_warning_icon(data["Temperature"], date_local, config)):
+    if (utils.show_temperature_warning_icon(data["Temperature"], date_local, config)):
       warning_icon = icons.get_scaled_image(images['misc']['warning'], 50)
       image.paste(warning_icon, (icon_position[0] + weather_icon.width - 2*warning_icon.width//3, icon_position[1] + weather_icon.height - 2*warning_icon.height//3), warning_icon)
 

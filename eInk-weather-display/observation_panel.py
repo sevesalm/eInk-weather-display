@@ -101,7 +101,7 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
     image.paste(wind_image_rot, (right_column_x_base + weather_icon_size//2 - cloud_cover_icon.width//2, data_y_base + weather_icon.height + margin), wind_image_rot)
 
   # Warning icon
-  if (utils.show_temperatur_warning_icon(latest["t2m"], latest_date_local, config)):
+  if (utils.show_temperature_warning_icon(latest["t2m"], latest_date_local, config)):
     warning_icon = icons.get_scaled_image(images['misc']['warning'], 60)
     image.paste(warning_icon, (right_column_x_base + weather_icon.width - 2*warning_icon.width//3, data_y_base + weather_icon.height - 2*warning_icon.height//3), warning_icon)
 
