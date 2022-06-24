@@ -3,6 +3,7 @@ from PIL import Image, ImageDraw
 import logging
 from celestial import get_is_daylight
 import utils
+import draw_utils
 import icons
 from feels_like_temperature import get_feels_like_temperature
 from configparser import SectionProxy
@@ -101,9 +102,12 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
     image.paste(wind_image_rot, (right_column_x_base + weather_icon_size//2 - cloud_cover_icon.width//2, data_y_base + weather_icon.height + margin), wind_image_rot)
 
   # Warning icon
-  if (utils.show_temperature_warning_icon(latest["t2m"], latest_date_local, config)):
-    warning_icon = icons.get_scaled_image(images['misc']['warning'], 60)
-    image.paste(warning_icon, (right_column_x_base + weather_icon.width - 2*warning_icon.width//3, data_y_base + weather_icon.height - 2*warning_icon.height//3), warning_icon)
+  draw_utils.draw_warning_icons(latest["t2m"], latest_date_local, images, image, weather_icon, (right_column_x_base, data_y_base), config)
+
+  # Warning icon
+  # if (utils.show_temperature_warning_icon(latest["t2m"], latest_date_local, config)):
+  #   warning_icon = icons.get_scaled_image(images['misc']['warning'], 60)
+  #   image.paste(warning_icon, (right_column_x_base + weather_icon.width - 2*warning_icon.width//3, data_y_base + weather_icon.height - 2*warning_icon.height//3), warning_icon)
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):

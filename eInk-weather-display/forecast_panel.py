@@ -3,6 +3,7 @@ from PIL import Image, ImageDraw
 from celestial import get_is_daylight
 import logging
 import utils
+import draw_utils
 import icons
 from configparser import SectionProxy
 from type_alias import Fonts, Icons, WeatherData
@@ -49,9 +50,7 @@ def get_forecasts_panel(forecast_data: WeatherData, images: Icons, fonts: Fonts,
     image.paste(weather_icon, icon_position, weather_icon)
 
     # Warning icon
-    if (utils.show_temperature_warning_icon(data["Temperature"], date_local, config)):
-      warning_icon = icons.get_scaled_image(images['misc']['warning'], 50)
-      image.paste(warning_icon, (icon_position[0] + weather_icon.width - 2*warning_icon.width//3, icon_position[1] + weather_icon.height - 2*warning_icon.height//3), warning_icon)
+    draw_utils.draw_warning_icons(data["Temperature"], date_local, images, image, weather_icon, icon_position, config)
 
     # Temperature
     utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 350), str(round(data["Temperature"])), '°C', fonts)

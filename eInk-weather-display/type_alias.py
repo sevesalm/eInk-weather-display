@@ -1,3 +1,4 @@
+from enum import Enum
 import datetime
 from PIL import Image, ImageFont
 from typing import Mapping, TypedDict
@@ -33,3 +34,9 @@ class SingleSensorData(TypedDict):
 
 
 SensorData = Mapping[str, SingleSensorData]
+
+
+class WeatherWarning(Enum):
+  NONE = 0
+  WARNING = 1
+  CRITICAL = 2
