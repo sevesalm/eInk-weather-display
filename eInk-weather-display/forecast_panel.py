@@ -17,7 +17,6 @@ def get_forecasts_panel(forecast_data: WeatherData, images: Icons, fonts: Fonts,
   y_size = 800
   (forecasts, position, position_name, _) = forecast_data
   count = len(forecasts.keys())
-  logger.info('Received data: %s', repr(forecasts))
 
   dates = sorted(forecasts.keys())
   image = Image.new('L', (x_size, y_size), 0xff)
