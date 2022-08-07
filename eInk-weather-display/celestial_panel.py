@@ -1,10 +1,11 @@
 from PIL import Image, ImageDraw
-from celestial import get_moon_phase, get_moon_phase_chr, get_dusks_and_dawns
+from celestial import get_moon_phase, get_moon_phase_chr, get_dusks_and_dawns, get_daytime_length
 import logging
 import utils
+import icons
 import datetime
 from configparser import SectionProxy
-from type_alias import Fonts, Position, Datetime
+from type_alias import Fonts, Position, Datetime, Icons
 
 
 def parse_sunrise_sunset_time(datetime: Datetime) -> str:
@@ -31,7 +32,7 @@ def get_shade_color(shade: int) -> str:
   raise Exception('Unsupported shade')
 
 
-def get_celestial_panel(position: Position, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_celestial_panel(position: Position, fonts: Fonts, images: Icons, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating celestial panel')
   x_size = 500
@@ -67,6 +68,16 @@ def get_celestial_panel(position: Position, fonts: Fonts, config: SectionProxy) 
     draw.text((x_base - 67, y_position+tick_height), hours, font=fonts['font_xs'], fill=0, anchor='rm')
     draw.rectangle(((x_base + 10, y_position + tick_height - 1), (x_base + 20, y_position + tick_height + 1)), "#000")
     y_position += tick_height
+
+  daytime_length = get_daytime_length(dusks_and_dawns)
+  if (daytime_length is not None):
+    y_position += 100
+    minutes = str((daytime_length.seconds//60) % 60) + ' min'
+    hours = str(daytime_length.seconds//3600) + ' h'
+    text = ' '.join([hours, minutes])
+    draw.text((x_base + tick_gap + 30, y_position), text, font=fonts['font_xs'], fill=0, anchor='mm')
+    sunrise_icon = icons.get_scaled_image_by_height(images['misc']['sunrise'], 70)
+    image.paste(sunrise_icon, (20, y_position - 25), sunrise_icon)
 
   arrow_offset = y_base + dusks_and_dawns["now_index"] * tick_height + tick_height//2
   draw.polygon([(x_base + tick_gap + tick_width + arrow_gap + arrow_width, -10 + arrow_offset), (x_base + tick_gap + tick_width + arrow_gap, arrow_offset), (x_base + tick_gap + tick_width + arrow_gap + arrow_width, 10 + arrow_offset)], "#000")

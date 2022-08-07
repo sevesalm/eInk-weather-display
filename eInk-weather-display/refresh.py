@@ -40,7 +40,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
   sensor_panel_in = get_sensor_panel(config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_IN_NAME'), sensor_data, images, fonts, config)
   sensor_panel_out = get_sensor_panel(config.get('RUUVITAG_MAC_OUT'), config.get('RUUVITAG_MAC_OUT_NAME'), sensor_data, images, fonts, config, False)
   (forecasts_panel, position) = get_forecasts_panel(forecast_data, images, fonts, config)
-  celestial_panel = get_celestial_panel(position, fonts, config)
+  celestial_panel = get_celestial_panel(position, fonts, images, config)
   info_panel = get_info_panel(fonts, config)
 
   # Paste the panels on the main image

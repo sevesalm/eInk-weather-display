@@ -6,6 +6,15 @@ import datetime
 from zoneinfo import ZoneInfo
 from typing import Optional, TypedDict
 from type_alias import Datetime, Position
+import enum
+
+
+class Twilight(enum.IntEnum):
+  DAYTIME = 0
+  CIVIL = 1
+  NAUTICAL = 2
+  ASTRONOMICAL = 3
+  NIGHT = 4
 
 
 class DusksAndDawns(TypedDict):
@@ -121,6 +130,20 @@ def get_dusks_and_dawns(position: Position, now: Datetime) -> DusksAndDawns:
   return {"now_index": now_index,
           "times": times,
           "twilights": twilights}
+
+
+def get_twilight_length(twilight_data: DusksAndDawns, index: int) -> datetime.timedelta:
+  if (0 < index < len(twilight_data['twilights'])):
+    return twilight_data['times'][index] - twilight_data['times'][index-1]
+  raise Exception('Index out of bounds')
+
+
+def get_daytime_length(twilight_data: DusksAndDawns) -> Optional[datetime.timedelta]:
+  try:
+    index = twilight_data['twilights'].index(Twilight.DAYTIME)
+    return get_twilight_length(twilight_data, index)
+  except ValueError:
+    return None
 
 
 def get_moon_phase() -> tuple[int, float]:
