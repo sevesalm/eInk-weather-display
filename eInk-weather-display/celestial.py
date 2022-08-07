@@ -49,13 +49,13 @@ def get_observer(position: Position, aware_datetime: Datetime) -> ephem.Observer
 
 
 def get_twilight(sun: ephem._sun) -> int:
-  if(sun.alt + sun.radius > 0):
+  if (sun.alt + sun.radius > 0):
     return 0
-  if(sun.alt >= ephem.degrees(CIVIL_TWILIGHT_HORIZON)):
+  if (sun.alt >= ephem.degrees(CIVIL_TWILIGHT_HORIZON)):
     return 1
-  if(sun.alt >= ephem.degrees(NAUTICAL_TWILIGHT_HORIZON)):
+  if (sun.alt >= ephem.degrees(NAUTICAL_TWILIGHT_HORIZON)):
     return 2
-  if(sun.alt >= ephem.degrees(ASTRONOMICAL_TWILIGHT_HORIZON)):
+  if (sun.alt >= ephem.degrees(ASTRONOMICAL_TWILIGHT_HORIZON)):
     return 3
   return 4
 

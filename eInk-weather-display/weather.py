@@ -66,7 +66,7 @@ def parse_multipoint_data(xml_data: et.Element, count: int, skip_count: Optional
 def get_position(xml_data: et.Element) -> tuple[str, str]:
   ns = {'gml': 'http://www.opengis.net/gml/3.2'}
   element = xml_data.find('.//gml:pos', ns)
-  if(element is None or element.text is None):
+  if (element is None or element.text is None):
     raise Exception('Could not find any position data')
   position_data = element.text.split(' ')[:-1]
   return (position_data[0], position_data[1])
@@ -75,7 +75,7 @@ def get_position(xml_data: et.Element) -> tuple[str, str]:
 def get_fmisid(xml_data: et.Element) -> str:
   ns = {'gml': 'http://www.opengis.net/gml/3.2'}
   element = xml_data.find('.//gml:identifier', ns)
-  if(element is None or element.text is None):
+  if (element is None or element.text is None):
     raise Exception('Could not find any fmisid data')
   return element.text
 
@@ -83,7 +83,7 @@ def get_fmisid(xml_data: et.Element) -> str:
 def get_position_name(xml_data: et.Element) -> str:
   ns = {'gml': 'http://www.opengis.net/gml/3.2'}
   element = xml_data.find('.//gml:name', ns)
-  if(element is None or element.text is None):
+  if (element is None or element.text is None):
     raise Exception('Could not find any position name data')
   return element.text
 
@@ -92,7 +92,7 @@ def combine(data_sets: list[ApiData]) -> ApiData:
   data = {}
   for data_set in data_sets:
     for key, val in data_set.items():
-      if(key not in data):
+      if (key not in data):
         data[key] = val
       else:
         data[key].update(val)

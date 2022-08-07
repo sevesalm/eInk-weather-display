@@ -3,7 +3,7 @@ def get_temp_chill(temp: float, wind: float) -> float:
 
 
 def get_temp_heat(temp: float, humidity: float) -> float:
-  if(temp < 14.5):
+  if (temp < 14.5):
     return temp
   humidity_ref = 0.5
   return (1.8*temp - 0.55*(1-humidity)*(1.8*temp - 26) - 0.55*(1-humidity_ref)*26) / (1.8 * (1 - 0.55*(1 - humidity_ref)))

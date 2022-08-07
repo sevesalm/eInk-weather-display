@@ -27,9 +27,9 @@ def check_python_version() -> None:
 
 
 def from_8bit_to_2bit(image: Image.Image) -> bytes:
-  if(image.mode != 'L'):
+  if (image.mode != 'L'):
     raise Exception('Image mode must be \'L\'')
-  if(image.width % 4 != 0):
+  if (image.width % 4 != 0):
     raise Exception('Image width % 4 must be 0')
 
   image_bytes = image.tobytes()
@@ -47,7 +47,7 @@ def from_8bit_to_2bit(image: Image.Image) -> bytes:
 
 
 def get_epd_data(config: SectionProxy) -> tuple[Optional[ctypes.CDLL], tuple[int, int]]:
-  if(is_supported_epd(config.get('EPD_MODEL'))):
+  if (is_supported_epd(config.get('EPD_MODEL'))):
     if (config.getboolean('FILE_OUTPUT')):
       return (None, (1872, 1404))
     else:
@@ -57,7 +57,7 @@ def get_epd_data(config: SectionProxy) -> tuple[Optional[ctypes.CDLL], tuple[int
 
 
 def get_fonts(config: SectionProxy) -> Fonts:
-  if(is_supported_epd(config.get('EPD_MODEL'))):
+  if (is_supported_epd(config.get('EPD_MODEL'))):
     font_mult = 4
   else:
     raise Exception(f'Unsupported model: {config.get("EPD_MODEL")}')

@@ -9,7 +9,7 @@ from type_alias import Fonts, Position, Datetime, Icons
 
 
 def parse_sunrise_sunset_time(datetime: Datetime) -> str:
-  if(datetime is None):
+  if (datetime is None):
     return 'N/A'
   return datetime.astimezone(tz=None).strftime('%-H:%M')
 

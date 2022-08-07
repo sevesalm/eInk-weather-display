@@ -19,9 +19,9 @@ def main_loop(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: 
   logger = logging.getLogger(__name__)
   logger.info("main_loop() started")
   wakeup_time = datetime.datetime.now()
-  if((wakeup_time.minute - 5) % config.getint('REFRESH_FULL_INTERVAL') == 0):
+  if ((wakeup_time.minute - 5) % config.getint('REFRESH_FULL_INTERVAL') == 0):
     refresh.refresh(panel_size, fonts, images, config, epd_so, True)
-  elif(wakeup_time.minute % config.getint('REFRESH_PARTIAL_INTERVAL') == 0):
+  elif (wakeup_time.minute % config.getint('REFRESH_PARTIAL_INTERVAL') == 0):
     refresh.refresh(panel_size, fonts, images, config, epd_so, False)
 
 

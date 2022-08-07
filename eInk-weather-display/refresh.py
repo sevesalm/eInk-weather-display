@@ -54,7 +54,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
   full_image.paste(info_panel, (panel_size[0] - info_panel.width, 0))
   elapsed_draw_time = timer() - start_draw_time
 
-  if(config.getboolean('DRAW_BORDERS')):
+  if (config.getboolean('DRAW_BORDERS')):
     border_color = 0x80
     draw_width = 2
     draw = ImageDraw.Draw(full_image)
@@ -74,7 +74,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
       full_image = full_image.transpose(Image.FLIP_LEFT_RIGHT)
     image_bytes = full_image.rotate(0 if not config.getboolean('ROTATE_180') else 180, expand=True).tobytes()
     c_logger = ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_wchar_p)(logging.getLogger('esp.so').log)
-    if(epd_so):
+    if (epd_so):
       start_refresh_time = timer()
       try:
         p = Process(target=epd_so.draw_image_8bit, args=(image_bytes, ctypes.c_bool(init), ctypes.c_int(config.getint('EPD_VOLTAGE')), config.getint('BITS_PER_PIXEL'), c_logger))

@@ -15,12 +15,12 @@ def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, 
     return utils.get_missing_weather_icon_icon(wawa, is_daylight, images, fonts)
 
   # For codes 0 to 3 and 20 to 26, let's use cloud cover to determine the icon set
-  if(((0 <= wawa <= 3) or (20 <= wawa <= 26)) and not math.isnan(cloud_coverage)):
-    if(cloud_coverage <= 1):  # Clear sky
+  if (((0 <= wawa <= 3) or (20 <= wawa <= 26)) and not math.isnan(cloud_coverage)):
+    if (cloud_coverage <= 1):  # Clear sky
       icon_set = images['forecast'].get(1)
-    elif(2 <= cloud_coverage <= 6):  # Partially cloudy
+    elif (2 <= cloud_coverage <= 6):  # Partially cloudy
       icon_set = images['forecast'].get(2)
-    elif(7 <= cloud_coverage <= 8):  # Overcast
+    elif (7 <= cloud_coverage <= 8):  # Overcast
       icon_set = images['forecast'].get(3)
     else:  # Lolwut?
       icon_set = images['observation'].get(0)
@@ -51,7 +51,7 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
   data_y_base = 100
 
   # Feels like
-  if(radiation_data):
+  if (radiation_data):
     latest_radiation_date = max(radiation_data.keys())
     latest_dir_1min = radiation_data[latest_radiation_date]["dir_1min"]
   else:
@@ -96,7 +96,7 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
 
   # Wind direction
   w_dir = latest['wd_10min']
-  if(not math.isnan(w_dir)):
+  if (not math.isnan(w_dir)):
     wind_image = icons.get_scaled_image(images['misc']['wind_icon'], 160)
     wind_image_rot = wind_image.rotate(-w_dir + 180, fillcolor=0xff, resample=Image.BICUBIC)
     image.paste(wind_image_rot, (right_column_x_base + weather_icon_size//2 - cloud_cover_icon.width//2, data_y_base + weather_icon.height + margin), wind_image_rot)
