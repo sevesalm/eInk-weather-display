@@ -47,7 +47,7 @@ def get_celestial_panel(position: Position, fonts: Fonts, images: Icons, config:
   dusks_and_dawns = get_dusks_and_dawns(position, now)
 
   tick_height = 50
-  y_base = 80 + (9 - len(dusks_and_dawns["twilights"])) * tick_height//2
+  y_base = 100 + (9 - len(dusks_and_dawns["twilights"])) * tick_height//2
   x_base = 150
   tick_width = 20
   tick_gap = 20
@@ -63,31 +63,39 @@ def get_celestial_panel(position: Position, fonts: Fonts, images: Icons, config:
   y_position = y_base
   for new_threshold in dusks_and_dawns["times"]:
     (hours, minutes) = parse_sunrise_sunset_hour_minute(new_threshold)
-    draw.text((x_base - 60, y_position+tick_height), ":", font=fonts['font_xs'], fill=0, anchor='mm')
-    draw.text((x_base - 53, y_position+tick_height), minutes, font=fonts['font_xs'], fill=0, anchor='lm')
-    draw.text((x_base - 67, y_position+tick_height), hours, font=fonts['font_xs'], fill=0, anchor='rm')
+    draw.text((x_base - 69, y_position+tick_height), ":", font=fonts['font_xs'], fill=0, anchor='mm')
+    draw.text((x_base - 62, y_position+tick_height), minutes, font=fonts['font_xs'], fill=0, anchor='lm')
+    draw.text((x_base - 76, y_position+tick_height), hours, font=fonts['font_xs'], fill=0, anchor='rm')
     draw.rectangle(((x_base + 10, y_position + tick_height - 1), (x_base + 20, y_position + tick_height + 1)), "#000")
     y_position += tick_height
 
-  daytime_length = get_daytime_length(dusks_and_dawns)
-  if (daytime_length is not None):
-    y_position += 100
-    minutes = str((daytime_length.seconds//60) % 60) + ' min'
-    hours = str(daytime_length.seconds//3600) + ' h'
-    text = ' '.join([hours, minutes])
-    draw.text((x_base + tick_gap + 30, y_position), text, font=fonts['font_xs'], fill=0, anchor='mm')
-    sunrise_icon = icons.get_scaled_image_by_height(images['misc']['sunrise'], 70)
-    image.paste(sunrise_icon, (20, y_position - 25), sunrise_icon)
-
+  # Current twilight
   arrow_offset = y_base + dusks_and_dawns["now_index"] * tick_height + tick_height//2
-  draw.polygon([(x_base + tick_gap + tick_width + arrow_gap + arrow_width, -10 + arrow_offset), (x_base + tick_gap + tick_width + arrow_gap, arrow_offset), (x_base + tick_gap + tick_width + arrow_gap + arrow_width, 10 + arrow_offset)], "#000")
+  # Arrow on the right side
+  # draw.polygon([(x_base + tick_gap + tick_width + arrow_gap + arrow_width, -10 + arrow_offset), (x_base + tick_gap + tick_width + arrow_gap, arrow_offset), (x_base + tick_gap + tick_width + arrow_gap + arrow_width, 10 + arrow_offset)], "#000")
+  # Arrow on the left side
+  draw.polygon([(x_base + tick_gap - arrow_gap - arrow_width, -10 + arrow_offset), (x_base + tick_gap - arrow_gap, arrow_offset), (x_base + tick_gap - arrow_gap - arrow_width, 10 + arrow_offset)], "#000")
 
-  (moon_phase, percent) = get_moon_phase()
+  # Moon phase
+  (moon_phase, _) = get_moon_phase()
   moon_font_chr = get_moon_phase_chr(moon_phase)
   font_moon = fonts['font_misc_md']
   draw.text((3*x_size//4, 90), moon_font_chr, font=font_moon, fill=0, anchor="ma")
-  ascent, descent = font_moon.getmetrics()
-  utils.draw_quantity(draw, (3*x_size//4, 90 + ascent + descent + 70), str(round(percent)), '%', fonts)
+  # ascent, descent = font_moon.getmetrics()
+  # utils.draw_quantity(draw, (3*x_size//4, 90 + ascent + descent + 70), str(round(percent)), '%', fonts)
+
+  # Daytime length
+  daytime_length = get_daytime_length(dusks_and_dawns)
+  if (daytime_length is not None):
+    daytime_index = dusks_and_dawns["twilights"].index(0)
+    length_y_position = y_base + daytime_index*tick_height + tick_height//2
+    minutes = str((daytime_length.seconds//60) % 60) + ' min'
+    hours = str(daytime_length.seconds//3600) + ' h'
+    text = ' '.join([hours, minutes])
+    draw.text((x_base + tick_gap + tick_width + 90, length_y_position), text, font=fonts['font_xs'], fill=0, anchor='lm')
+    # Sunrise icon
+    sunrise_icon = icons.get_scaled_image_by_height(images['misc']['sunrise'], 50)
+    image.paste(sunrise_icon, (x_base + tick_gap + tick_width + 10, length_y_position - sunrise_icon.height//2), sunrise_icon)
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):
