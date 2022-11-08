@@ -34,10 +34,10 @@ def get_sensor_panel(sensor_mac: str, sensor_name: str, sensor_data: SensorData,
   if (sensor_mac in sensor_data):
     data_y_base = 100 if (draw_title) else 0
     state_in = sensor_data[sensor_mac]
-    utils.draw_quantity(draw, (x_size//2 + 110, data_y_base + 120), str(round(state_in['temperature'], 1)), '°C', fonts, 'font_lg', 'font_sm')
+    utils.draw_quantity(draw, (x_size//2 + 110, data_y_base + 120), utils.roundToString(state_in['temperature'], 1), '°C', fonts, 'font_lg', 'font_sm')
     humidity_icon = icons.get_scaled_image(images['misc']['humidity'], 70)
     image.paste(humidity_icon, (x_size//2 - 50, data_y_base + 150), humidity_icon)
-    utils.draw_quantity(draw, (x_size//2 + 110, data_y_base + 210), str(round(state_in['humidity'])), '%', fonts)
+    utils.draw_quantity(draw, (x_size//2 + 110, data_y_base + 210), utils.roundToString(state_in['humidity']), '%', fonts)
 
     # Battery level
     battery_icon = icons.get_scaled_image(get_battery_icon(state_in['battery'], images), 60)
@@ -47,7 +47,7 @@ def get_sensor_panel(sensor_mac: str, sensor_name: str, sensor_data: SensorData,
     # Adding is trivial by editing ruuvitag-sensor package's decoder.py
     # See: https://github.com/ttu/ruuvitag-sensor/issues/52
     # if ('rssi' in state_in):
-    #   utils.draw_quantity(draw, (100, data_y_base + 210), str(round(state_in['rssi'])), 'dBm', fonts, 'font_xs', 'font_xxs')
+    #   utils.draw_quantity(draw, (100, data_y_base + 210), utils.roundToString(state_in['rssi']), 'dBm', fonts, 'font_xs', 'font_xxs')
 
   else:
     logger.info(f'Could not find mac {sensor_mac} in sensor data')

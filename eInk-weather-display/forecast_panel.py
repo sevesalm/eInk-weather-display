@@ -52,9 +52,9 @@ def get_forecasts_panel(forecast_data: WeatherData, images: Icons, fonts: Fonts,
     draw_utils.draw_warning_icons(data["Temperature"], date_local, images, image, weather_icon, icon_position, config)
 
     # Temperature
-    utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 350), str(round(data["Temperature"])), '°C', fonts)
+    utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 350), utils.roundToString(data["Temperature"]), '°C', fonts)
     # Wind speed
-    utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 430), str(round(data["WindSpeedMS"])), 'm/s', fonts)
+    utils.draw_quantity(draw, (x_base + i*x_step, data_y_base + 430), utils.roundToString(data["WindSpeedMS"]), 'm/s', fonts)
 
     # Cloud cover
     cloud_cover_raw = data["TotalCloudCover"]

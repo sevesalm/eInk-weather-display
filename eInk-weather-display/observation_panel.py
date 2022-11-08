@@ -60,25 +60,25 @@ def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData
   temp_feels = get_feels_like_temperature(latest["t2m"], latest["ws_10min"], latest_dir_1min, latest["rh"]/100.0)
 
   # Temperature
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 120), str(round(latest["t2m"], 1)), '°C', fonts, 'font_lg', 'font_sm')
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 120), utils.roundToString(latest["t2m"], 1), '°C', fonts, 'font_lg', 'font_sm')
 
   # Feels like temperature
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 210), str(round(temp_feels)), '°C', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 210), utils.roundToString(temp_feels), '°C', fonts)
   temperature_feel_icon = icons.get_scaled_image_by_height(images['misc']['temperature_feel'], 70)
   image.paste(temperature_feel_icon, (10, data_y_base + 210-65), temperature_feel_icon)
 
   # Relative humidity
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 290), str(round(latest["rh"])), '%', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 290), utils.roundToString(latest["rh"]), '%', fonts)
   humidity_icon = icons.get_scaled_image(images['misc']['humidity'], 70)
   image.paste(humidity_icon, (10, data_y_base + 290-65), humidity_icon)
 
   # Barometric pressure
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 370), str(round(latest["p_sea"])), 'hPa', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 370), utils.roundToString(latest["p_sea"]), 'hPa', fonts)
   pressure_icon = icons.get_scaled_image(images['misc']['pressure'], 70)
   image.paste(pressure_icon, (10, data_y_base + 370-65), pressure_icon)
 
   # Wind speed
-  utils.draw_quantity(draw, (delimiter_x, data_y_base + 450), f'{round(latest["ws_10min"])} – {round(latest["wg_10min"])}', 'm/s', fonts)
+  utils.draw_quantity(draw, (delimiter_x, data_y_base + 450), f'{utils.roundToString(latest["ws_10min"])} – {utils.roundToString(latest["wg_10min"])}', 'm/s', fonts)
   wind_icon = icons.get_scaled_image(images['misc']['wind'], 70)
   image.paste(wind_icon, (10, data_y_base + 450-65), wind_icon)
 

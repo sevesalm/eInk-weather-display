@@ -9,6 +9,7 @@ from typing import Optional, Union
 from type_alias import Datetime, Fonts, Icons, DayNightIcons, WeatherWarning
 
 SUPPORTED_EPD_MODELS = ['7.8', '10.3']
+NAN_SYMBOL = '?'
 
 
 def draw_quantity(draw: ImageDraw.ImageDraw, mid_point: tuple[int, int], value: str, unit: str, fonts: Fonts, font: str = 'font_sm', font_unit: str = 'font_xs') -> None:
@@ -138,3 +139,9 @@ def get_weather_warning_level(temperature: float, time: Datetime, config: Sectio
 
 def is_supported_epd(epd_model: str) -> bool:
   return epd_model in SUPPORTED_EPD_MODELS
+
+
+def roundToString(value: float, decimals: Optional[int] = None) -> str:
+  if (math.isnan(value)):
+    return NAN_SYMBOL
+  return str(round(value, decimals))
