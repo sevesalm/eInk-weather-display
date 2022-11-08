@@ -1,9 +1,9 @@
 APScheduler==3.9.1
-Pillow==9.2.0
+Pillow==9.3.0
 pyephem==9.99
 python-dateutil==2.8.2
 requests==2.28.1
 RPi.GPIO==0.7.1
 ruuvitag-sensor==2.0.0
-spidev==3.5
+spidev==3.6
 flake8==5.0.4
