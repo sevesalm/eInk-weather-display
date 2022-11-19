@@ -6,9 +6,13 @@ from reactivex import operators as ops
 from type_alias import SensorData
 
 
+def get_random_sensor_data(macs: list[str]) -> SensorData:
+  return {mac: {"temperature": random.uniform(18, 30), "humidity": random.uniform(20, 80), "battery": random.uniform(2000, 3000), "rssi": random.uniform(-120, -10)} for mac in macs}
+
+
 def get_sensor_data(logger: logging.Logger, config: SectionProxy, macs: list[str]) -> SensorData:
   try:
-    if (not config.getboolean('USE_RANDOM_DATA')):
+    if (not (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE'))):
       ruuvis = RuuviTagReactive(macs)
       ruuvi_emissions = ruuvis.get_subject()
       missing_data = ruuvi_emissions.pipe(
@@ -31,7 +35,7 @@ def get_sensor_data(logger: logging.Logger, config: SectionProxy, macs: list[str
       logger.info('Sensor data received: %s', repr(sensor_data))
       return {k: v for k, v in sensor_data.items() if v is not None}
     else:
-      sensor_data: SensorData = {mac: {"temperature": random.uniform(18, 30), "humidity": random.uniform(20, 80), "battery": random.uniform(2000, 3000), "rssi": random.uniform(-120, -10)} for mac in macs}
+      sensor_data = get_random_sensor_data(macs)
       logger.info('Using random sensor data: %s', repr(sensor_data))
       return sensor_data
   except Exception as e:

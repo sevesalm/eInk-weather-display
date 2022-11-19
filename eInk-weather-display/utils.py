@@ -49,7 +49,7 @@ def from_8bit_to_2bit(image: Image.Image) -> bytes:
 
 def get_epd_data(config: SectionProxy) -> tuple[Optional[ctypes.CDLL], tuple[int, int]]:
   if (is_supported_epd(config.get('EPD_MODEL'))):
-    if (config.getboolean('FILE_OUTPUT')):
+    if (config.getboolean('DEV_MODE')):
       return (None, (1872, 1404))
     else:
       return (ctypes.CDLL("lib/epd78.so"), (1872, 1404))

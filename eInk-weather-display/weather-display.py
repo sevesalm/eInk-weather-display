@@ -47,10 +47,11 @@ def main():
       logger.info("Initial refresh")
       refresh.refresh(panel_size, fonts, images, config, epd_so, True)  # Once in the beginning
 
-      logger.info('Starting scheduler')
-      scheduler = BlockingScheduler()
-      scheduler.add_job(lambda: main_loop(panel_size, fonts, images, config, epd_so), 'cron', minute='*/1')
-      scheduler.start()
+      if not config.getboolean('DEV_MODE'):
+        logger.info('Starting scheduler')
+        scheduler = BlockingScheduler()
+        scheduler.add_job(lambda: main_loop(panel_size, fonts, images, config, epd_so), 'cron', minute='*/1')
+        scheduler.start()
 
   except FileNotFoundError as e:
     logger.exception(f'Error opening file "{CONFIG_FILENAME}": %s', str(e))

@@ -16,7 +16,7 @@ def get_info_panel(fonts: Fonts, config: SectionProxy) -> Image.Image:
   draw.text((x_size//2, 20), f'{time.strftime("%-H:%M")}', fill="black", font=fonts['font_md'], anchor='mt')
   draw.text((x_size//2, 180), f'{time.strftime("%-d.%-m.%Y")}', fill="black", font=fonts['font_sm'], anchor='ms')
 
-  if (config.getboolean('USE_RANDOM_DATA')):
+  if (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE')):
     draw.text((x_size//2, 250), '(Fake data)', fill="black", font=fonts['font_xxs'], anchor='ms')
 
   # Borders

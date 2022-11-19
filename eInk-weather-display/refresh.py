@@ -63,7 +63,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
     draw.line([observation_panel.width + sensor_panel_in.width, 0, observation_panel.width + sensor_panel_in.width, observation_panel.height - panel_size[1]//20], fill=border_color, width=draw_width)
     draw.line([observation_panel.width + sensor_panel_in.width + celestial_panel.width, 0, observation_panel.width + sensor_panel_in.width + celestial_panel.width, observation_panel.height - panel_size[1]//20], fill=border_color, width=draw_width)
 
-  if (config.getboolean('FILE_OUTPUT')):
+  if (config.getboolean('DEV_MODE')):
     filename = config.get('OUTPUT_FILENAME')
     logger.info(f'Saving image to {filename}')
     full_image.save(filename)

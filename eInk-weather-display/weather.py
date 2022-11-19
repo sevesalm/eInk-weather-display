@@ -119,7 +119,7 @@ def get_radiation_data(fmisid: str, logger: Logger) -> ApiData:
 
 
 def get_observation_data(config: SectionProxy, logger: Logger) -> WeatherData:
-  if (config.getboolean('USE_RANDOM_DATA')):
+  if (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE')):
     return get_random_observation_data(logger)
   params = {
     'place': config['FMI_LOCATION'],
@@ -136,7 +136,7 @@ def get_observation_data(config: SectionProxy, logger: Logger) -> WeatherData:
 
 
 def get_forecast_data(config: SectionProxy, count: int, skip_count: Optional[int], logger: Logger) -> WeatherData:
-  if (config.getboolean('USE_RANDOM_DATA')):
+  if (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE')):
     return get_random_forecast_data(logger)
   params = {
     'place': config['FMI_LOCATION'],
