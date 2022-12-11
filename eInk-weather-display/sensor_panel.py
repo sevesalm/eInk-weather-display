@@ -29,7 +29,7 @@ def get_sensor_panel(sensor_mac: str, sensor_name: str, sensor_data: SensorData,
   draw = ImageDraw.Draw(image)
 
   if (draw_title):
-    utils.draw_title(draw, fonts['font_sm'], 'SENSOR', sensor_name, fonts['font_xs'])
+    utils.draw_title(draw, fonts['font_sm'], 'SENSOR', sensor_name, fonts['font_xxs'])
 
   if (sensor_mac in sensor_data):
     data_y_base = 100 if (draw_title) else 0
