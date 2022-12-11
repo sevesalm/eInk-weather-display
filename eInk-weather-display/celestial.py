@@ -136,10 +136,10 @@ def get_dusks_and_dawns(position: Position, now: Datetime) -> DusksAndDawns:
           "twilights": twilights}
 
 
-def get_twilight_length(twilight_data: DusksAndDawns, index: int) -> datetime.timedelta:
+def get_twilight_length(twilight_data: DusksAndDawns, index: int) -> Optional[datetime.timedelta]:
   if (0 < index < len(twilight_data['twilights'])):
     return twilight_data['times'][index] - twilight_data['times'][index-1]
-  raise Exception('Index out of bounds')
+  return None
 
 
 def get_daytime_length(twilight_data: DusksAndDawns) -> Optional[datetime.timedelta]:
