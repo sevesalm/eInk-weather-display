@@ -34,13 +34,13 @@ class TestCelestial(unittest.TestCase):
     now = datetime.fromisoformat('2021-12-21T12:00:00+02:00')
     result = celestial.get_dusks_and_dawns(self.HELSINKI_LOCATION, now)
     self.assertEqual(result["twilights"], [4, 3, 2, 1, 0, 1, 2, 3, 4])
-    self.assertEqual(result["now_index"], 4)
+    self.assertAlmostEqual(result['current_twilight'], 4.4, places=1)
 
   def test_get_dusks_and_dawns_helsinki_winter_nautical_dusk(self):
     now = datetime.fromisoformat('2021-12-21T16:30:00+02:00')
     result = celestial.get_dusks_and_dawns(self.HELSINKI_LOCATION, now)
     self.assertEqual(result["twilights"], [4, 3, 2, 1, 0, 1, 2, 3, 4])
-    self.assertEqual(result["now_index"], 6)
+    self.assertAlmostEqual(result["current_twilight"], 6.3, places=1)
 
   def test_get_dusks_and_dawns_helsinki(self):
     now = datetime.fromisoformat('2021-08-21T12:00:00+02:00')
@@ -56,7 +56,7 @@ class TestCelestial(unittest.TestCase):
     now = datetime.fromisoformat('2021-06-01T12:00:00+02:00')
     result = celestial.get_dusks_and_dawns(self.IVALO_LOCATION, now)
     self.assertEqual(result["twilights"], [0])
-    self.assertEqual(result["now_index"], 0)
+    self.assertEqual(result["current_twilight"], 0.5)
 
   def test_get_dusks_and_dawns_ivalo_spring(self):
     now = datetime.fromisoformat('2021-04-01T12:00:00+02:00')

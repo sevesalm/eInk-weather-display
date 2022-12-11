@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw
-from celestial import get_moon_phase, get_moon_phase_chr, get_dusks_and_dawns, get_daytime_length
+from celestial import get_moon_phase, get_moon_phase_chr, get_dusks_and_dawns, get_daytime_length, Twilight
 import logging
 import utils
 import icons
@@ -46,8 +46,10 @@ def get_celestial_panel(position: Position, fonts: Fonts, images: Icons, config:
   now = datetime.datetime.now().astimezone()
   dusks_and_dawns = get_dusks_and_dawns(position, now)
 
-  tick_height = 50
-  y_base = 100 + (9 - len(dusks_and_dawns["twilights"])) * tick_height//2
+  tick_height_map = [80, 45, 45, 45, 45]
+  tick_heights = [tick_height_map[x] for x in dusks_and_dawns["twilights"]]
+  tick_height_total = sum(tick_heights)
+  y_base = 100 + sum(tick_height_map[1:]) + tick_height_map[0]//2 - tick_height_total//2
   x_base = 150
   tick_width = 20
   tick_gap = 20
@@ -55,22 +57,25 @@ def get_celestial_panel(position: Position, fonts: Fonts, images: Icons, config:
   arrow_width = 25
 
   y_position = y_base
-  for shade in dusks_and_dawns["twilights"]:
+  for shade, tick_height in zip(dusks_and_dawns["twilights"], tick_heights):
     color = get_shade_color(shade)
     draw.rectangle(((x_base + tick_gap, y_position), (x_base + tick_gap + tick_width, y_position + tick_height)), color)
     y_position += tick_height
 
   y_position = y_base
-  for new_threshold in dusks_and_dawns["times"]:
+  for new_threshold, tick_height, prev_shade, next_shade in zip(dusks_and_dawns["times"], tick_heights, dusks_and_dawns["twilights"][:-1], dusks_and_dawns["twilights"][1:]):
     (hours, minutes) = parse_sunrise_sunset_hour_minute(new_threshold)
-    draw.text((x_base - 69, y_position+tick_height), ":", font=fonts['font_xs'], fill=0, anchor='mm')
-    draw.text((x_base - 62, y_position+tick_height), minutes, font=fonts['font_xs'], fill=0, anchor='lm')
-    draw.text((x_base - 76, y_position+tick_height), hours, font=fonts['font_xs'], fill=0, anchor='rm')
+    font = fonts['font_xs'] if Twilight.DAYTIME in [prev_shade, next_shade] else fonts['font_xxs']
+    draw.text((x_base - 69, y_position+tick_height), ":", font=font, fill=0, anchor='mm')
+    draw.text((x_base - 62, y_position+tick_height), minutes, font=font, fill=0, anchor='lm')
+    draw.text((x_base - 76, y_position+tick_height), hours, font=font, fill=0, anchor='rm')
     draw.rectangle(((x_base + 10, y_position + tick_height - 1), (x_base + 20, y_position + tick_height + 1)), "#000")
     y_position += tick_height
 
   # Current twilight
-  arrow_offset = y_base + dusks_and_dawns["now_index"] * tick_height + tick_height//2
+  current_twilight_index = int(dusks_and_dawns['current_twilight'])
+  current_twilight_fraction = dusks_and_dawns['current_twilight'] % 1
+  arrow_offset = y_base + sum(tick_heights[:current_twilight_index]) + tick_heights[current_twilight_index] * current_twilight_fraction
   # Arrow on the right side
   # draw.polygon([(x_base + tick_gap + tick_width + arrow_gap + arrow_width, -10 + arrow_offset), (x_base + tick_gap + tick_width + arrow_gap, arrow_offset), (x_base + tick_gap + tick_width + arrow_gap + arrow_width, 10 + arrow_offset)], "#000")
   # Arrow on the left side
@@ -87,8 +92,8 @@ def get_celestial_panel(position: Position, fonts: Fonts, images: Icons, config:
   # Daytime length
   daytime_length = get_daytime_length(dusks_and_dawns)
   if (daytime_length is not None):
-    daytime_index = dusks_and_dawns["twilights"].index(0)
-    length_y_position = y_base + daytime_index*tick_height + tick_height//2
+    daytime_index = dusks_and_dawns["twilights"].index(Twilight.DAYTIME)
+    length_y_position = y_base + sum(tick_heights[0:daytime_index]) + tick_heights[daytime_index]//2
     minutes = str((daytime_length.seconds//60) % 60) + ' min'
     hours = str(daytime_length.seconds//3600) + ' h'
     text = ' '.join([hours, minutes])

@@ -18,9 +18,9 @@ class Twilight(enum.IntEnum):
 
 
 class DusksAndDawns(TypedDict):
-    now_index: int
+    current_twilight: float
     times: list[Datetime]
-    twilights: list[int]
+    twilights: list[Twilight]
 
 
 CIVIL_TWILIGHT_HORIZON = '-6'
@@ -121,13 +121,17 @@ def get_dusks_and_dawns(position: Position, now: Datetime) -> DusksAndDawns:
   dusks = [x for x in [next_sunset, civil_dusk, nautical_dusk, astronomical_dusk] if x is not None]
 
   times = dawns + dusks
-  now_index = sorted(times + [now]).index(now)
+  sorted_times = sorted(times + [now])
+  current_twilight_index = sorted(times + [now]).index(now)
+  prev_time = sorted_times[current_twilight_index-1] if current_twilight_index > 0 else None
+  next_time = sorted_times[current_twilight_index+1] if current_twilight_index < len(sorted_times) - 1 else None
+  current_twilight = current_twilight_index + (0.5 if (not prev_time or not next_time) else (now-prev_time)/(next_time - prev_time))
 
-  dawn_twilights = list(range(transit_twilight + len(dawns), transit_twilight, -1))
-  dusk_twilights = list(range(transit_twilight, transit_twilight + len(dusks) + 1))
+  dawn_twilights = [Twilight(x) for x in list(range(transit_twilight + len(dawns), transit_twilight, -1))]
+  dusk_twilights = [Twilight(x) for x in list(range(transit_twilight, transit_twilight + len(dusks) + 1))]
   twilights = dawn_twilights + dusk_twilights
 
-  return {"now_index": now_index,
+  return {"current_twilight": current_twilight,
           "times": times,
           "twilights": twilights}
 
