@@ -2,6 +2,7 @@ import unittest
 import celestial
 from datetime import datetime, timedelta
 import pprint
+from type_utils import assertNotNone
 
 
 class TestCelestial(unittest.TestCase):
@@ -87,8 +88,9 @@ class TestCelestial(unittest.TestCase):
     expected = timedelta(hours=15, minutes=9, seconds=13.1).total_seconds()
     now = datetime.fromisoformat('2021-08-21T12:00:00+02:00')
     twilight_data = celestial.get_dusks_and_dawns(self.HELSINKI_LOCATION, now)
-    result = celestial.get_twilight_length(twilight_data, 3).total_seconds()
-    self.assertAlmostEqual(result, expected, delta=1)
+    twilight_length = assertNotNone(celestial.get_twilight_length(twilight_data, 3))
+    twilight_length_seconds = twilight_length.total_seconds()
+    self.assertAlmostEqual(twilight_length_seconds, expected, delta=1)
 
   def test_get_daytime_length_helsinki_summer(self):
     now = datetime.fromisoformat('2021-08-21T12:00:00+02:00')
@@ -97,20 +99,23 @@ class TestCelestial(unittest.TestCase):
     self.assertIsNotNone(daytime_length)
     if (daytime_length is not None):
       daytime_length_seconds = daytime_length.total_seconds()
-      twilight_length = celestial.get_twilight_length(twilight_data, 3).total_seconds()
-      self.assertEqual(twilight_length, daytime_length_seconds)
+      twilight_length = assertNotNone(celestial.get_twilight_length(twilight_data, 3))
+      twilight_length_seconds = twilight_length.total_seconds()
+      self.assertEqual(twilight_length_seconds, daytime_length_seconds)
 
   def test_get_twilight_length_helsinki_summer_with_exception(self):
     now = datetime.fromisoformat('2021-08-21T12:00:00+02:00')
     twilight_data = celestial.get_dusks_and_dawns(self.HELSINKI_LOCATION, now)
-    self.assertRaises(Exception, celestial.get_twilight_length, twilight_data, 0)
+    twilight_length = celestial.get_twilight_length(twilight_data, 0)
+    self.assertIsNone(twilight_length)
 
   def test_get_twilight_length_mount_ellsworth_summer(self):
     expected = timedelta(minutes=33, seconds=55.6).total_seconds()
     now = datetime.fromisoformat('2021-07-10T12:00:00+02:00')
     twilight_data = celestial.get_dusks_and_dawns(self.MOUNT_ELLSWORTH_LOCATION, now)
-    result = celestial.get_twilight_length(twilight_data, 1).total_seconds()
-    self.assertAlmostEqual(result, expected, delta=1)
+    twilight_length = assertNotNone(celestial.get_twilight_length(twilight_data, 1))
+    twilight_length_seconds = twilight_length.total_seconds()
+    self.assertAlmostEqual(twilight_length_seconds, expected, delta=1)
 
   def test_get_daytime_length_mount_ellsworth_summer(self):
     now = datetime.fromisoformat('2021-07-10T12:00:00+02:00')
