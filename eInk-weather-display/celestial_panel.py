@@ -32,7 +32,7 @@ def get_shade_color(shade: int) -> str:
   raise Exception('Unsupported shade')
 
 
-def get_celestial_panel(position: Position, fonts: Fonts, images: Icons, config: SectionProxy) -> Image.Image:
+def get_celestial_panel(position: Position, position_name: str, fonts: Fonts, images: Icons, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating celestial panel')
   x_size = 500
@@ -40,7 +40,7 @@ def get_celestial_panel(position: Position, fonts: Fonts, images: Icons, config:
   image = Image.new('L', (x_size, y_size), 0xff)
   draw = ImageDraw.Draw(image)
 
-  utils.draw_title(draw, fonts['font_sm'], 'SKY')
+  utils.draw_title(draw, fonts['font_sm'], 'SKY', position_name)
 
   # Icons
   now = datetime.datetime.now().astimezone()

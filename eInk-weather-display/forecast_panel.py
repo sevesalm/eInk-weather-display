@@ -1,4 +1,5 @@
 import math
+from typing import Optional
 from PIL import Image, ImageDraw
 from celestial import get_is_daylight
 import logging
@@ -9,18 +10,23 @@ from configparser import SectionProxy
 from type_alias import Fonts, Icons, WeatherData
 
 
-def get_forecasts_panel(forecast_data: WeatherData, images: Icons, fonts: Fonts, config: SectionProxy) -> tuple[Image.Image, tuple[str, str]]:
+def get_forecasts_panel(forecast_data: Optional[WeatherData], images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating forecast panel')
-  icon_width = 200
   x_size = 1872
   y_size = 800
+  image = Image.new('L', (x_size, y_size), 0xff)
+  draw = ImageDraw.Draw(image)
+
+  if (forecast_data is None):
+    logger.error('Missing data')
+    utils.draw_title(draw, fonts['font_sm'], 'FORECAST', 'MISSING DATA', fonts['font_xxs'])
+    return image
+  icon_width = 200
   (forecasts, position, position_name, _) = forecast_data
   count = len(forecasts.keys())
 
   dates = sorted(forecasts.keys())
-  image = Image.new('L', (x_size, y_size), 0xff)
-  draw = ImageDraw.Draw(image)
 
   utils.draw_title(draw, fonts['font_sm'], 'FORECAST', position_name, fonts['font_xxs'])
 
@@ -71,7 +77,7 @@ def get_forecasts_panel(forecast_data: WeatherData, images: Icons, fonts: Fonts,
   if (config.getboolean('DRAW_PANEL_BORDERS')):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
 
-  return (image, position)
+  return image
 
 
 def get_forecats_weather_icon(weather_symbol_3, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:

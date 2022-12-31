@@ -6,7 +6,7 @@ from dateutil.parser import parse
 from zoneinfo import ZoneInfo
 from configparser import SectionProxy
 from typing import Optional, Union
-from type_alias import Datetime, Fonts, Icons, DayNightIcons, WeatherWarning
+from type_alias import Datetime, Fonts, Icons, DayNightIcons, WeatherWarning, Position
 
 SUPPORTED_EPD_MODELS = ['7.8', '10.3']
 NAN_SYMBOL = '?'
@@ -135,6 +135,12 @@ def get_weather_warning_level(temperature: float, time: Datetime, config: Sectio
     return WeatherWarning.WARNING
 
   return WeatherWarning.NONE
+
+
+def get_config_override_position(config: SectionProxy) -> Position:
+  latitude = config.get('OVERRIDE_LATITUDE')
+  longitude = config.get('OVERRIDE_LONGITUDE')
+  return (latitude, longitude)
 
 
 def is_supported_epd(epd_model: str) -> bool:

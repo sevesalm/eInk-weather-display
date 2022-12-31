@@ -1,6 +1,7 @@
 import ctypes
 import logging
 from PIL import Image, ImageDraw
+from utils import get_config_override_position
 from observation_panel import get_observation_panel
 from info_panel import get_info_panel
 from forecast_panel import get_forecasts_panel
@@ -25,7 +26,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
   # Fetch data
   start_fetch_time = timer()
   observation_data = get_observation_data(config, logger)
-  radiation_data = get_radiation_data(observation_data[3], logger)
+  radiation_data = get_radiation_data(observation_data, logger)
   forecast_data = get_forecast_data(config, 7, 6, logger)
   elapsed_fetch_time = timer() - start_fetch_time
 
@@ -39,8 +40,9 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
   observation_panel = get_observation_panel(observation_data, radiation_data, images, fonts, config)
   sensor_panel_in = get_sensor_panel(config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_IN_NAME'), sensor_data, images, fonts, config)
   sensor_panel_out = get_sensor_panel(config.get('RUUVITAG_MAC_OUT'), config.get('RUUVITAG_MAC_OUT_NAME'), sensor_data, images, fonts, config, False)
-  (forecasts_panel, position) = get_forecasts_panel(forecast_data, images, fonts, config)
-  celestial_panel = get_celestial_panel(position, fonts, images, config)
+  forecasts_panel = get_forecasts_panel(forecast_data, images, fonts, config)
+  (_, position, position_name, _) = forecast_data if forecast_data is not None else (None, get_config_override_position(config), config.get('OVERRIDE_NAME'), None)
+  celestial_panel = get_celestial_panel(position, position_name, fonts, images, config)
   info_panel = get_info_panel(fonts, config)
 
   # Paste the panels on the main image

@@ -1,4 +1,5 @@
 import math
+from typing import Optional
 from PIL import Image, ImageDraw
 import logging
 from celestial import get_is_daylight
@@ -31,19 +32,25 @@ def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, 
   return utils.get_icon_variant(is_daylight, icon_set)
 
 
-def get_observation_panel(observation_data: WeatherData, radiation_data: ApiData, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_observation_panel(observation_data: Optional[WeatherData], radiation_data: Optional[ApiData], images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating observation panel')
+  x_size = 710
+  y_size = 550
+  image = Image.new('L', (x_size, y_size), 0xff)
+  draw = ImageDraw.Draw(image)
+
+  if (observation_data is None or radiation_data is None):
+    logger.error('Missing data')
+    utils.draw_title(draw, fonts['font_sm'], 'OUT', 'MISSING DATA', fonts['font_xxs'])
+    return image
+
   weather_icon_size = 280
   (observations, position, position_name, _) = observation_data
   latest_date = max(observations.keys())
   latest_date_local = utils.utc_datetime_string_to_local_datetime(latest_date)
   is_daylight = get_is_daylight(position, latest_date)
-  x_size = 710
-  y_size = 550
   latest = observations[latest_date]
-  image = Image.new('L', (x_size, y_size), 0xff)
-  draw = ImageDraw.Draw(image)
 
   utils.draw_title(draw, fonts['font_sm'], 'OUT', position_name, fonts['font_xxs'])
 

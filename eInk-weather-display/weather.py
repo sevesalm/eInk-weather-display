@@ -106,9 +106,11 @@ def get_next_forecast_start_timestamp() -> Datetime:
   return new_time
 
 
-def get_radiation_data(fmisid: str, logger: Logger) -> ApiData:
+def get_radiation_data(observation_data: Optional[WeatherData], logger: Logger) -> Optional[ApiData]:
+  if (observation_data is None):
+    return None
   params = {
-    'fmisid': fmisid,
+    'fmisid': observation_data[3],
     'parameters': ','.join(RADIATION_PARAMETERS)
   }
   xml_data = fetch_data(RADIATION_QUERY, params)
@@ -118,39 +120,47 @@ def get_radiation_data(fmisid: str, logger: Logger) -> ApiData:
   return result
 
 
-def get_observation_data(config: SectionProxy, logger: Logger) -> WeatherData:
-  if (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE')):
-    return get_random_observation_data(logger)
-  params = {
-    'place': config['FMI_LOCATION'],
-    'parameters': ','.join(OBS_PARAMETERS)
-  }
-  xml_data = fetch_data(OBS_QUERY, params)
-  observation_data = parse_multipoint_data(xml_data, 1)
-  position = get_position(xml_data)
-  position_name = get_position_name(xml_data)
-  fmisid = get_fmisid(xml_data)
-  result = (observation_data, position, position_name, fmisid)
-  logger.info('Received observation data: %s', repr(result))
-  return result
+def get_observation_data(config: SectionProxy, logger: Logger) -> Optional[WeatherData]:
+  try:
+    if (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE')):
+      return get_random_observation_data(logger)
+    params = {
+      'place': config['FMI_LOCATION'],
+      'parameters': ','.join(OBS_PARAMETERS)
+    }
+    xml_data = fetch_data(OBS_QUERY, params)
+    observation_data = parse_multipoint_data(xml_data, 1)
+    position = get_position(xml_data)
+    position_name = get_position_name(xml_data)
+    fmisid = get_fmisid(xml_data)
+    result = (observation_data, position, position_name, fmisid)
+    logger.info('Received observation data: %s', repr(result))
+    return result
+  except Exception as e:
+    logger.error('Error while fetching observation data: %s', repr(e))
+    return None
 
 
-def get_forecast_data(config: SectionProxy, count: int, skip_count: Optional[int], logger: Logger) -> WeatherData:
-  if (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE')):
-    return get_random_forecast_data(logger)
-  params = {
-    'place': config['FMI_LOCATION'],
-    'parameters': ','.join(FORECAST_PARAMETERS),
-    'starttime': get_next_forecast_start_timestamp().isoformat()
-  }
-  xml_data = fetch_data(FORECAST_QUERY, params)
-  forecast_data = parse_multipoint_data(xml_data, count, skip_count, True)
-  position = get_position(xml_data)
-  position_name = get_position_name(xml_data)
-  fmisid = get_fmisid(xml_data)
-  result = (forecast_data, position, position_name, fmisid)
-  logger.info('Received forecast data: %s', repr(result))
-  return result
+def get_forecast_data(config: SectionProxy, count: int, skip_count: Optional[int], logger: Logger) -> Optional[WeatherData]:
+  try:
+    if (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE')):
+      return get_random_forecast_data(logger)
+    params = {
+      'place': config['FMI_LOCATION'],
+      'parameters': ','.join(FORECAST_PARAMETERS),
+      'starttime': get_next_forecast_start_timestamp().isoformat()
+    }
+    xml_data = fetch_data(FORECAST_QUERY, params)
+    forecast_data = parse_multipoint_data(xml_data, count, skip_count, True)
+    position = get_position(xml_data)
+    position_name = get_position_name(xml_data)
+    fmisid = get_fmisid(xml_data)
+    result = (forecast_data, position, position_name, fmisid)
+    logger.info('Received forecast data: %s', repr(result))
+    return result
+  except Exception as e:
+    logger.error('Error while fetching forecast data: %s', repr(e))
+    return None
 
 
 def get_random_coordinates() -> Tuple[str, str]:
