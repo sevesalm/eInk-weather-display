@@ -1,0 +1,14 @@
+[Unit]
+Description=eInk Weather Display
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=
+ExecStart=/
+Restart=no
+EnvironmentFile=
+
+[Install]
+WantedBy=multi-user.target
