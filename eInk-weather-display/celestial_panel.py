@@ -40,7 +40,7 @@ def get_celestial_panel(position: Position, position_name: str, fonts: Fonts, im
   image = Image.new('L', (x_size, y_size), 0xff)
   draw = ImageDraw.Draw(image)
 
-  utils.draw_title(draw, fonts['font_sm'], 'SKY', position_name)
+  utils.draw_title(draw, fonts['font_sm'], 'SKY', position_name, fonts['font_xxs'])
 
   # Icons
   now = datetime.datetime.now().astimezone()
