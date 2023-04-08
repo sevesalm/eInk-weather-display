@@ -1,4 +1,5 @@
 import logging
+import LogFormatter
 
 DEFAULT_FILENAME = 'logger.log'
 
@@ -15,12 +16,10 @@ def setup(loglevel=logging.DEBUG) -> None:
     fileHandler.setLevel(logging.WARN)
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(loglevel)
-
+    stream_handler.setFormatter(LogFormatter.LogFormatter())
     handlers = [fileHandler, stream_handler]
 
-    log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(
-        format=log_format,
         datefmt="%Y-%m-%d %H:%M:%S",
         handlers=handlers,
         level=logging.DEBUG
