@@ -13,7 +13,7 @@ from configparser import SectionProxy
 from typing import Optional
 from type_alias import Icons, Fonts
 from multiprocessing import Process
-from weather import get_observation_data, get_forecast_data, get_radiation_data
+from weather_data import get_observation_data, get_forecast_data, get_radiation_data
 
 PROCESS_TIMEOPUT = 10  # In seconds
 

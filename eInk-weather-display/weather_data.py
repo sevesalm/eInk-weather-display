@@ -1,14 +1,14 @@
 import xml.etree.ElementTree as et
-from datetime import datetime, timedelta
+from datetime import datetime
 import requests
-import random
 from configparser import SectionProxy
 from zoneinfo import ZoneInfo
 from itertools import zip_longest
 from logging import Logger
-from typing import Mapping, Optional, Dict, List, Tuple
-from type_alias import ApiData, WeatherData, Datetime
-from icon_mapping import observation_mapping, forecast_mapping
+from typing import Optional, Dict, List
+from type_alias import ApiData, WeatherData
+from weather_data_mock import get_random_forecast_data, get_random_observation_data, get_random_radiation_data
+import utils
 
 FMI_API_URL = 'http://opendata.fmi.fi/wfs/eng'
 OBS_PARAMETERS = ['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wg_10min', 'n_man', 'wawa']
@@ -100,13 +100,6 @@ def combine(data_sets: list[ApiData]) -> ApiData:
   return data
 
 
-def get_next_forecast_start_timestamp() -> Datetime:
-  now = datetime.today()
-  new_hour = ((now.hour-3)//6 + 1) * 6 + 3
-  new_time = (now + timedelta(hours=new_hour - now.hour)).replace(minute=0, second=0, microsecond=0).astimezone(tz=None)
-  return new_time
-
-
 def get_radiation_data(config: SectionProxy, observation_data: Optional[WeatherData], logger: Logger) -> Optional[ApiData]:
   if (observation_data is None):
     return None
@@ -155,7 +148,7 @@ def get_forecast_data(config: SectionProxy, count: int, skip_count: Optional[int
     params = {
       'place': config['FMI_LOCATION'],
       'parameters': ','.join(FORECAST_PARAMETERS),
-      'starttime': get_next_forecast_start_timestamp().isoformat()
+      'starttime': utils.get_next_forecast_start_timestamp().isoformat()
     }
     xml_data = fetch_data(FORECAST_QUERY, params)
     forecast_data = parse_multipoint_data(xml_data, count, skip_count, True)
@@ -168,59 +161,3 @@ def get_forecast_data(config: SectionProxy, count: int, skip_count: Optional[int
   except Exception as e:
     logger.error('Error while fetching forecast data: %s', repr(e))
     return None
-
-
-def get_random_coordinates() -> Tuple[str, str]:
-  return (str(random.uniform(-90, 90)), str(random.uniform(-180, 180)))
-
-
-def get_random_observation_data(logger: Logger) -> WeatherData:
-  ws_10min = random.uniform(0, 20)
-  now = datetime.today().isoformat()
-  observation_data: ApiData = {now: {
-    't2m': random.uniform(-30, 40),
-    'rh': random.uniform(10, 90),
-    'p_sea': random.uniform(900, 1100),
-    'ws_10min': ws_10min,
-    'wd_10min': random.uniform(0, 360),
-    'wg_10min': ws_10min + random.uniform(0, 10),
-    'n_man': random.randint(0, 8),
-    'wawa': random.choice(list(observation_mapping.keys()))
-  }}
-  position = get_random_coordinates()
-  result: WeatherData = (observation_data, position, 'Helsinki', '12345')
-  logger.info('Using random observation data: %s', repr(result))
-  return result
-
-
-def get_random_radiation_data(logger: Logger) -> ApiData:
-  start_date = datetime.today()
-  now = start_date.astimezone(tz=ZoneInfo('UTC')).isoformat()
-  now = datetime.today().isoformat()
-  radiation_data: ApiData = {now: {
-    'dir_1min': random.uniform(0, 200)
-  }}
-  logger.info('Using random radiation data: %s', repr(radiation_data))
-  return radiation_data
-
-
-def get_random_forecast_data(logger: Logger) -> WeatherData:
-  start_date = get_next_forecast_start_timestamp()
-  forecast_datetimes: List[str] = []
-  for i in range(7):
-    new_datetime = start_date + i*timedelta(hours=6)
-    forecast_datetimes.append(new_datetime.astimezone(tz=ZoneInfo('UTC')).isoformat())
-  forecast_data = {}
-  for forecast_datetime in forecast_datetimes:
-    data: Mapping[str, float] = {
-      'Temperature': random.uniform(-30, 40),
-      'WindSpeedMS': random.uniform(0, 20),
-      'WindDirection': random.uniform(0, 360),
-      'TotalCloudCover': random.uniform(0, 100),
-      'WeatherSymbol3': random.choice(list(forecast_mapping.keys()))
-    }
-    forecast_data[forecast_datetime] = data
-  position = get_random_coordinates()
-  result: WeatherData = (forecast_data, position, 'Helsinki', '12345')
-  logger.info('Using random forecast data: %s', repr(result))
-  return result

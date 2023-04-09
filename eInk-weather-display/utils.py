@@ -7,6 +7,7 @@ from zoneinfo import ZoneInfo
 from configparser import SectionProxy
 from typing import Optional, Union
 from type_alias import Datetime, Fonts, Icons, DayNightIcons, WeatherWarning, Position
+from datetime import datetime, timedelta
 
 SUPPORTED_EPD_MODELS = ['7.8', '10.3']
 NAN_SYMBOL = '?'
@@ -151,3 +152,10 @@ def roundToString(value: float, decimals: Optional[int] = None) -> str:
   if (math.isnan(value)):
     return NAN_SYMBOL
   return str(round(value, decimals))
+
+
+def get_next_forecast_start_timestamp() -> Datetime:
+  now = datetime.today()
+  new_hour = ((now.hour-3)//6 + 1) * 6 + 3
+  new_time = (now + timedelta(hours=new_hour - now.hour)).replace(minute=0, second=0, microsecond=0).astimezone(tz=None)
+  return new_time
