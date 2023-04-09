@@ -109,6 +109,8 @@ def get_next_forecast_start_timestamp() -> Datetime:
 def get_radiation_data(observation_data: Optional[WeatherData], logger: Logger) -> Optional[ApiData]:
   if (observation_data is None):
     return None
+  if (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE')):
+      return get_random_radiation_data(logger)
   params = {
     'fmisid': observation_data[3],
     'parameters': ','.join(RADIATION_PARAMETERS)
@@ -184,6 +186,17 @@ def get_random_observation_data(logger: Logger) -> WeatherData:
   result: WeatherData = (observation_data, position, 'Helsinki', '12345')
   logger.info('Using random observation data: %s', repr(result))
   return result
+
+
+def get_random_radiation_data(logger: Logger) -> ApiData:
+  start_date = datetime.today()
+  now = start_date.astimezone(tz=ZoneInfo('UTC')).isoformat()
+  now = datetime.today().isoformat()
+  radiation_data: ApiData = {now: {
+    'dir_1min': random.uniform(0, 200)
+  }}
+  logger.info('Using random radiation data: %s', repr(radiation_data))
+  return radiation_data
 
 
 def get_random_forecast_data(logger: Logger) -> WeatherData:
