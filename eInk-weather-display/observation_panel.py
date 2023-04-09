@@ -40,7 +40,7 @@ def get_observation_panel(observation_data: Optional[WeatherData], radiation_dat
   image = Image.new('L', (x_size, y_size), 0xff)
   draw = ImageDraw.Draw(image)
 
-  if (observation_data is None or radiation_data is None):
+  if (not observation_data):
     logger.error('Missing data')
     utils.draw_title(draw, fonts['font_sm'], 'OUT', 'MISSING DATA', fonts['font_xxs'])
     return image
