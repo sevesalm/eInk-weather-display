@@ -37,6 +37,7 @@ def fetch_data(query_type: str, extra_params: Dict[str, str] = {}) -> et.Element
   params = base_params | extra_params
 
   response = requests.get(FMI_API_URL, params=params)
+  response.raise_for_status()
   return et.fromstring(response.content)
 
 
@@ -106,7 +107,7 @@ def get_next_forecast_start_timestamp() -> Datetime:
   return new_time
 
 
-def get_radiation_data(observation_data: Optional[WeatherData], logger: Logger) -> Optional[ApiData]:
+def get_radiation_data(config: SectionProxy, observation_data: Optional[WeatherData], logger: Logger) -> Optional[ApiData]:
   if (observation_data is None):
     return None
   if (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE')):
@@ -115,11 +116,15 @@ def get_radiation_data(observation_data: Optional[WeatherData], logger: Logger) 
     'fmisid': observation_data[3],
     'parameters': ','.join(RADIATION_PARAMETERS)
   }
-  xml_data = fetch_data(RADIATION_QUERY, params)
-  radiation_data = parse_multipoint_data(xml_data, 1)
-  result = (radiation_data)
-  logger.info('Received radiation data: %s', repr(result))
-  return result
+  try:
+    xml_data = fetch_data(RADIATION_QUERY, params)
+    radiation_data = parse_multipoint_data(xml_data, 1)
+    result = (radiation_data)
+    logger.info('Received radiation data: %s', repr(result))
+    return result
+  except Exception as e:
+    logger.error('Error fetching radiation data:  %s', repr(e))
+    return None
 
 
 def get_observation_data(config: SectionProxy, logger: Logger) -> Optional[WeatherData]:

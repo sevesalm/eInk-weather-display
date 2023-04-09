@@ -26,7 +26,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
   # Fetch data
   start_fetch_time = timer()
   observation_data = get_observation_data(config, logger)
-  radiation_data = get_radiation_data(observation_data, logger)
+  radiation_data = get_radiation_data(config, observation_data, logger)
   forecast_data = get_forecast_data(config, 7, 6, logger)
   elapsed_fetch_time = timer() - start_fetch_time
 
