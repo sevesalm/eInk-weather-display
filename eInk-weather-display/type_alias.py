@@ -6,6 +6,29 @@ from typing import Mapping, TypedDict
 Datetime = datetime.datetime
 
 
+class ObservationDataItem(TypedDict):
+  t2m: float
+  rh: float
+  p_sea: float
+  ws_10min: float
+  wd_10min: float
+  wg_10min: float
+  n_man: int
+  wawa: int
+
+
+class ForecastDataItem(TypedDict):
+  Temperature: float
+  WindSpeedMS: float
+  WindDirection: float
+  TotalCloudCover: float
+  WeatherSymbol3: int
+
+
+class RadiationDataItem(TypedDict):
+  dir_1min: float
+
+
 class DayNightIcons(TypedDict):
   day: Image.Image
   night: Image.Image
@@ -21,9 +44,9 @@ Fonts = Mapping[str, ImageFont.FreeTypeFont]
 
 Position = tuple[str, str]
 
-ApiData = Mapping[str, Mapping[str, float]]
-
-WeatherData = tuple[ApiData, tuple[str, str], str, str]
+ObservationData = tuple[Mapping[str, ObservationDataItem], tuple[str, str], str, str]
+ForecastData = tuple[Mapping[str, ForecastDataItem], tuple[str, str], str, str]
+RadiationData = Mapping[str, RadiationDataItem]
 
 
 class SingleSensorData(TypedDict):

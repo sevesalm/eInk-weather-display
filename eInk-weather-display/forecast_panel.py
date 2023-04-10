@@ -7,10 +7,10 @@ import utils
 import draw_utils
 import icons
 from configparser import SectionProxy
-from type_alias import Fonts, Icons, WeatherData
+from type_alias import Fonts, Icons, ForecastData
 
 
-def get_forecasts_panel(forecast_data: Optional[WeatherData], images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating forecast panel')
   x_size = 1872

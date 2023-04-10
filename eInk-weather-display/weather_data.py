@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 from itertools import zip_longest
 from logging import Logger
 from typing import Optional, Dict, List
-from type_alias import ApiData, WeatherData
+from type_alias import ObservationData, ForecastData, RadiationData
 from weather_data_mock import get_random_forecast_data, get_random_observation_data, get_random_radiation_data
 import utils
 from validate_data import validate_data, observation_data_mapping_schema, radiation_data_mapping_schema, forecast_data_mapping_schema
@@ -42,7 +42,7 @@ def fetch_data(query_type: str, extra_params: Dict[str, str] = {}) -> et.Element
   return et.fromstring(response.content)
 
 
-def parse_multipoint_data(xml_data: et.Element, count: int, skip_count: Optional[int] = 1, reversed: bool = False) -> ApiData:
+def parse_multipoint_data(xml_data: et.Element, count: int, skip_count: Optional[int] = 1, reversed: bool = False) -> Dict:
   ns = {'gml': 'http://www.opengis.net/gml/3.2', 'gmlcov': 'http://www.opengis.net/gmlcov/1.0', 'swe': 'http://www.opengis.net/swe/2.0'}
   parameter_element = xml_data.find('.//swe:DataRecord', ns)
   pos_element = xml_data.find('.//gmlcov:positions', ns)
@@ -76,6 +76,7 @@ def get_position(xml_data: et.Element) -> tuple[str, str]:
   return (position_data[0], position_data[1])
 
 
+# TODO: Can return None also
 def get_fmisid(xml_data: et.Element) -> str:
   ns = {'gml': 'http://www.opengis.net/gml/3.2'}
   element = xml_data.find('.//gml:identifier', ns)
@@ -84,6 +85,7 @@ def get_fmisid(xml_data: et.Element) -> str:
   return element.text
 
 
+# TODO: Can return None also
 def get_position_name(xml_data: et.Element) -> str:
   ns = {'gml': 'http://www.opengis.net/gml/3.2'}
   element = xml_data.find('.//gml:name', ns)
@@ -112,7 +114,7 @@ def get_radiation_data(config: SectionProxy, observation_data: Optional[Observat
     return None
 
 
-def get_observation_data(config: SectionProxy, logger: Logger) -> Optional[WeatherData]:
+def get_observation_data(config: SectionProxy, logger: Logger) -> Optional[ObservationData]:
   try:
     if (config.getboolean('DEV_MODE_RANDOM_WEATHER_DATA') and config.getboolean('DEV_MODE')):
       return get_random_observation_data(logger)
@@ -134,7 +136,7 @@ def get_observation_data(config: SectionProxy, logger: Logger) -> Optional[Weath
     return None
 
 
-def get_forecast_data(config: SectionProxy, count: int, skip_count: Optional[int], logger: Logger) -> Optional[WeatherData]:
+def get_forecast_data(config: SectionProxy, count: int, skip_count: Optional[int], logger: Logger) -> Optional[ForecastData]:
   try:
     if (config.getboolean('DEV_MODE_RANDOM_WEATHER_DATA') and config.getboolean('DEV_MODE')):
       return get_random_forecast_data(logger)

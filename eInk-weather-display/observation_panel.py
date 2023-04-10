@@ -8,7 +8,7 @@ import draw_utils
 import icons
 from feels_like_temperature import get_feels_like_temperature
 from configparser import SectionProxy
-from type_alias import Icons, Fonts, WeatherData, ApiData
+from type_alias import Icons, Fonts, ObservationData, RadiationData
 
 
 def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
@@ -32,7 +32,7 @@ def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, 
   return utils.get_icon_variant(is_daylight, icon_set)
 
 
-def get_observation_panel(observation_data: Optional[WeatherData], radiation_data: Optional[ApiData], images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_observation_panel(observation_data: Optional[ObservationData], radiation_data: Optional[RadiationData], images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating observation panel')
   x_size = 710
