@@ -92,18 +92,7 @@ def get_position_name(xml_data: et.Element) -> str:
   return element.text
 
 
-def combine(data_sets: list[ApiData]) -> ApiData:
-  data = {}
-  for data_set in data_sets:
-    for key, val in data_set.items():
-      if (key not in data):
-        data[key] = val
-      else:
-        data[key].update(val)
-  return data
-
-
-def get_radiation_data(config: SectionProxy, observation_data: Optional[WeatherData], logger: Logger) -> Optional[ApiData]:
+def get_radiation_data(config: SectionProxy, observation_data: Optional[ObservationData], logger: Logger) -> Optional[RadiationData]:
   if (observation_data is None):
     return None
   try:
