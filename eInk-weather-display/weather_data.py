@@ -103,13 +103,13 @@ def combine(data_sets: list[ApiData]) -> ApiData:
 def get_radiation_data(config: SectionProxy, observation_data: Optional[WeatherData], logger: Logger) -> Optional[ApiData]:
   if (observation_data is None):
     return None
-  if (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE')):
-      return get_random_radiation_data(logger)
-  params = {
-    'fmisid': observation_data[3],
-    'parameters': ','.join(RADIATION_PARAMETERS)
-  }
   try:
+    if (config.getboolean('DEV_MODE_RANDOM_WEATHER_DATA') and config.getboolean('DEV_MODE')):
+      return get_random_radiation_data(logger)
+    params = {
+      'fmisid': observation_data[3],
+      'parameters': ','.join(RADIATION_PARAMETERS)
+    }
     xml_data = fetch_data(RADIATION_QUERY, params)
     radiation_data = parse_multipoint_data(xml_data, 1)
     result = (radiation_data)
@@ -122,7 +122,7 @@ def get_radiation_data(config: SectionProxy, observation_data: Optional[WeatherD
 
 def get_observation_data(config: SectionProxy, logger: Logger) -> Optional[WeatherData]:
   try:
-    if (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE')):
+    if (config.getboolean('DEV_MODE_RANDOM_WEATHER_DATA') and config.getboolean('DEV_MODE')):
       return get_random_observation_data(logger)
     params = {
       'place': config['FMI_LOCATION'],
@@ -143,7 +143,7 @@ def get_observation_data(config: SectionProxy, logger: Logger) -> Optional[Weath
 
 def get_forecast_data(config: SectionProxy, count: int, skip_count: Optional[int], logger: Logger) -> Optional[WeatherData]:
   try:
-    if (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE')):
+    if (config.getboolean('DEV_MODE_RANDOM_WEATHER_DATA') and config.getboolean('DEV_MODE')):
       return get_random_forecast_data(logger)
     params = {
       'place': config['FMI_LOCATION'],

@@ -12,7 +12,7 @@ def get_random_sensor_data(macs: list[str]) -> SensorData:
 
 def get_sensor_data(logger: logging.Logger, config: SectionProxy, macs: list[str]) -> SensorData:
   try:
-    if (not (config.getboolean('USE_RANDOM_DATA') or config.getboolean('DEV_MODE'))):
+    if (not (config.getboolean('DEV_MODE_RANDOM_SENSOR_DATA') and config.getboolean('DEV_MODE'))):
       ruuvis = RuuviTagReactive(macs)
       ruuvi_emissions = ruuvis.get_subject()
       missing_data = ruuvi_emissions.pipe(
