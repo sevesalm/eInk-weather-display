@@ -9,6 +9,7 @@ from typing import Optional, Dict, List
 from type_alias import ApiData, WeatherData
 from weather_data_mock import get_random_forecast_data, get_random_observation_data, get_random_radiation_data
 import utils
+from validate_data import validate_data, observation_data_mapping_schema, radiation_data_mapping_schema, forecast_data_mapping_schema
 
 FMI_API_URL = 'http://opendata.fmi.fi/wfs/eng'
 OBS_PARAMETERS = ['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wg_10min', 'n_man', 'wawa']
@@ -70,6 +71,8 @@ def get_position(xml_data: et.Element) -> tuple[str, str]:
   if (element is None or element.text is None):
     raise Exception('Could not find any position data')
   position_data = element.text.split(' ')[:-1]
+  if (len(position_data) != 2):
+    raise Exception('Could not parse position data')
   return (position_data[0], position_data[1])
 
 
@@ -112,9 +115,9 @@ def get_radiation_data(config: SectionProxy, observation_data: Optional[WeatherD
     }
     xml_data = fetch_data(RADIATION_QUERY, params)
     radiation_data = parse_multipoint_data(xml_data, 1)
-    result = (radiation_data)
-    logger.info('Received radiation data: %s', repr(result))
-    return result
+    validate_data(radiation_data, radiation_data_mapping_schema, logger)
+    logger.info('Received radiation data: %s', repr(radiation_data))
+    return radiation_data
   except Exception as e:
     logger.error('Error fetching radiation data:  %s', repr(e))
     return None
@@ -130,6 +133,7 @@ def get_observation_data(config: SectionProxy, logger: Logger) -> Optional[Weath
     }
     xml_data = fetch_data(OBS_QUERY, params)
     observation_data = parse_multipoint_data(xml_data, 1)
+    validate_data(observation_data, observation_data_mapping_schema, logger)
     position = get_position(xml_data)
     position_name = get_position_name(xml_data)
     fmisid = get_fmisid(xml_data)
@@ -152,6 +156,7 @@ def get_forecast_data(config: SectionProxy, count: int, skip_count: Optional[int
     }
     xml_data = fetch_data(FORECAST_QUERY, params)
     forecast_data = parse_multipoint_data(xml_data, count, skip_count, True)
+    validate_data(forecast_data, forecast_data_mapping_schema, logger)
     position = get_position(xml_data)
     position_name = get_position_name(xml_data)
     fmisid = get_fmisid(xml_data)
