@@ -7,3 +7,4 @@ RPi.GPIO==0.7.1
 ruuvitag-sensor==2.0.0
 spidev==3.6
 flake8==5.0.4
+jsonschema==4.17.3
