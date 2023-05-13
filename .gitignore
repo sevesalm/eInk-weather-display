@@ -7,3 +7,4 @@ config.env
 logger.log
 .DS_Store
 config.ini
+.ideas*
