@@ -75,17 +75,23 @@ def get_fonts(config: SectionProxy) -> Fonts:
   }
 
 
+def get_text_size(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont) -> tuple[int, int]:
+  b_box = draw.textbbox((0, 0), text, font)
+  return (b_box[2] - b_box[0], b_box[3] - b_box[1])
+
+
 def draw_title(draw: ImageDraw.ImageDraw, title_font: ImageFont.FreeTypeFont, title: str, sub_title: Optional[str] = None, sub_title_font: Optional[ImageFont.FreeTypeFont] = None) -> None:
-  size_width, size_height = draw.textsize(title, title_font)
+  size_width, size_height = get_text_size(draw, title, title_font)
   x_padding = 20
-  y_padding = 4
+  y_padding = 8
+  y_offset = -3  # To actually center the title
 
   draw.rectangle(((0, 0), (size_width + x_padding, size_height + y_padding)), fill=0x00)
-  draw.text(((size_width + x_padding)//2, (size_height + y_padding)//2), title, fill="white", font=title_font, anchor='mm')
+  draw.text(((size_width + x_padding)//2, (size_height + y_padding)//2 + y_offset), title, fill="white", font=title_font, anchor='mm')
   if (sub_title):
     if (not sub_title_font):
       sub_title_font = title_font
-    sub_title_size_width, _ = draw.textsize(sub_title, sub_title_font)
+    sub_title_size_width, _ = get_text_size(draw, sub_title, sub_title_font)
     draw.rectangle(((size_width + x_padding, 0), (size_width + x_padding + sub_title_size_width + 40, size_height + y_padding)), fill=0xff, outline=0, width=4)
     draw.text(((size_width + x_padding + (sub_title_size_width + 40)//2), (size_height + y_padding)//2), sub_title, fill="black", font=sub_title_font, anchor='mm')
 
