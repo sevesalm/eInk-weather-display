@@ -31,6 +31,7 @@ def main():
   logger.info("App starting")
   try:
     utils.check_python_version()
+    utils.check_raqm_support(logger)
     logger.info(f'Reading config file "{CONFIG_FILENAME}"')
     with open(CONFIG_FILENAME) as f:
       config_parser = configparser.ConfigParser()

@@ -1,13 +1,14 @@
 import sys
 import math
 import ctypes
-from PIL import ImageFont, ImageDraw, Image
+from PIL import ImageFont, ImageDraw, Image, features
 from dateutil.parser import parse
 from zoneinfo import ZoneInfo
 from configparser import SectionProxy
 from typing import Optional, Union
 from type_alias import Datetime, Fonts, Icons, DayNightIcons, WeatherWarning, Position
 from datetime import datetime, timedelta
+import logging
 
 SUPPORTED_EPD_MODELS = ['7.8', '10.3']
 NAN_SYMBOL = '?'
@@ -19,16 +20,24 @@ def draw_quantity(draw: ImageDraw.ImageDraw, mid_point: tuple[int, int], value: 
   draw.text((x + 7, y), unit, font=fonts[font_unit], fill=0, anchor='ls')
 
 
+def check_raqm_support(logger: logging.Logger) -> None:
+  '''Check if the Raqm support is enabled. Used to enable OpenType font features.'''
+  is_raqm_supported = features.check_feature('raqm')
+  if is_raqm_supported:
+    logger.info("Raqm support detected")
+  else:
+    logger.warn('Raqm not supported')
+
+
 def check_python_version() -> None:
   major = sys.version_info[0]
   minor = sys.version_info[1]
   if major < 3 or minor < 7:
     raise Exception('Python 3.7 or newer required')
 
-# Converts a 8-bit image into a packed 2-bit image which can be fed to EPD
-
 
 def from_8bit_to_2bit(image: Image.Image) -> bytes:
+  '''Converts a 8-bit image into a packed 2-bit image which can be fed to EPD.'''
   if (image.mode != 'L'):
     raise Exception('Image mode must be \'L\'')
   if (image.width % 4 != 0):
