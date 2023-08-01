@@ -1,5 +1,6 @@
 #!/bin/bash
-API_ROOT=https://google-webfonts-helper.herokuapp.com/api
+set -euo pipefail
+API_ROOT=https://gwfh.mranftl.com/api
 FONT_ID=barlow-condensed
 FONT_FILENAME_REGULAR=regular.woff
 FONT_FILENAME_BOLD=bold.woff
