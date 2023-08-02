@@ -66,9 +66,8 @@ def get_celestial_panel(position: Position, position_name: str, fonts: Fonts, im
   for new_threshold, tick_height, prev_shade, next_shade in zip(dusks_and_dawns["times"], tick_heights, dusks_and_dawns["twilights"][:-1], dusks_and_dawns["twilights"][1:]):
     (hours, minutes) = parse_sunrise_sunset_hour_minute(new_threshold)
     font = fonts['font_xs'] if Twilight.DAYTIME in [prev_shade, next_shade] else fonts['font_xxs']
-    draw.text((x_base - 69, y_position+tick_height), ":", font=font, fill=0, anchor='mm')
-    draw.text((x_base - 62, y_position+tick_height), minutes, font=font, fill=0, anchor='lm')
-    draw.text((x_base - 76, y_position+tick_height), hours, font=font, fill=0, anchor='rm')
+    offset = 0 if Twilight.DAYTIME in [prev_shade, next_shade] else 18
+    utils.draw_time(draw, (x_base - 69 + offset, y_position+tick_height), minutes, hours, font)
     draw.rectangle(((x_base + 10, y_position + tick_height - 1), (x_base + 20, y_position + tick_height + 1)), "#000")
     y_position += tick_height
 

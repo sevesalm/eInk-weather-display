@@ -44,10 +44,13 @@ def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fo
     is_daylight = get_is_daylight(position, date)
     data = forecasts[date]
     date_local = utils.utc_datetime_string_to_local_datetime(date)
-    date_formatted = date_local.strftime('%-H:%M')
+    hours = date_local.strftime('%-H')
+    minutes = date_local.strftime('%M')
 
     # Time
-    draw.text((x_base + i*x_step, data_y_base + 10), date_formatted, font=(fonts['font_sm'] if date_formatted != "15:00" else fonts['font_sm_bold']), fill=0, anchor='mt')
+    is_main_time = hours == "15" and minutes == "00"
+    font = (fonts['font_sm'] if not is_main_time else fonts['font_sm_bold'])
+    utils.draw_time(draw, (x_base + i*x_step, data_y_base + 35), minutes, hours, font)
 
     # Weather icon
     icon_position = (x_base + i*x_step - icon_width//2, data_y_base + 80)

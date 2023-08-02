@@ -20,6 +20,13 @@ def draw_quantity(draw: ImageDraw.ImageDraw, mid_point: tuple[int, int], value: 
   draw.text((x + 7, y), unit, font=fonts[font_unit], fill=0, anchor='ls')
 
 
+def draw_time(draw: ImageDraw.ImageDraw, coordinate: tuple[int, int], minutes: str, hours: str, font: ImageFont.FreeTypeFont) -> None:
+  offset = font.size//8
+  draw.text(coordinate, ":", font=font, fill=0, anchor='mm')
+  draw.text((coordinate[0]+offset, coordinate[1]), minutes, font=font, fill=0, anchor='lm', features=["tnum"])
+  draw.text((coordinate[0]-offset, coordinate[1]), hours, font=font, fill=0, anchor='rm', features=["tnum"])
+
+
 def check_raqm_support(logger: logging.Logger) -> None:
   '''Check if the Raqm support is enabled. Used to enable OpenType font features.'''
   is_raqm_supported = features.check_feature('raqm')
