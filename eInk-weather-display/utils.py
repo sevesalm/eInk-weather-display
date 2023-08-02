@@ -16,8 +16,9 @@ NAN_SYMBOL = '?'
 
 def draw_quantity(draw: ImageDraw.ImageDraw, mid_point: tuple[int, int], value: str, unit: str, fonts: Fonts, font: str = 'font_sm', font_unit: str = 'font_xs') -> None:
   (x, y) = mid_point
-  draw.text((x - 7, y), value, font=fonts[font], fill=0, anchor='rs', features=["tnum"])
-  draw.text((x + 7, y), unit, font=fonts[font_unit], fill=0, anchor='ls')
+  offset = 7
+  draw.text((x - offset, y), value, font=fonts[font], fill=0, anchor='rs', features=["tnum"])
+  draw.text((x + offset, y), unit, font=fonts[font_unit], fill=0, anchor='ls')
 
 
 def draw_time(draw: ImageDraw.ImageDraw, coordinate: tuple[int, int], minutes: str, hours: str, font: ImageFont.FreeTypeFont) -> None:

@@ -38,18 +38,15 @@ def get_sensor_panel(sensor_mac: str, sub_title: Optional[str], sensor_data: Sen
     state_in = sensor_data[sensor_mac]
     utils.draw_quantity(draw, (x_size//2 + offset, data_y_base + 120), utils.roundToString(state_in['temperature'], 1), '°C', fonts, 'font_lg', 'font_sm')
     humidity_icon = icons.get_scaled_image(images['misc']['humidity'], 70)
-    image.paste(humidity_icon, (x_size//2 + offset - 160, data_y_base + 150), humidity_icon)
+    image.paste(humidity_icon, (x_size//2 + offset - 150, data_y_base + 150), humidity_icon)
     utils.draw_quantity(draw, (x_size//2 + offset, data_y_base + 210), utils.roundToString(state_in['humidity']), '%', fonts)
 
     # Battery level
     battery_icon = icons.get_scaled_image(get_battery_icon(state_in['battery'], images), 60)
     image.paste(battery_icon, (x_size//2 + offset + 10, data_y_base - 10), battery_icon)
 
-    # RSSI - not yet part of ruuvitag-sensor
-    # Adding is trivial by editing ruuvitag-sensor package's decoder.py
-    # See: https://github.com/ttu/ruuvitag-sensor/issues/52
-    # if ('rssi' in state_in):
-    #   utils.draw_quantity(draw, (100, data_y_base + 210), utils.roundToString(state_in['rssi']), 'dBm', fonts, 'font_xs', 'font_xxs')
+    # TODO: Fix layout
+    # utils.draw_quantity(draw, (100, data_y_base + 210), utils.roundToString(state_in['rssi']), 'dBm', fonts, 'font_xs', 'font_xxs')
 
   else:
     logger.info(f'Could not find mac {sensor_mac} in sensor data')
