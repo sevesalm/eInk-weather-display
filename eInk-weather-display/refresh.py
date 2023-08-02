@@ -39,7 +39,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
   start_draw_time = timer()
   observation_panel = get_observation_panel(observation_data, radiation_data, images, fonts, config)
   sensor_panel_in = get_sensor_panel(config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_IN_NAME'), sensor_data, images, fonts, config)
-  sensor_panel_out = get_sensor_panel(config.get('RUUVITAG_MAC_OUT'), config.get('RUUVITAG_MAC_OUT_NAME'), sensor_data, images, fonts, config, False)
+  sensor_panel_out = get_sensor_panel(config.get('RUUVITAG_MAC_OUT'), None, sensor_data, images, fonts, config)
   forecasts_panel = get_forecasts_panel(forecast_data, images, fonts, config)
   (_, position, position_name, _) = forecast_data if forecast_data is not None else (None, get_config_override_position(config), config.get('OVERRIDE_NAME'), None)
   celestial_panel = get_celestial_panel(position, position_name, fonts, images, config)

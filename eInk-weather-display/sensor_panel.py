@@ -1,4 +1,5 @@
 from configparser import SectionProxy
+from typing import Optional
 from PIL import Image, ImageDraw
 import logging
 import utils
@@ -18,7 +19,7 @@ def get_battery_icon(voltage: float, images: Icons) -> Image.Image:
   return images['misc']['battery_empty']
 
 
-def get_sensor_panel(sensor_mac: str, sensor_name: str, sensor_data: SensorData, images: Icons, fonts: Fonts, config: SectionProxy, draw_title: bool = True) -> Image.Image:
+def get_sensor_panel(sensor_mac: str, sub_title: Optional[str], sensor_data: SensorData, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating sensor panel')
 
@@ -29,11 +30,11 @@ def get_sensor_panel(sensor_mac: str, sensor_name: str, sensor_data: SensorData,
   image = Image.new('L', (x_size, y_size), 0xff)
   draw = ImageDraw.Draw(image)
 
-  if (draw_title):
-    utils.draw_title(draw, fonts['font_sm'], 'SENSOR', sensor_name, fonts['font_xxs'])
+  if (sub_title):
+    utils.draw_title(draw, fonts['font_sm'], 'SENSOR', sub_title, fonts['font_xxs'])
 
   if (sensor_mac in sensor_data):
-    data_y_base = 100 if (draw_title) else 0
+    data_y_base = 100 if (sub_title) else 0
     state_in = sensor_data[sensor_mac]
     utils.draw_quantity(draw, (x_size//2 + offset, data_y_base + 120), utils.roundToString(state_in['temperature'], 1), '°C', fonts, 'font_lg', 'font_sm')
     humidity_icon = icons.get_scaled_image(images['misc']['humidity'], 70)
