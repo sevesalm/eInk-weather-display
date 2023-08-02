@@ -35,7 +35,7 @@ def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, 
 def get_observation_panel(observation_data: Optional[ObservationData], radiation_data: Optional[RadiationData], images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating observation panel')
-  x_size = 710
+  x_size = 730
   y_size = 550
   image = Image.new('L', (x_size, y_size), 0xff)
   draw = ImageDraw.Draw(image)
@@ -54,7 +54,7 @@ def get_observation_panel(observation_data: Optional[ObservationData], radiation
 
   utils.draw_title(draw, fonts['font_sm'], 'OUT', position_name, fonts['font_xxs'])
 
-  delimiter_x = 300
+  delimiter_x = 320
   data_y_base = 100
 
   # Feels like
@@ -90,7 +90,7 @@ def get_observation_panel(observation_data: Optional[ObservationData], radiation
   image.paste(wind_icon, (10, data_y_base + 450-65), wind_icon)
 
   margin = 15
-  right_column_x_base = x_size//2 + margin + 30
+  right_column_x_base = x_size//2 + margin + 40
   cloud_coverage = latest['n_man']
 
   # Weather icon

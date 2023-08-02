@@ -16,7 +16,7 @@ NAN_SYMBOL = '?'
 
 def draw_quantity(draw: ImageDraw.ImageDraw, mid_point: tuple[int, int], value: str, unit: str, fonts: Fonts, font: str = 'font_sm', font_unit: str = 'font_xs') -> None:
   (x, y) = mid_point
-  draw.text((x - 7, y), value, font=fonts[font], fill=0, anchor='rs')
+  draw.text((x - 7, y), value, font=fonts[font], fill=0, anchor='rs', features=["tnum"])
   draw.text((x + 7, y), unit, font=fonts[font_unit], fill=0, anchor='ls')
 
 
@@ -122,7 +122,7 @@ def get_missing_weather_icon_icon(icon_index: Union[float, int], is_daylight: bo
   icon = images['misc']['background_day'].copy() if is_daylight else images['misc']['background_night'].copy()
   draw = ImageDraw.Draw(icon)
   text = "NaN" if math.isnan(icon_index) else str(icon_index)
-  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm')
+  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=["tnum"])
   return icon
 
 
@@ -133,7 +133,7 @@ def get_cloud_cover_icon(cloud_cover: float, images: Icons, fonts: Fonts, config
   icon = images['misc']['cloud_cover_0'].copy()
   draw = ImageDraw.Draw(icon)
   text = "NaN" if math.isnan(icon_index) else str(icon_index)
-  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm')
+  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=["tnum"])
   return icon
 
 
