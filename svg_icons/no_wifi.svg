@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   viewBox="0 0 100 100" style="background-color: white" stroke="black" fill="white"
-  stroke-width="6" stroke-linecap="round">
-  <g transform="rotate(-90 50 50)">
-    <circle cx="30" cy="50" r="2" fill="black" stroke="black" />
-    <!-- The gap length is 2*pi*R - 2*dash length -->
-    <circle cx="30" cy="50" r="12" stroke-dasharray="8 59" fill="transparent" />
-    <circle cx="30" cy="50" r="24" stroke-dasharray="16 118" fill="transparent" />
-    <circle cx="30" cy="50" r="36" stroke-dasharray="24 178" fill="transparent" />
+  stroke-width="12" stroke-linecap="round">
+  <g transform="translate(50 80) rotate(-130 0 0) ">
+    <circle cx="0" cy="0" r="4" fill="black" stroke="black" />
+    <path d="M 25 0 A 25 25 0 0 1 4.3 24.5" fill="transparent" stroke="#ddd"/>
+    <path d="M 45 0 A 45 45 0 0 1 7.8 44.3" fill="transparent" stroke="#ddd"/>
+    <path d="M 65 0 A 65 65 0 0 1 11.3 64" fill="transparent" stroke="#ddd"/>
   </g>
-  <path d="M 48 30 L 50 63 L 52 30 z" stroke-linecap="square" stroke-width="12" stroke="white" />
-  <path d="M 48 30 L 50 60 L 52 30 z" stroke-linejoin="round" />
+  <path d="M 42 5 L 46 63 L 54 63 L 58 5 z" stroke-linecap="square" stroke-width="12" stroke="white" />
+  <path d="M 45 5 L 48 60 L 52 60 L 55 5 z" stroke-linejoin="round" fill="black" stroke-width="6"/>
 </svg>
