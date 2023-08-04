@@ -19,12 +19,20 @@ def get_battery_icon(voltage: float, images: Icons) -> Image.Image:
   return images['misc']['battery_empty']
 
 
+def get_signal_strength_icon(rssi: float, images: Icons) -> Image.Image:
+  if (rssi > -50):
+    return images['misc']['wifi_high']
+  if (rssi > -75):
+    return images['misc']['wifi_med']
+  return images['misc']['wifi_low']
+
+
 def get_sensor_panel(sensor_mac: str, sub_title: Optional[str], sensor_data: SensorData, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating sensor panel')
 
   x_size = 380
-  y_size = 330
+  y_size = 330 if (sub_title) else 230
   offset = 100
 
   image = Image.new('L', (x_size, y_size), 0xff)
@@ -36,22 +44,26 @@ def get_sensor_panel(sensor_mac: str, sub_title: Optional[str], sensor_data: Sen
   if (sensor_mac in sensor_data):
     data_y_base = 100 if (sub_title) else 0
     state_in = sensor_data[sensor_mac]
+
+    # Temperature
     utils.draw_quantity(draw, (x_size//2 + offset, data_y_base + 120), utils.roundToString(state_in['temperature'], 1), '°C', fonts, 'font_lg', 'font_sm')
-    humidity_icon = icons.get_scaled_image(images['misc']['humidity'], 70)
-    image.paste(humidity_icon, (x_size//2 + offset - 150, data_y_base + 150), humidity_icon)
-    utils.draw_quantity(draw, (x_size//2 + offset, data_y_base + 210), utils.roundToString(state_in['humidity']), '%', fonts)
 
     # Battery level
     battery_icon = icons.get_scaled_image(get_battery_icon(state_in['battery'], images), 60)
     image.paste(battery_icon, (x_size//2 + offset + 10, data_y_base - 10), battery_icon)
 
-    # TODO: Fix layout
-    # utils.draw_quantity(draw, (100, data_y_base + 210), utils.roundToString(state_in['rssi']), 'dBm', fonts, 'font_xs', 'font_xxs')
+    # Humidity
+    humidity_icon = icons.get_scaled_image(images['misc']['humidity'], 70)
+    image.paste(humidity_icon, (x_size//2 + offset - 140, data_y_base + 140), humidity_icon)
+    utils.draw_quantity(draw, (x_size//2 + offset, data_y_base + 200), utils.roundToString(state_in['humidity']), '%', fonts)
 
+    # Signal strength
+    signal_strength_icon = icons.get_scaled_image(get_signal_strength_icon(state_in['rssi'], images), 70)
+    image.paste(signal_strength_icon, (x_size//2 + offset - 250, data_y_base + 140), signal_strength_icon)
   else:
     logger.info(f'Could not find mac {sensor_mac} in sensor data')
-    no_wifi_image = icons.get_scaled_image(images['misc']['no_wifi'], 200)
-    image.paste(no_wifi_image, (x_size//2 - no_wifi_image.width//2, y_size//2 - no_wifi_image.height//2), no_wifi_image)
+    no_wifi_icon = icons.get_scaled_image(images['misc']['no_wifi'], 150)
+    image.paste(no_wifi_icon, (x_size//2 - no_wifi_icon.width//2, y_size//2 - no_wifi_icon.height//2), no_wifi_icon)
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):
