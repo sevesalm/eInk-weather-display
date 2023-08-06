@@ -97,7 +97,7 @@ Install dependencies on Raspberry Pi:
 1. Install `python3-venv`: `sudo apt install python3-venv`
 1. Install `libpython3.9-dev`: `sudo apt install libpython3.9-dev`
 1. Install `tmux`: `sudo apt install tmux`
-1. Install Raqm dependencies: `sudo apt install libfribidi0 libharfbuzz0b libfreetype6 libraqm0`
+1. Install `Raqm`: `sudo apt install libraqm0`
 
 ## Setup and Deploy
 
