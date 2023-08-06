@@ -10,6 +10,7 @@ This is a set of custom made icons to be used with FMI observation and forecast 
 ![clear.png](preview/clear.png)
 ![clear_night.png](preview/clear_night.png)
 ![clouds.png](preview/clouds.png)
+![cloudy.png](preview/cloudy.png)
 ![partially_cloudy.png](preview/partially_cloudy.png)
 ![partially_cloudy_night.png](preview/partially_cloudy_night.png)
 
@@ -22,10 +23,10 @@ This is a set of custom made icons to be used with FMI observation and forecast 
 ![drizzle_icing.png](preview/drizzle_icing.png)
 ![drizzle_strong_icing.png](preview/drizzle_strong_icing.png)
 
-### Fog and mist
+### Mist and fog
 
-![fog.png](preview/fog.png)
 ![mist.png](preview/mist.png)
+![fog.png](preview/fog.png)
 
 ### Hail
 
@@ -82,15 +83,23 @@ This is a set of custom made icons to be used with FMI observation and forecast 
 ![partially_cloudy_thunder_strong.png](preview/partially_cloudy_thunder_strong.png)
 ![partially_cloudy_thunder_strong_night.png](preview/partially_cloudy_thunder_strong_night.png)
 
+### Precipitation
+
+![precipitation_mild.png](preview/precipitation_mild.png)
+![precipitation.png](preview/precipitation.png)
+![precipitation_heavy.png](preview/precipitation_heavy.png)
+
+### Ice pellets
+
+![ice_pellets_mild.png](preview/ice_pellets_mild.png)
+![ice_pellets.png](preview/ice_pellets.png)
+![ice_pellets_strong.png](preview/ice_pellets_strong.png)
+
 ## Miscellaneous
 
 ![sunrise.png](preview/sunrise.png)
 ![sunset.png](preview/sunset.png)
 ![wind_icon.png](preview/wind_icon.png)
-![wifi_high.png](preview/wifi_high.png)
-![wifi_med.png](preview/wifi_med.png)
-![wifi_low.png](preview/wifi_low.png)
-![no_wifi.png](preview/no_wifi.png)
 ![temperature.png](preview/temperature.png)
 ![temperature_feel.png](preview/temperature_feel.png)
 ![humidity.png](preview/humidity.png)
@@ -98,13 +107,20 @@ This is a set of custom made icons to be used with FMI observation and forecast 
 ![pressure.png](preview/pressure.png)
 ![warning.png](preview/warning.png)
 
-## Battery icons
+## Battery level
 
 ![battery_full.png](preview/battery_full.png)
 ![battery_75.png](preview/battery_75.png)
 ![battery_50.png](preview/battery_50.png)
 ![battery_25.png](preview/battery_25.png)
 ![battery_empty.png](preview/battery_empty.png)
+
+## Signal strength
+
+![wifi_high.png](preview/wifi_high.png)
+![wifi_med.png](preview/wifi_med.png)
+![wifi_low.png](preview/wifi_low.png)
+![no_wifi.png](preview/no_wifi.png)
 
 ## Cloud cover
 
