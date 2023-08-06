@@ -117,10 +117,10 @@ This is a set of custom made icons to be used with FMI observation and forecast 
 
 ## Signal strength
 
-![wifi_high.png](preview/wifi_high.png)
-![wifi_med.png](preview/wifi_med.png)
-![wifi_low.png](preview/wifi_low.png)
-![no_wifi.png](preview/no_wifi.png)
+![signal_high.png](preview/signal_high.png)
+![signal_med.png](preview/signal_med.png)
+![signal_low.png](preview/signal_low.png)
+![no_signal.png](preview/no_signal.png)
 
 ## Cloud cover
 

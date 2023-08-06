@@ -21,10 +21,10 @@ def get_battery_icon(voltage: float, images: Icons) -> Image.Image:
 
 def get_signal_strength_icon(rssi: float, images: Icons) -> Image.Image:
   if (rssi > -50):
-    return images['misc']['wifi_high']
+    return images['misc']['signal_high']
   if (rssi > -75):
-    return images['misc']['wifi_med']
-  return images['misc']['wifi_low']
+    return images['misc']['signal_med']
+  return images['misc']['signal_low']
 
 
 def get_sensor_panel(sensor_mac: str, sub_title: Optional[str], sensor_data: SensorData, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
@@ -62,8 +62,8 @@ def get_sensor_panel(sensor_mac: str, sub_title: Optional[str], sensor_data: Sen
     image.paste(signal_strength_icon, (x_size//2 + offset - 250, data_y_base + 140), signal_strength_icon)
   else:
     logger.info(f'Could not find mac {sensor_mac} in sensor data')
-    no_wifi_icon = icons.get_scaled_image(images['misc']['no_wifi'], 150)
-    image.paste(no_wifi_icon, (x_size//2 - no_wifi_icon.width//2, y_size//2 - no_wifi_icon.height//2), no_wifi_icon)
+    no_signal_icon = icons.get_scaled_image(images['misc']['no_signal'], 150)
+    image.paste(no_signal_icon, (x_size//2 - no_signal_icon.width//2, y_size//2 - no_signal_icon.height//2), no_signal_icon)
 
   # Borders
   if (config.getboolean('DRAW_PANEL_BORDERS')):
