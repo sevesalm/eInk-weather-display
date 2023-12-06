@@ -1,3 +1,7 @@
+import os
+# Use Bleson adapter as the default BlueZ adapter causes random crashes and does not recover 
+os.environ["RUUVI_BLE_ADAPTER"] = "bleson"
+
 from configparser import SectionProxy
 import logging
 import random
@@ -5,6 +9,7 @@ from ruuvitag_sensor.ruuvi_rx import RuuviTagReactive
 from reactivex import operators as ops
 from type_alias import SensorData
 
+logging.getLogger("bleson").setLevel(logging.ERROR) # Suppress Bleson logging
 
 def get_random_sensor_data(macs: list[str]) -> SensorData:
   return {mac: {"temperature": random.uniform(18, 30), "humidity": random.uniform(20, 80), "battery": random.uniform(2000, 3000), "rssi": random.uniform(-120, -10)} for mac in macs}

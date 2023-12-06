@@ -93,7 +93,6 @@ Reboot and check that everything works and you can connect to Raspberry using SS
 Install dependencies on Raspberry Pi:
 
 1. Install [BCM2835 Driver](https://www.airspayce.com/mikem/bcm2835/)
-1. Install [BlueZ](https://github.com/ttu/ruuvitag-sensor#BlueZ)
 1. Install `python3-venv`: `sudo apt install python3-venv`
 1. Install `libpython3.9-dev`: `sudo apt install libpython3.9-dev`
 1. Install `tmux`: `sudo apt install tmux`

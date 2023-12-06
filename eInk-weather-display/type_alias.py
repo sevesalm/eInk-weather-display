@@ -1,7 +1,7 @@
 from enum import Enum
 import datetime
 from PIL import Image, ImageFont
-from typing import Mapping, TypedDict
+from typing import Mapping, Optional, TypedDict
 
 Datetime = datetime.datetime
 
@@ -53,7 +53,7 @@ class SingleSensorData(TypedDict):
   temperature: float
   humidity: float
   battery: float
-  rssi: float
+  rssi: Optional[float]
 
 
 SensorData = Mapping[str, SingleSensorData]

@@ -58,8 +58,9 @@ def get_sensor_panel(sensor_mac: str, sub_title: Optional[str], sensor_data: Sen
     utils.draw_quantity(draw, (x_size//2 + offset, data_y_base + 200), utils.roundToString(state_in['humidity']), '%', fonts)
 
     # Signal strength
-    signal_strength_icon = icons.get_scaled_image(get_signal_strength_icon(state_in['rssi'], images), 70)
-    image.paste(signal_strength_icon, (x_size//2 + offset - 250, data_y_base + 140), signal_strength_icon)
+    if(state_in['rssi'] is not None):
+      signal_strength_icon = icons.get_scaled_image(get_signal_strength_icon(state_in['rssi'], images), 70)
+      image.paste(signal_strength_icon, (x_size//2 + offset - 250, data_y_base + 140), signal_strength_icon)
   else:
     logger.info(f'Could not find mac {sensor_mac} in sensor data')
     no_signal_icon = icons.get_scaled_image(images['misc']['no_signal'], 150)
