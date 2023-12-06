@@ -12,6 +12,7 @@ jobs:
         with:
           python-version: "3.9"
           cache: "pip"
+          cache-dependency-path: "requirements/development.txt"
       - name: Update pip
         run: pip install --upgrade pip
       - name: Install dependencies
