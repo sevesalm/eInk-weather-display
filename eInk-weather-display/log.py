@@ -14,6 +14,7 @@ def setup(loglevel=logging.DEBUG) -> None:
     set_module_log_levels()
     fileHandler = logging.FileHandler(DEFAULT_FILENAME)
     fileHandler.setLevel(logging.WARN)
+    fileHandler.setFormatter(LogFormatter.LogFormatter())
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(loglevel)
     stream_handler.setFormatter(LogFormatter.LogFormatter())
