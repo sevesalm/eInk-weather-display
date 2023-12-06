@@ -19,8 +19,6 @@ jobs:
       - name: Check the code compiles
         run: python -m compileall -q .
       - name: Lint with flake8
-        run: |
-          pip install flake8
-          flake8
+        run: flake8
       - name: Run tests
         run: python -m unittest discover -s eInk-weather-display
