@@ -58,7 +58,7 @@ def get_sensor_panel(sensor_mac: str, sub_title: Optional[str], sensor_data: Sen
     utils.draw_quantity(draw, (x_size//2 + offset, data_y_base + 200), utils.roundToString(state_in['humidity']), '%', fonts)
 
     # Signal strength
-    if(state_in['rssi'] is not None):
+    if (state_in['rssi'] is not None):
       signal_strength_icon = icons.get_scaled_image(get_signal_strength_icon(state_in['rssi'], images), 70)
       image.paste(signal_strength_icon, (x_size//2 + offset - 250, data_y_base + 140), signal_strength_icon)
   else:

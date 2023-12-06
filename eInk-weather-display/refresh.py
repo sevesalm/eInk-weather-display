@@ -34,7 +34,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
   sensor_data = get_sensor_data(logger, config, [config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_OUT')])
   elapsed_sensor_time = timer() - start_sensor_time
 
-  if(config.getboolean('LOG_SENSOR_DATA')):
+  if (config.getboolean('LOG_SENSOR_DATA')):
     log_sensor_data(sensor_data, config)
 
   # Draw individual panels
