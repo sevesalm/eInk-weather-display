@@ -15,7 +15,7 @@ jobs:
       - name: Update pip
         run: pip install --upgrade pip
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements/development.txt
       - name: Check the code compiles
         run: python -m compileall -q .
       - name: Lint with flake8

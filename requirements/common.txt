@@ -1,11 +1,6 @@
 APScheduler==3.10.4
-bleson==0.1.8
 ephem==4.1.5
 Pillow==10.1.0
 python-dateutil==2.8.2
 requests==2.31.0
-RPi.GPIO==0.7.1
-ruuvitag-sensor==2.3.0
-spidev==3.6
-flake8==6.1.0
 jsonschema==4.20.0
