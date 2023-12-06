@@ -7,7 +7,7 @@ from info_panel import get_info_panel
 from forecast_panel import get_forecasts_panel
 from celestial_panel import get_celestial_panel
 from sensor_panel import get_sensor_panel
-from sensor_data import get_sensor_data
+from sensor_data import get_sensor_data, log_sensor_data
 from timeit import default_timer as timer
 from configparser import SectionProxy
 from typing import Optional
@@ -33,6 +33,9 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
   start_sensor_time = timer()
   sensor_data = get_sensor_data(logger, config, [config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_OUT')])
   elapsed_sensor_time = timer() - start_sensor_time
+
+  if(config.getboolean('LOG_SENSOR_DATA')):
+    log_sensor_data(sensor_data, config)
 
   # Draw individual panels
   logger.info('Drawing panels')

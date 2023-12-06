@@ -2,6 +2,7 @@ import os
 # Use Bleson adapter as the default BlueZ adapter causes random crashes and does not recover 
 os.environ["RUUVI_BLE_ADAPTER"] = "bleson"
 
+import datetime
 from configparser import SectionProxy
 import logging
 import random
@@ -46,3 +47,24 @@ def get_sensor_data(logger: logging.Logger, config: SectionProxy, macs: list[str
   except Exception as e:
     logger.error('get_sensor_data() failed: %s', repr(e))
     return {}
+
+
+# Logs stats about the sensor battery level
+def log_sensor_data(sensor_data: SensorData, config: SectionProxy) -> None:
+  now = datetime.datetime.now()
+  filename = config.get('SENSOR_DATA_LOG_FILENAME')
+  # Logs battery levels at midnight
+  if (now.hour == 0 and now.minute == 0):
+    with open(filename, 'a') as f:
+      mac_in = config.get('RUUVITAG_MAC_IN')
+      name_in = config.get('RUUVITAG_MAC_IN_NAME')
+      mac_out = config.get('RUUVITAG_MAC_OUT')
+      name_out = config.get('RUUVITAG_MAC_OUT_NAME')
+      log_str_in = get_sensor_battery_log_string(sensor_data, mac_in, name_in)
+      log_str_out = get_sensor_battery_log_string(sensor_data, mac_out, name_out)
+      data_row = f'[{now.isoformat()}]: {log_str_in}, {log_str_out}\n'
+      f.write(data_row)
+
+
+def get_sensor_battery_log_string(sensor_data: SensorData, mac: str, name: str):
+  return f'{name} {sensor_data[mac]["battery"]} mV'
