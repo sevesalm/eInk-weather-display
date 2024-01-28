@@ -1,3 +1,4 @@
+from cachetools import cached, TTLCache
 import xml.etree.ElementTree as et
 from datetime import datetime
 import requests
@@ -18,6 +19,7 @@ FORECAST_PARAMETERS = ['Temperature', 'WindSpeedMS', 'WindDirection', 'TotalClou
 FORECAST_QUERY = 'fmi::forecast::harmonie::surface::point::multipointcoverage'
 RADIATION_QUERY = 'fmi::observations::radiation::multipointcoverage'
 RADIATION_PARAMETERS = ['dir_1min']
+CACHE_TTL = 9 * 60 + 30
 
 
 def split_in_chunks(data: List, size: int):
@@ -94,6 +96,7 @@ def get_position_name(xml_data: et.Element) -> str:
   return element.text
 
 
+@cached(cache=TTLCache(maxsize=1, ttl=CACHE_TTL), key=lambda *args: 'obs')
 def get_radiation_data(config: SectionProxy, observation_data: Optional[ObservationData], logger: Logger) -> Optional[RadiationData]:
   if (observation_data is None):
     return None
@@ -114,6 +117,7 @@ def get_radiation_data(config: SectionProxy, observation_data: Optional[Observat
     return None
 
 
+@cached(cache=TTLCache(maxsize=1, ttl=CACHE_TTL), key=lambda *args: 'rad')
 def get_observation_data(config: SectionProxy, logger: Logger) -> Optional[ObservationData]:
   try:
     if (config.getboolean('DEV_MODE_RANDOM_WEATHER_DATA') and config.getboolean('DEV_MODE')):
@@ -136,6 +140,7 @@ def get_observation_data(config: SectionProxy, logger: Logger) -> Optional[Obser
     return None
 
 
+@cached(cache=TTLCache(maxsize=1, ttl=CACHE_TTL), key=lambda *args: 'for')
 def get_forecast_data(config: SectionProxy, count: int, skip_count: Optional[int], logger: Logger) -> Optional[ForecastData]:
   try:
     if (config.getboolean('DEV_MODE_RANDOM_WEATHER_DATA') and config.getboolean('DEV_MODE')):
