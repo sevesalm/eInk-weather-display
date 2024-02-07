@@ -69,6 +69,13 @@ The 7.8" display comes only with C code for controlling it using the [BCM 2835 G
 
 Support for the 7.8" eInk has been added. The shared library [eInk-weather-display/lib/epd78.so](eInk-weather-display/lib/epd78.so) manages image bit depth operations and drawing the data on 7.8" eInk display.
 
+## Development
+
+Running tests:
+
+1. `cd eInk-weather-display`
+1. `python -m unittest`
+
 ## Used licenses
 
 See the [eInk-weather-display/fonts/README.md](eInk-weather-display/fonts/README.md) for information about fonts used in this project and their licenses.
