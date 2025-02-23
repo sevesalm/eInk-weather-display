@@ -23,6 +23,7 @@ class ForecastDataItem(TypedDict):
   WindDirection: float
   TotalCloudCover: float
   WeatherSymbol3: int
+  SmartSymbol: int
 
 
 class RadiationDataItem(TypedDict):
@@ -36,7 +37,8 @@ class DayNightIcons(TypedDict):
 
 class Icons(TypedDict):
     observation: Mapping[int, DayNightIcons]
-    forecast: Mapping[int, DayNightIcons]
+    weather_symbol_3: Mapping[int, DayNightIcons]
+    smart_symbol: Mapping[int, DayNightIcons]
     misc: Mapping[str, Image.Image]
 
 
