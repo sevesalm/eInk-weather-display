@@ -51,7 +51,7 @@ observation_mapping = {
   89: {'day': 'partially_cloudy_hail_rain', 'night': 'partially_cloudy_hail_rain_night'}
 }
 
-forecast_mapping = {
+weather_symbol_3_mapping = {
   1:  {'day': 'clear', 'night': 'clear_night'},
   2:  {'day': 'partially_cloudy', 'night': 'partially_cloudy_night'},
   3:  {'day': 'clouds'},
@@ -79,6 +79,55 @@ forecast_mapping = {
   83: {'day': 'sleet_strong'},
   91: {'day': 'mist'},
   92: {'day': 'fog'},
+}
+
+smart_symbol_mapping = {
+  1: {'day': 'clear', 'night': 'clear_night'},
+  2:  {'day': 'partially_cloudy', 'night': 'partially_cloudy_night'},
+  4:  {'day': 'partially_cloudy', 'night': 'partially_cloudy_night'},
+  6:  {'day': 'clouds'},
+  7:  {'day': 'clouds'},
+  9:  {'day': 'fog'},
+  71: {'day': 'partially_cloudy_thunder', 'night': 'partially_cloudy_thunder_night'},
+  74: {'day': 'partially_cloudy_thunder', 'night': 'partially_cloudy_thunder_night'},
+  77: {'day': 'partially_cloudy_thunder', 'night': 'partially_cloudy_thunder_night'},
+  21: {'day': 'partially_cloudy_rain', 'night': 'partially_cloudy_rain_night'},
+  22: {'day': 'partially_cloudy_rain', 'night': 'partially_cloudy_rain_night'},
+  24: {'day': 'partially_cloudy_rain', 'night': 'partially_cloudy_rain_night'},
+  27: {'day': 'partially_cloudy_rain', 'night': 'partially_cloudy_rain_night'},
+  14: {'day': 'drizzle_icing'},
+  17: {'day': 'rain_icing'},
+  11: {'day': 'drizzle'},
+  31: {'day': 'partially_cloudy_rain_mild', 'night': 'partially_cloudy_rain_mild_night'},
+  34: {'day': 'partially_cloudy_rain_mild', 'night': 'partially_cloudy_rain_mild_night'},
+  37: {'day': 'rain_mild'},
+  32: {'day': 'partially_cloudy_rain', 'night': 'partially_cloudy_rain_night'},
+  35: {'day': 'partially_cloudy_rain', 'night': 'partially_cloudy_rain_night'},
+  38: {'day': 'rain'},
+  33: {'day': 'partially_cloudy_rain_strong', 'night': 'partially_cloudy_rain_strong_night'},
+  36: {'day': 'partially_cloudy_rain_strong', 'night': 'partially_cloudy_rain_strong_night'},
+  39: {'day': 'rain_strong'},
+  41: {'day': 'partially_cloudy_sleet_mild', 'night': 'partially_cloudy_sleet_mild_night'},
+  44: {'day': 'partially_cloudy_sleet_mild', 'night': 'partially_cloudy_sleet_mild_night'},
+  47: {'day': 'sleet_mild'},
+  42: {'day': 'partially_cloudy_sleet', 'night': 'partially_cloudy_sleet_night'},
+  45: {'day': 'partially_cloudy_sleet', 'night': 'partially_cloudy_sleet_night'},
+  48: {'day': 'sleet'},
+  43: {'day': 'partially_cloudy_sleet_strong', 'night': 'partially_cloudy_sleet_strong_night'},
+  46: {'day': 'partially_cloudy_sleet_strong', 'night': 'partially_cloudy_sleet_strong_night'},
+  49: {'day': 'sleet_strong'},
+  51: {'day': 'partially_cloudy_snow_mild', 'night': 'partially_cloudy_snow_mild_night'},
+  54: {'day': 'partially_cloudy_snow_mild', 'night': 'partially_cloudy_snow_mild_night'},
+  57: {'day': 'snow_mild'},
+  52: {'day': 'partially_cloudy_snow', 'night': 'partially_cloudy_snow_night'},
+  55: {'day': 'partially_cloudy_snow', 'night': 'partially_cloudy_snow_night'},
+  58: {'day': 'snow'},
+  53: {'day': 'partially_cloudy_snow_strong', 'night': 'partially_cloudy_snow_strong_night'},
+  56: {'day': 'partially_cloudy_snow_strong', 'night': 'partially_cloudy_snow_strong_night'},
+  59: {'day': 'snow_mild'},
+  61: {'day': 'partially_cloudy_hail_rain', 'night': 'partially_cloudy_hail_rain_night'},
+  64: {'day': 'partially_cloudy_hail_rain', 'night': 'partially_cloudy_hail_rain_night'},
+  67: {'day': 'partially_cloudy_hail_rain', 'night': 'partially_cloudy_hail_rain_night'}
 }
 
 misc_icons = [

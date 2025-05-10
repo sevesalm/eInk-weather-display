@@ -55,7 +55,7 @@ The application shows sunrise and sunset times and the phase of the Moon. These 
 
 This repository contains a custom set of [weather icons](svg_icons/README.md) to be used with the application. The icon set also contains icons for showing the moon phase, RuuviTag battery charge level.
 
-The data from FMI API includes [WaWa and WeatherSymbol3](weather_icon_codes.md) codes which can be used to show a weather icon or a description to the user. There are a lot of free weather icons or icon fonts available in the Internet but it is hard to find one which covers all the codes FMI uses. For this reason I have created a set of weather icons for this need.
+The data from FMI API includes [WaWa, SmartSymbol and WeatherSymbol3](weather_icon_codes.md) codes which can be used to show a weather icon or a description to the user. There are a lot of free weather icons or icon fonts available in the Internet but it is hard to find one which covers all the codes FMI uses. For this reason I have created a set of weather icons for this need.
 
 The weather icon set contains a unique icon for almost all weather codes. The icons were drawn programmatically in svg. Because the PILLOW library doesn't support SVG format, the icons have to be converted to PNG images using the provided [script](scripts/convert.sh) before usage.
 

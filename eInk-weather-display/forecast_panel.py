@@ -54,7 +54,14 @@ def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fo
 
     # Weather icon
     icon_position = (x_base + i*x_step - icon_width//2, data_y_base + 80)
-    weather_icon = icons.get_scaled_image(get_forecats_weather_icon(data['WeatherSymbol3'], is_daylight, images, fonts, config), icon_width)
+    # WeatherSymbol3 seems to have more accurate fog data
+    if (data['SmartSymbol'] != 9):
+      weather_icon = icons.get_scaled_image(get_smart_symbol_icon(data['SmartSymbol'], is_daylight, images, fonts, config), icon_width)
+    else:
+      logger.info(f"SmartSymbol: {data['SmartSymbol']}, WeatherSymbol3: {data['WeatherSymbol3']}")
+      logger.debug(f"SmartSymbol: {data['SmartSymbol']}, WeatherSymbol3: {data['WeatherSymbol3']}")
+      weather_icon = icons.get_scaled_image(get_forecats_weather_icon(data['WeatherSymbol3'], is_daylight, images, fonts, config), icon_width)
+
     image.paste(weather_icon, icon_position, weather_icon)
 
     # Warning icon
@@ -88,8 +95,22 @@ def get_forecats_weather_icon(weather_symbol_3, is_daylight: bool, images: Icons
     return utils.get_missing_weather_icon_icon(math.nan, is_daylight, images, fonts)
 
   icon_index = round(weather_symbol_3)
-  if (icon_index not in images['forecast']):
+  if (icon_index not in images['weather_symbol_3']):
     return utils.get_missing_weather_icon_icon(icon_index, is_daylight, images, fonts)
 
-  icon_set = images['forecast'][icon_index]
+  icon_set = images['weather_symbol_3'][icon_index]
+  return utils.get_icon_variant(is_daylight, icon_set)
+
+
+def get_smart_symbol_icon(smart_symbol, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
+  if (math.isnan(smart_symbol)):
+    return utils.get_missing_weather_icon_icon(math.nan, is_daylight, images, fonts)
+
+  icon_index = round(smart_symbol)
+  icon_index = icon_index if icon_index < 100 else icon_index - 100
+
+  if (icon_index not in images['smart_symbol']):
+    return utils.get_missing_weather_icon_icon(icon_index, is_daylight, images, fonts)
+
+  icon_set = images['smart_symbol'][icon_index]
   return utils.get_icon_variant(is_daylight, icon_set)

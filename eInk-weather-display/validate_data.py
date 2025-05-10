@@ -64,7 +64,7 @@ forecast_data_mapping_schema = {
   'type': 'object',
   'additionalProperties': {
     'type': 'object',
-    'required': ['Temperature', 'WindSpeedMS', 'WindDirection', 'TotalCloudCover', 'WeatherSymbol3'],
+    'required': ['Temperature', 'WindSpeedMS', 'WindDirection', 'TotalCloudCover', 'WeatherSymbol3', 'SmartSymbol'],
     'additionalProperties': False,
     'properties': {
       'Temperature': {
@@ -80,6 +80,9 @@ forecast_data_mapping_schema = {
         'type': 'number'
       },
       'WeatherSymbol3': {
+        'type': 'integer'
+      },
+      'SmartSymbol': {
         'type': 'integer'
       },
     }

@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 from logging import Logger
 from typing import Mapping, List, Tuple
 from type_alias import ObservationDataItem, ObservationData, ForecastDataItem, ForecastData, RadiationData
-from icon_mapping import observation_mapping, forecast_mapping
+from icon_mapping import observation_mapping, weather_symbol_3_mapping, smart_symbol_mapping
 import utils
 
 
@@ -57,7 +57,8 @@ def get_random_forecast_data(logger: Logger) -> ForecastData:
       'WindSpeedMS': random.uniform(0, 20),
       'WindDirection': random.uniform(0, 360),
       'TotalCloudCover': random.uniform(0, 100),
-      'WeatherSymbol3': random.choice(list(forecast_mapping.keys()))
+      'WeatherSymbol3': random.choice(list(weather_symbol_3_mapping.keys())),
+      'SmartSymbol': random.choice(list(smart_symbol_mapping.keys())),
     }
     forecast_data[forecast_datetime] = data
   position = get_random_coordinates()
