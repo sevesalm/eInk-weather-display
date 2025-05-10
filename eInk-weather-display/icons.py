@@ -1,6 +1,6 @@
 import logging
 from PIL import Image
-from icon_mapping import observation_mapping, forecast_mapping, misc_icons
+from icon_mapping import observation_mapping, weather_symbol_3_mapping, smart_symbol_mapping, misc_icons
 from typing import Optional, Mapping
 from type_alias import Icons, DayNightIcons
 
@@ -25,18 +25,28 @@ def get_weather_images() -> Icons:
     }
     observation_images[key] = images
 
-  forecast_images: Mapping[int, DayNightIcons] = {}
-  for key, icon_set in forecast_mapping.items():
+  weather_symbol_3: Mapping[int, DayNightIcons] = {}
+  for key, icon_set in weather_symbol_3_mapping.items():
     night_icon = icon_set['night'] if ('night' in icon_set) else icon_set['day']
     images: DayNightIcons = {
       'day': read_weather_icon(icon_set['day'], misc_images['background_day']),
       'night': read_weather_icon(night_icon, misc_images['background_night'])
     }
-    forecast_images[key] = images
+    weather_symbol_3[key] = images
+
+  smart_symbol: Mapping[int, DayNightIcons] = {}
+  for key, icon_set in smart_symbol_mapping.items():
+    night_icon = icon_set['night'] if ('night' in icon_set) else icon_set['day']
+    images: DayNightIcons = {
+      'day': read_weather_icon(icon_set['day'], misc_images['background_day']),
+      'night': read_weather_icon(night_icon, misc_images['background_night'])
+    }
+    smart_symbol[key] = images
 
   result: Icons = {
     "observation": observation_images,
-    "forecast": forecast_images,
+    "weather_symbol_3": weather_symbol_3,
+    "smart_symbol": smart_symbol,
     "misc": misc_images,
   }
 

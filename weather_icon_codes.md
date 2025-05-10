@@ -4,6 +4,58 @@ Both the realtime observations and forecasts contain a code for each entry which
 
 Weather icon sets available for free usage don't usually contain a proper icon for each of these codes. For this reason I decided to draw an extensive set of icons for the application. The icon set is not complete yet but covers most cases.
 
+## SmartSymbol Codes
+
+The table below shows the WeatherSymbol3 codes used by FMI open API when querying weather forecast (eg. stored query `fmi::forecast::harmonie::surface::point::timevaluepair`). The data contains both SmartSymbol and WeatherSymbol3 codes but SmartSymbol delivers more information (with the exception of fog and mist).
+
+| Code (day) | Code (night) | Description (FMI)                                                           | Description (English)                      |
++------------+--------------+-----------------------------------------------------------------------------+--------------------------------------------+
+| 1          | 101          | Selkeää                                                                     | Clear                                      |
+| 2          | 102          | Enimmäkseen selkeää                                                         | Mostly clear                               |
+| 4          | 104          | Puolipilvistä                                                               | Partly cloudy                              |
+| 6          | 106          | Enimmäkseen pilvistä                                                        | Mostly cloudy                              |
+| 7          |              | Pilvistä                                                                    | Overcast                                   |
+| 9          |              | Sumua                                                                       | Fog                                        |
+| 71         | 171          | Yksittäisiä ukkoskuuroja                                                    | Isolated thundershowers                    |
+| 74         | 174          | Paikoin ukkoskuuroja                                                        | Scattered thundershowers                   |
+| 77         |              | Ukkoskuuroja                                                                | Thundershowers                             |
+| 21         | 121          | Yksittäisiä sadekuuroja                                                     | Isolated showers                           |
+| 24         | 124          | Paikoin sadekuuroja                                                         | Scattered showers                          |
+| 27         |              | Sadekuuroja                                                                 | Showers                                    |
+| 14         |              | Jäätävää tihkua                                                             | Freezing drizzle                           |
+| 17         |              | Jäätävää sadetta                                                            | Freezing rain                              |
+| 11         |              | Tihkusadetta                                                                | Drizzle                                    |
+| 31         | 131          | Puolipilvistä ja ajoittain heikkoa vesisadetta                              | Partly cloudy and periods of light rain    |
+| 34         | 134          | Enimmäkseen pilvistä ja ajoittain heikkoa vesisadetta                       | Mostly cloudy and periods of light rain    |
+| 37         |              | Heikkoa vesisadetta                                                         | Light rain                                 |
+| 32         | 132          | Puolipilvistä ja ajoittain kohtalaista vesisadetta                          | Partly cloudy and periods of moderate rain |
+| 35         | 135          | Enimmäkseen pilvistä ja ajoittain kohtalaista vesisadetta                   | Mostly cloudy and periods of moderate rain |
+| 38         |              | Kohtalaista vesisadetta                                                     | Moderate rain                              |
+| 33         | 133          | Puolipilvistä ja ajoittain voimakasta vesisadetta                           | Partly cloudy and periods of heavy rain    |
+| 36         | 136          | Enimmäkseen pilvistä ja ajoittain voimakasta vesisadetta                    | Mostly cloudy and periods of heavy rain    |
+| 39         |              | Voimakasta vesisadetta                                                      | Heavy rain                                 |
+| 41         | 141          | Puolipilvistä ja ajoittain heikkoa räntäsadetta tai räntäkuuroja            | Isolated light sleet showers               |
+| 44         | 144          | Enimmäkseen pilvistä ja ajoittain heikkoa räntäsadetta tai räntäkuuroja     | Scattered light sleet showers              |
+| 47         |              | Heikkoa räntäsadetta                                                        | Light sleet                                |
+| 42         | 142          | Puolipilvistä ja ajoittain kohtalaista räntäsadetta tai räntäkuuroja        | Isolated moderate sleet showers            |
+| 45         | 145          | Enimmäkseen pilvistä ja ajoittain kohtalaista räntäsadetta tai räntäkuuroja | Scattered moderate sleet showers           |
+| 48         |              | Kohtalaista räntäsadetta                                                    | Moderate sleet                             |
+| 43         | 143          | Puolipilvistä ja ajoittain voimakasta räntäsadetta tai räntäkuuroja         | Isolated heavy sleet showers               |
+| 46         |              | Enimmäkseen pilvistä ja ajoittain voimakasta räntäsadetta tai räntäkuuroja  | Scattered heavy sleet showers              |
+| 49         |              | Voimakasta räntäsadetta                                                     | Heavy sleet                                |
+| 51         | 151          | Puolipilvistä ja ajoittain heikkoa lumisadetta tai lumikuuroja              | Isolated light snow showers                |
+| 54         | 154          | Enimmäkseen pilvistä ja ajoittain heikkoa lumisadetta tai lumikuuroja       | Scattered light snow showers               |
+| 57         |              | Heikkoa lumisadetta                                                         | Light snowfall                             |
+| 52         | 152          | Puolipilvistä ja ajoittain kohtalaista lumisadetta tai lumikuuroja          | Isolated moderate snow showers             |
+| 55         | 155          | Enimmäkseen pilvistä ja ajoittain kohtalaista lumisadetta tai lumikuuroja   | Scattered moderate snow showers            |
+| 58         |              | Kohtalaista lumisadetta                                                     | Moderate snowfall                          |
+| 53         | 153          | Puolipilvistä ja ajoittain sakeaa lumisadetta tai lumikuuroja               | Isolated heavy snow showers                |
+| 56         | 156          | Enimmäkseen pilvistä ja ajoittain sakeaa lumisadetta tai lumikuuroja        | Scattered heavy snow showers               |
+| 59         |              | Runsasta lumisadetta                                                        | Heavy snowfall                             |
+| 61         | 161          | Yksittäisiä raekuuroja                                                      | Isolated hail showers                      |
+| 64         | 164          | Paikoin raekuuroja                                                          | Scattered hail showers                     |
+| 67         |              | Raekuuroja                                                                  | Hail showers                               |
+
 ## WeatherSymbol3 Codes
 
 The table below shows the WeatherSymbol3 codes used by FMI open API when querying weather forecast (eg. stored query `fmi::forecast::harmonie::surface::point::timevaluepair`).
@@ -11,7 +63,7 @@ The table below shows the WeatherSymbol3 codes used by FMI open API when queryin
 I have translated the descriptions to English.
 
 | Code | Description (FMI)        | Description (English)  |
-| ---- | ------------------------ | ---------------------- |
++------+--------------------------+------------------------+
 | 1    | Selkeää                  | Clear                  |
 | 2    | Puolipilvistä            | Partly cloudy          |
 | 21   | Heikkoja sadekuuroja     | Light showers          |
@@ -45,7 +97,7 @@ I have translated the descriptions to English.
 The table below shows the WaWa codes used by FMI open API when querying real time weather observations from weather stations (eg. stored query `fmi::observations::weather::timevaluepair`). Not all codes are listed by FMI.
 
 | Code    | Description                                                                                 |
-| ------- | ------------------------------------------------------------------------------------------- |
++---------+---------------------------------------------------------------------------------------------+
 | 00      | No significant weather observed                                                             |
 | 01      | Clouds generally dissolving or becoming less developed during the past hour                 |
 | 02      | State of sky on the whole unchanged during the past hour                                    |

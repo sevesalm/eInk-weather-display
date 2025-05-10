@@ -18,11 +18,11 @@ def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, 
   # For codes 0 to 3 and 20 to 26, let's use cloud cover to determine the icon set
   if (((0 <= wawa <= 3) or (20 <= wawa <= 26)) and not math.isnan(cloud_coverage)):
     if (cloud_coverage <= 1):  # Clear sky
-      icon_set = images['forecast'].get(1)
+      icon_set = images['weather_symbol_3'].get(1)
     elif (2 <= cloud_coverage <= 6):  # Partially cloudy
-      icon_set = images['forecast'].get(2)
+      icon_set = images['weather_symbol_3'].get(2)
     elif (7 <= cloud_coverage <= 8):  # Overcast
-      icon_set = images['forecast'].get(3)
+      icon_set = images['weather_symbol_3'].get(3)
     else:  # Lolwut?
       icon_set = images['observation'].get(0)
   else:
