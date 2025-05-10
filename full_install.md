@@ -94,7 +94,7 @@ Install dependencies on Raspberry Pi:
 
 1. Install [BCM2835 Driver](https://www.airspayce.com/mikem/bcm2835/)
 1. Install `python3-venv`: `sudo apt install python3-venv`
-1. Install `libpython3.9-dev`: `sudo apt install libpython3.9-dev`
+1. Install `libpython3.13-dev`: `sudo apt install libpython3.13-dev`
 1. Install `tmux`: `sudo apt install tmux`
 1. Install `Raqm`: `sudo apt install libraqm0`
 

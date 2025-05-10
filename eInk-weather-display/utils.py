@@ -40,8 +40,8 @@ def check_raqm_support(logger: logging.Logger) -> None:
 def check_python_version() -> None:
   major = sys.version_info[0]
   minor = sys.version_info[1]
-  if major < 3 or minor < 7:
-    raise Exception('Python 3.7 or newer required')
+  if major < 3 or minor < 9:
+    raise Exception('Python 3.9 or newer required')
 
 
 def from_8bit_to_2bit(image: Image.Image) -> bytes:
