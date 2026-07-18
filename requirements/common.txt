@@ -1,6 +1,6 @@
-APScheduler==3.11.0
-ephem==4.2
-Pillow==10.4.0
+APScheduler==3.11.3
+ephem==4.2.1
+Pillow==11.3.0
 python-dateutil==2.9.0.post0
-requests==2.32.3
-jsonschema==4.23.0
+requests==2.32.5
+jsonschema==4.25.1

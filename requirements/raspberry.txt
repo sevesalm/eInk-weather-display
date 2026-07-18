@@ -3,4 +3,4 @@
 bleson==0.1.8
 RPi.GPIO==0.7.1
 ruuvitag-sensor==3.1.0
-spidev==3.7
+spidev==3.8
