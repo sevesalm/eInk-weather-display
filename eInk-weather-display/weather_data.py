@@ -119,7 +119,7 @@ def get_observation_data(config: SectionProxy, logger: Logger) -> Optional[Obser
     if (config.getboolean('DEV_MODE_RANDOM_WEATHER_DATA') and config.getboolean('DEV_MODE')):
       return get_random_observation_data(logger)
     params = {
-      'place': config['FMI_LOCATION'],
+      'place': config['FMI_OBSERVATION_LOCATION_OVERRIDE'] if config['FMI_OBSERVATION_LOCATION_OVERRIDE'] else config['FMI_LOCATION'],
       'parameters': ','.join(OBS_PARAMETERS)
     }
     xml_data = fetch_data(OBS_QUERY, params)
