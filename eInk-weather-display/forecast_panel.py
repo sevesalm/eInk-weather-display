@@ -6,11 +6,11 @@ import logging
 import utils
 import draw_utils
 import icons
-from configparser import SectionProxy
 from type_alias import Fonts, Icons, ForecastData
+from app_config import AppConfig
 
 
-def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating forecast panel')
   x_size = 1872
@@ -84,13 +84,13 @@ def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fo
     image.paste(wind_image_rot, (x_base + i*x_step - wind_image_rot.width//2, data_y_base + 450), wind_image_rot)
 
   # Borders
-  if (config.getboolean('DRAW_PANEL_BORDERS')):
+  if (config.draw_panel_borders):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
 
   return image
 
 
-def get_forecats_weather_icon(weather_symbol_3, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_forecats_weather_icon(weather_symbol_3, is_daylight: bool, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   if (math.isnan(weather_symbol_3)):
     return utils.get_missing_weather_icon_icon(math.nan, is_daylight, images, fonts)
 
@@ -102,7 +102,7 @@ def get_forecats_weather_icon(weather_symbol_3, is_daylight: bool, images: Icons
   return utils.get_icon_variant(is_daylight, icon_set)
 
 
-def get_smart_symbol_icon(smart_symbol, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_smart_symbol_icon(smart_symbol, is_daylight: bool, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   if (math.isnan(smart_symbol)):
     return utils.get_missing_weather_icon_icon(math.nan, is_daylight, images, fonts)
 

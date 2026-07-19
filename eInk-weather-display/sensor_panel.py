@@ -1,10 +1,10 @@
-from configparser import SectionProxy
 from typing import Optional
 from PIL import Image, ImageDraw
 import logging
 import utils
 import icons
 from type_alias import Fonts, Icons, SensorData
+from app_config import AppConfig
 
 
 def get_battery_icon(voltage: float, images: Icons) -> Image.Image:
@@ -27,7 +27,7 @@ def get_signal_strength_icon(rssi: float, images: Icons) -> Image.Image:
   return images['misc']['signal_low']
 
 
-def get_sensor_panel(sensor_mac: str, sub_title: Optional[str], sensor_data: SensorData, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_sensor_panel(sensor_mac: Optional[str], sub_title: Optional[str], sensor_data: SensorData, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating sensor panel')
 
@@ -41,7 +41,7 @@ def get_sensor_panel(sensor_mac: str, sub_title: Optional[str], sensor_data: Sen
   if (sub_title):
     utils.draw_title(draw, fonts['font_sm'], 'SENSOR', sub_title, fonts['font_xxs'])
 
-  if (sensor_mac in sensor_data):
+  if (sensor_mac is not None and sensor_mac in sensor_data):
     data_y_base = 100 if (sub_title) else 0
     state_in = sensor_data[sensor_mac]
 
@@ -67,7 +67,7 @@ def get_sensor_panel(sensor_mac: str, sub_title: Optional[str], sensor_data: Sen
     image.paste(no_signal_icon, (x_size//2 - no_signal_icon.width//2, y_size//2 - no_signal_icon.height//2), no_signal_icon)
 
   # Borders
-  if (config.getboolean('DRAW_PANEL_BORDERS')):
+  if (config.draw_panel_borders):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
 
   return image

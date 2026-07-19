@@ -9,16 +9,16 @@ from celestial_panel import get_celestial_panel
 from sensor_panel import get_sensor_panel
 from sensor_data import get_sensor_data, log_sensor_data
 from timeit import default_timer as timer
-from configparser import SectionProxy
 from typing import Optional
 from type_alias import Icons, Fonts
 from multiprocessing import Process
 from weather_data import get_observation_data, get_forecast_data, get_radiation_data
+from app_config import AppConfig
 
 PROCESS_TIMEOPUT = 10  # In seconds
 
 
-def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: SectionProxy, epd_so: Optional[ctypes.CDLL], init: bool) -> None:
+def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: AppConfig, epd_so: Optional[ctypes.CDLL], init: bool) -> None:
   logger = logging.getLogger(__name__)
   logger.info('Refresh started')
   start_time = timer()
@@ -31,20 +31,21 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
   elapsed_fetch_time = timer() - start_fetch_time
 
   start_sensor_time = timer()
-  sensor_data = get_sensor_data(logger, config, [config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_OUT')])
+  sensor_macs = [mac for mac in [config.ruuvitag_mac_in, config.ruuvitag_mac_out] if mac]
+  sensor_data = get_sensor_data(logger, config, sensor_macs)
   elapsed_sensor_time = timer() - start_sensor_time
 
-  if (config.getboolean('LOG_SENSOR_DATA')):
+  if (config.log_sensor_data):
     log_sensor_data(sensor_data, config)
 
   # Draw individual panels
   logger.info('Drawing panels')
   start_draw_time = timer()
   observation_panel = get_observation_panel(observation_data, radiation_data, images, fonts, config)
-  sensor_panel_in = get_sensor_panel(config.get('RUUVITAG_MAC_IN'), config.get('RUUVITAG_MAC_IN_NAME'), sensor_data, images, fonts, config)
-  sensor_panel_out = get_sensor_panel(config.get('RUUVITAG_MAC_OUT'), None, sensor_data, images, fonts, config)
+  sensor_panel_in = get_sensor_panel(config.ruuvitag_mac_in, config.ruuvitag_mac_in_name, sensor_data, images, fonts, config)
+  sensor_panel_out = get_sensor_panel(config.ruuvitag_mac_out, config.ruuvitag_mac_out_name, sensor_data, images, fonts, config)
   forecasts_panel = get_forecasts_panel(forecast_data, images, fonts, config)
-  (_, position, position_name, _) = forecast_data if forecast_data is not None else (None, get_config_override_position(config), config.get('OVERRIDE_NAME'), None)
+  (_, position, position_name, _) = forecast_data if forecast_data is not None else (None, get_config_override_position(config), config.override_name, None)
   celestial_panel = get_celestial_panel(position, position_name, fonts, images, config)
   info_panel = get_info_panel(fonts, config)
 
@@ -59,7 +60,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
   full_image.paste(info_panel, (panel_size[0] - info_panel.width, 0))
   elapsed_draw_time = timer() - start_draw_time
 
-  if (config.getboolean('DRAW_BORDERS')):
+  if (config.draw_borders):
     border_color = 0x80
     draw_width = 2
     draw = ImageDraw.Draw(full_image)
@@ -68,21 +69,21 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Se
     draw.line([observation_panel.width + sensor_panel_in.width, 0, observation_panel.width + sensor_panel_in.width, observation_panel.height - panel_size[1]//20], fill=border_color, width=draw_width)
     draw.line([observation_panel.width + sensor_panel_in.width + celestial_panel.width, 0, observation_panel.width + sensor_panel_in.width + celestial_panel.width, observation_panel.height - panel_size[1]//20], fill=border_color, width=draw_width)
 
-  if (config.getboolean('DEV_MODE')):
-    filename = config.get('DEV_MODE_OUTPUT_FILENAME')
+  if (config.dev_mode):
+    filename = config.dev_mode_output_filename
     logger.info(f'Saving image to {filename}')
     full_image.save(filename)
     elapsed_refresh_time = 0
   else:
     logger.info(f'Sending image to EPD, {"full" if init else "partial"} refresh')
-    if (config.getboolean('MIRROR_HORIZONTAL')):
+    if (config.mirror_horizontal):
       full_image = full_image.transpose(Image.FLIP_LEFT_RIGHT)
-    image_bytes = full_image.rotate(0 if not config.getboolean('ROTATE_180') else 180, expand=True).tobytes()
+    image_bytes = full_image.rotate(0 if not config.rotate_180 else 180, expand=True).tobytes()
     c_logger = ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_wchar_p)(logging.getLogger('esp.so').log)
     if (epd_so):
       start_refresh_time = timer()
       try:
-        p = Process(target=epd_so.draw_image_8bit, args=(image_bytes, ctypes.c_bool(init), ctypes.c_int(config.getint('EPD_VOLTAGE')), config.getint('BITS_PER_PIXEL'), c_logger))
+        p = Process(target=epd_so.draw_image_8bit, args=(image_bytes, ctypes.c_bool(init), ctypes.c_int(config.epd_voltage), config.bits_per_pixel, c_logger))
         p.start()
         p.join(PROCESS_TIMEOPUT)
         logger.debug(f'Exit code: {p.exitcode}')

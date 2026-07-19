@@ -2,11 +2,11 @@ import time
 from PIL import Image, ImageDraw
 import logging
 import utils
-from configparser import SectionProxy
 from type_alias import Fonts
+from app_config import AppConfig
 
 
-def get_info_panel(fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_info_panel(fonts: Fonts, config: AppConfig) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating info panel')
   x_size = 260
@@ -20,11 +20,11 @@ def get_info_panel(fonts: Fonts, config: SectionProxy) -> Image.Image:
   draw.text((x_size//2, 300), f'{time.strftime("Week %V")}', fill="black", font=fonts['font_xs'], anchor='ms')
   draw.text((x_size//2, 350), f'{time.strftime("%Y")}', fill="black", font=fonts['font_xs'], anchor='ms')
 
-  if (config.getboolean('DEV_MODE')):
+  if (config.dev_mode):
     draw.text((x_size//2, 400), '(DEV MODE)', fill="black", font=fonts['font_xxs'], anchor='ms')
 
   # Borders
-  if (config.getboolean('DRAW_PANEL_BORDERS')):
+  if (config.draw_panel_borders):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
 
   return image
