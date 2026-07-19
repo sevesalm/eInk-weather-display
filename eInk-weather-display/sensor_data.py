@@ -1,8 +1,7 @@
 import datetime
 import logging
 import random
-from ruuvitag_sensor.ruuvi_rx import RuuviTagReactive
-from reactivex import operators as ops
+
 from type_alias import SensorData
 from app_config import AppConfig
 
@@ -16,6 +15,9 @@ def get_random_sensor_data(macs: list[str]) -> SensorData:
 def get_sensor_data(logger: logging.Logger, config: AppConfig, macs: list[str]) -> SensorData:
   try:
     if (not (config.dev_mode_random_sensor_data and config.dev_mode)):
+      # Imported conditionally to avoid import errors on systems without ruuvitag-sensor library
+      from ruuvitag_sensor.ruuvi_rx import RuuviTagReactive
+      from reactivex import operators as ops
       ruuvis = RuuviTagReactive(macs)
       ruuvi_emissions = ruuvis.get_subject()
       missing_data = ruuvi_emissions.pipe(
