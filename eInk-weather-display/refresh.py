@@ -6,14 +6,15 @@ from observation_panel import get_observation_panel
 from info_panel import get_info_panel
 from forecast_panel import get_forecasts_panel
 from celestial_panel import get_celestial_panel
-from sensor_panel import get_sensor_panel
-from sensor_data import get_sensor_data, log_sensor_data
+from sensor_panel import get_sensor_panel_new
+from sensor_data import get_ruuvi_sensor_data
 from timeit import default_timer as timer
 from typing import Optional
 from type_alias import Icons, Fonts
 from multiprocessing import Process
 from weather_data import get_observation_data, get_forecast_data, get_radiation_data
 from app_config import AppConfig
+from home_assistant import get_sensor_data
 
 PROCESS_TIMEOPUT = 10  # In seconds
 
@@ -31,19 +32,15 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Ap
   elapsed_fetch_time = timer() - start_fetch_time
 
   start_sensor_time = timer()
-  sensor_macs = [mac for mac in [config.ruuvitag_mac_in, config.ruuvitag_mac_out] if mac]
-  sensor_data = get_sensor_data(logger, config, sensor_macs)
-  elapsed_sensor_time = timer() - start_sensor_time
+  home_assistant_sensor_data = get_sensor_data(config, logger)
 
-  if (config.log_sensor_data):
-    log_sensor_data(sensor_data, config)
+  elapsed_sensor_time = timer() - start_sensor_time
 
   # Draw individual panels
   logger.info('Drawing panels')
   start_draw_time = timer()
   observation_panel = get_observation_panel(observation_data, radiation_data, images, fonts, config)
-  sensor_panel_in = get_sensor_panel(config.ruuvitag_mac_in, config.ruuvitag_mac_in_name, sensor_data, images, fonts, config)
-  sensor_panel_out = get_sensor_panel(config.ruuvitag_mac_out, config.ruuvitag_mac_out_name, sensor_data, images, fonts, config)
+  sensor_panel_new = get_sensor_panel_new(home_assistant_sensor_data, fonts, config)
   forecasts_panel = get_forecasts_panel(forecast_data, images, fonts, config)
   (_, position, position_name, _) = forecast_data if forecast_data is not None else (None, get_config_override_position(config), config.override_name, None)
   celestial_panel = get_celestial_panel(position, position_name, fonts, images, config)
@@ -53,10 +50,9 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Ap
   logger.info('Pasting panels')
   full_image = Image.new('L', (panel_size[0], panel_size[1]), 0xff)
   full_image.paste(observation_panel, (0, 0))
-  full_image.paste(sensor_panel_in, (observation_panel.width, 0))
-  full_image.paste(sensor_panel_out, (observation_panel.width, sensor_panel_in.height + 10))
+  full_image.paste(sensor_panel_new, (observation_panel.width, 0))
   full_image.paste(forecasts_panel, (0, panel_size[1] - forecasts_panel.height))
-  full_image.paste(celestial_panel, (observation_panel.width + sensor_panel_in.width, 0))
+  full_image.paste(celestial_panel, (observation_panel.width + sensor_panel_new.width, 0))
   full_image.paste(info_panel, (panel_size[0] - info_panel.width, 0))
   elapsed_draw_time = timer() - start_draw_time
 
@@ -66,8 +62,8 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Ap
     draw = ImageDraw.Draw(full_image)
     draw.line([0, panel_size[1] - forecasts_panel.height, panel_size[0], panel_size[1] - forecasts_panel.height], fill=border_color, width=draw_width)
     draw.line([observation_panel.width, 0, observation_panel.width, observation_panel.height - panel_size[1]//20], fill=border_color, width=draw_width)
-    draw.line([observation_panel.width + sensor_panel_in.width, 0, observation_panel.width + sensor_panel_in.width, observation_panel.height - panel_size[1]//20], fill=border_color, width=draw_width)
-    draw.line([observation_panel.width + sensor_panel_in.width + celestial_panel.width, 0, observation_panel.width + sensor_panel_in.width + celestial_panel.width, observation_panel.height - panel_size[1]//20], fill=border_color, width=draw_width)
+    draw.line([observation_panel.width + sensor_panel_new.width, 0, observation_panel.width + sensor_panel_new.width, observation_panel.height - panel_size[1]//20], fill=border_color, width=draw_width)
+    draw.line([observation_panel.width + sensor_panel_new.width + celestial_panel.width, 0, observation_panel.width + sensor_panel_new.width + celestial_panel.width, observation_panel.height - panel_size[1]//20], fill=border_color, width=draw_width)
 
   if (config.dev_mode):
     filename = config.dev_mode_output_filename
@@ -77,7 +73,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Ap
   else:
     logger.info(f'Sending image to EPD, {"full" if init else "partial"} refresh')
     if (config.mirror_horizontal):
-      full_image = full_image.transpose(Image.FLIP_LEFT_RIGHT)
+      full_image = full_image.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
     image_bytes = full_image.rotate(0 if not config.rotate_180 else 180, expand=True).tobytes()
     c_logger = ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_wchar_p)(logging.getLogger('esp.so').log)
     if (epd_so):

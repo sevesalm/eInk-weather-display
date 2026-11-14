@@ -13,7 +13,7 @@ from app_config import AppConfig
 
 def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   if (wawa not in images['observation']):
-    return utils.get_missing_weather_icon_icon(wawa, is_daylight, images, fonts)
+    return utils.get_missing_weather_icon_icon(wawa, is_daylight, images, fonts, config)
 
   # For codes 0 to 3 and 20 to 26, let's use cloud cover to determine the icon set
   if (((0 <= wawa <= 3) or (20 <= wawa <= 26)) and not math.isnan(cloud_coverage)):

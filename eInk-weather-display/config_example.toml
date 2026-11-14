@@ -1,6 +1,5 @@
-# Edit this example file to suit your needs
+# Edit this example file to suit your needs and save it as config.toml
 
-[general]
 # If True, save to a png file
 # If False, display on EPD
 dev_mode = true
@@ -9,10 +8,6 @@ dev_mode_output_filename = "image.png"
 # Control the usage of random data
 dev_mode_random_weather_data = true
 dev_mode_random_sensor_data = true
-
-# Allows logging sensor battery levels for debugging. Uses filename 'battery.log'.
-log_sensor_data = false
-sensor_data_log_filename = "battery.log"
 
 # A city or neighborhood
 fmi_location = "Helsinki"
@@ -29,12 +24,6 @@ draw_panel_borders = false
 # Subtle dividers to improve readibility
 draw_borders = true
 
-# MAC addresses of the two RuuviTag sensors
-ruuvitag_mac_in = "AA:BB:CC:DD:EE:FF"
-ruuvitag_mac_in_name = "In"
-ruuvitag_mac_out = "AA:BB:CC:DD:EE:FF"
-ruuvitag_mac_out_name = "Out"
-
 # Increase in case of bad reception, seconds
 sensor_poll_timeout = 10
 
@@ -44,7 +33,7 @@ rotate_180 = true
 # Mirrors the image horizontally (for 10.3" model)
 mirror_horizontal = true
 
-# Currently the only supported models: '7.8', '10.3' 
+# Currently the only supported models: '7.8', '10.3'
 epd_model = "10.3"
 
 # The input voltage of the display in millivolts
@@ -73,3 +62,23 @@ extreme_low_temperature_warning_threshold = -30
 
 # Show a warning icon if the temperature is >= this value between 21.00 and 03.00 (exclusive)
 tropical_night_temperature_warning_threshold = 20
+
+# Optional Home Assistant connection for reading sensor data.
+# Create a long-lived access token in Home Assistant under your user profile.
+# [home_assistant]
+# url = "http://homeassistant.local:8123"
+# bearer_token = "YOUR_LONG_LIVED_ACCESS_TOKEN"
+
+# Sensors to show. Repeat the [[sensors]] table for each sensor.
+# Home Assistant sensors refer to entity ids. battery_sensor_id is optional.
+# [[sensors]]
+# type = "HomeAssistant"
+# name = "Living room"
+# temperature_sensor_id = "sensor.living_room_temperature"
+# humidity_sensor_id = "sensor.living_room_humidity"
+# battery_sensor_id = "sensor.living_room_battery"
+#
+# [[sensors]]
+# type = "Ruuvi"
+# name = "Balcony"
+# mac = "AA:BB:CC:DD:EE:FF"

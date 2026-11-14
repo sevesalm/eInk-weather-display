@@ -10,28 +10,34 @@ from datetime import datetime, timedelta
 import logging
 from app_config import AppConfig
 
-SUPPORTED_EPD_MODELS = ['7.8', '10.3']
 NAN_SYMBOL = '?'
+
+TABULAR_NUMBERS_FEATURES = ["tnum"]  # OpenType feature for tabular numbers
+RAQM_SUPPORTED = features.check_feature('raqm')
+
+def get_features() -> Optional[list[str]]:
+  '''OpenType features used when drawing text. Disabled when Raqm is missing because Pillow raises without it.'''
+  return TABULAR_NUMBERS_FEATURES if RAQM_SUPPORTED else None
 
 
 def draw_quantity(draw: ImageDraw.ImageDraw, mid_point: tuple[int, int], value: str, unit: str, fonts: Fonts, font: str = 'font_sm', font_unit: str = 'font_xs') -> None:
   (x, y) = mid_point
   offset = 7
-  draw.text((x - offset, y), value, font=fonts[font], fill=0, anchor='rs', features=["tnum"])
+  draw.text((x - offset, y), value, font=fonts[font], fill=0, anchor='rs', features=get_features())
   draw.text((x + offset, y), unit, font=fonts[font_unit], fill=0, anchor='ls')
 
 
 def draw_time(draw: ImageDraw.ImageDraw, coordinate: tuple[int, int], minutes: str, hours: str, font: ImageFont.FreeTypeFont) -> None:
   offset = font.size//8
+  text_features = get_features()
   draw.text(coordinate, ":", font=font, fill=0, anchor='mm')
-  draw.text((coordinate[0]+offset, coordinate[1]), minutes, font=font, fill=0, anchor='lm', features=["tnum"])
-  draw.text((coordinate[0]-offset, coordinate[1]), hours, font=font, fill=0, anchor='rm', features=["tnum"])
+  draw.text((coordinate[0]+offset, coordinate[1]), minutes, font=font, fill=0, anchor='lm', features=text_features)
+  draw.text((coordinate[0]-offset, coordinate[1]), hours, font=font, fill=0, anchor='rm', features=text_features)
 
 
 def check_raqm_support(logger: logging.Logger) -> None:
   '''Check if the Raqm support is enabled. Used to enable OpenType font features.'''
-  is_raqm_supported = features.check_feature('raqm')
-  if is_raqm_supported:
+  if RAQM_SUPPORTED:
     logger.info("Raqm support detected")
   else:
     logger.warn('Raqm not supported')
@@ -66,20 +72,13 @@ def from_8bit_to_2bit(image: Image.Image) -> bytes:
 
 
 def get_epd_data(config: AppConfig) -> tuple[Optional[ctypes.CDLL], tuple[int, int]]:
-  if (is_supported_epd(config.epd_model)):
-    if (config.dev_mode):
-      return (None, (1872, 1404))
-    else:
-      return (ctypes.CDLL("lib/epd78.so"), (1872, 1404))
-  else:
-    raise Exception(f'Unsupported model: {config.epd_model}')
+  if (config.dev_mode):
+    return (None, (1872, 1404))
+  return (ctypes.CDLL("lib/epd78.so"), (1872, 1404))
 
 
 def get_fonts(config: AppConfig) -> Fonts:
-  if (is_supported_epd(config.epd_model)):
-    font_mult = 4
-  else:
-    raise Exception(f'Unsupported model: {config.epd_model}')
+  font_mult = 4
 
   return {
     'font_lg': ImageFont.truetype('fonts/regular.woff', font_mult * 42),
@@ -119,11 +118,11 @@ def get_icon_variant(is_daylight: bool, icon_set: DayNightIcons) -> Image.Image:
   return icon_set['day']
 
 
-def get_missing_weather_icon_icon(icon_index: Union[float, int], is_daylight: bool, images: Icons, fonts: Fonts) -> Image.Image:
+def get_missing_weather_icon_icon(icon_index: Union[float, int], is_daylight: bool, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   icon = images['misc']['background_day'].copy() if is_daylight else images['misc']['background_night'].copy()
   draw = ImageDraw.Draw(icon)
   text = "NaN" if math.isnan(icon_index) else str(icon_index)
-  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=["tnum"])
+  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=get_features())
   return icon
 
 
@@ -134,7 +133,7 @@ def get_cloud_cover_icon(cloud_cover: float, images: Icons, fonts: Fonts, config
   icon = images['misc']['cloud_cover_0'].copy()
   draw = ImageDraw.Draw(icon)
   text = "NaN" if math.isnan(icon_index) else str(icon_index)
-  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=["tnum"])
+  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=get_features())
   return icon
 
 
@@ -165,10 +164,6 @@ def get_config_override_position(config: AppConfig) -> Position:
   latitude = str(config.override_latitude)
   longitude = str(config.override_longitude)
   return (latitude, longitude)
-
-
-def is_supported_epd(epd_model: str) -> bool:
-  return epd_model in SUPPORTED_EPD_MODELS
 
 
 def roundToString(value: float, decimals: Optional[int] = None) -> str:

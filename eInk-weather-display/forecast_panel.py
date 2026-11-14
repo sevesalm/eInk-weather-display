@@ -14,7 +14,7 @@ def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fo
   logger = logging.getLogger(__name__)
   logger.info('Generating forecast panel')
   x_size = 1872
-  y_size = 800
+  y_size = 720
   image = Image.new('L', (x_size, y_size), 0xff)
   draw = ImageDraw.Draw(image)
 
@@ -92,11 +92,11 @@ def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fo
 
 def get_forecats_weather_icon(weather_symbol_3, is_daylight: bool, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   if (math.isnan(weather_symbol_3)):
-    return utils.get_missing_weather_icon_icon(math.nan, is_daylight, images, fonts)
+    return utils.get_missing_weather_icon_icon(math.nan, is_daylight, images, fonts, config)
 
   icon_index = round(weather_symbol_3)
   if (icon_index not in images['weather_symbol_3']):
-    return utils.get_missing_weather_icon_icon(icon_index, is_daylight, images, fonts)
+    return utils.get_missing_weather_icon_icon(icon_index, is_daylight, images, fonts, config)
 
   icon_set = images['weather_symbol_3'][icon_index]
   return utils.get_icon_variant(is_daylight, icon_set)
@@ -104,13 +104,13 @@ def get_forecats_weather_icon(weather_symbol_3, is_daylight: bool, images: Icons
 
 def get_smart_symbol_icon(smart_symbol, is_daylight: bool, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   if (math.isnan(smart_symbol)):
-    return utils.get_missing_weather_icon_icon(math.nan, is_daylight, images, fonts)
+    return utils.get_missing_weather_icon_icon(math.nan, is_daylight, images, fonts, config)
 
   icon_index = round(smart_symbol)
   icon_index = icon_index if icon_index < 100 else icon_index - 100
 
   if (icon_index not in images['smart_symbol']):
-    return utils.get_missing_weather_icon_icon(icon_index, is_daylight, images, fonts)
+    return utils.get_missing_weather_icon_icon(icon_index, is_daylight, images, fonts, config)
 
   icon_set = images['smart_symbol'][icon_index]
   return utils.get_icon_variant(is_daylight, icon_set)

@@ -12,7 +12,7 @@ from typing import Optional
 from type_alias import Icons, Fonts
 from app_config import AppConfig, ConfigLoadError, load_config
 
-CONFIG_FILENAME = 'config.ini'
+CONFIG_FILENAME = 'config.toml'
 
 
 def main_loop(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: AppConfig, epd_so: Optional[ctypes.CDLL]) -> None:

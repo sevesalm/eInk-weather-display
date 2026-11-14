@@ -1,73 +1,54 @@
 from typing import Optional
+from uuid import UUID
 from PIL import Image, ImageDraw
 import logging
 import utils
-import icons
-from type_alias import Fonts, Icons, SensorData
+from type_alias import Fonts
 from app_config import AppConfig
+from home_assistant import SensorReading
 
 
-def get_battery_icon(voltage: float, images: Icons) -> Image.Image:
-  if (voltage >= 2850):
-    return images['misc']['battery_full']
-  if (voltage >= 2750):
-    return images['misc']['battery_75']
-  if (voltage >= 2600):
-    return images['misc']['battery_50']
-  if (voltage >= 2400):
-    return images['misc']['battery_25']
-  return images['misc']['battery_empty']
-
-
-def get_signal_strength_icon(rssi: float, images: Icons) -> Image.Image:
-  if (rssi > -50):
-    return images['misc']['signal_high']
-  if (rssi > -75):
-    return images['misc']['signal_med']
-  return images['misc']['signal_low']
-
-
-def get_sensor_panel(sensor_mac: Optional[str], sub_title: Optional[str], sensor_data: SensorData, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
+def get_sensor_panel_new(home_assistant_sensor_data: dict[UUID, Optional[SensorReading]], fonts: Fonts, config: AppConfig) -> Image.Image:
   logger = logging.getLogger(__name__)
-  logger.info('Generating sensor panel')
+  logger.info('Generating new sensor panel')
 
   x_size = 380
-  y_size = 330 if (sub_title) else 230
-  offset = 100
+  # Fits above the forecast panel (1404 - 720) and leaves room for 6 rows
+  y_size = 684
 
   image = Image.new('L', (x_size, y_size), 0xff)
   draw = ImageDraw.Draw(image)
 
-  if (sub_title):
-    utils.draw_title(draw, fonts['font_sm'], 'SENSOR', sub_title, fonts['font_xxs'])
+  # Build a mapping from sensor ID to sensor name
+  sensor_names: dict[UUID, str] = {
+    sensor.id: sensor.name
+    for sensor in config.sensors
+  }
 
-  if (sensor_mac is not None and sensor_mac in sensor_data):
-    data_y_base = 100 if (sub_title) else 0
-    state_in = sensor_data[sensor_mac]
+  y_offset = 20
+  row_height = 110
 
-    # Temperature
-    utils.draw_quantity(draw, (x_size//2 + offset, data_y_base + 120), utils.roundToString(state_in['temperature'], 1), '°C', fonts, 'font_lg', 'font_sm')
+  for sensor_id, reading in home_assistant_sensor_data.items():
+    sensor_name = sensor_names.get(sensor_id, str(sensor_id))
 
-    # Battery level
-    battery_icon = icons.get_scaled_image(get_battery_icon(state_in['battery'], images), 60)
-    image.paste(battery_icon, (x_size//2 + offset + 10, data_y_base - 10), battery_icon)
+    # Draw sensor name
+    draw.text((20, y_offset), sensor_name, font=fonts['font_xxs'], fill=0, anchor='lt')
 
-    # Humidity
-    humidity_icon = icons.get_scaled_image(images['misc']['humidity'], 70)
-    image.paste(humidity_icon, (x_size//2 + offset - 140, data_y_base + 140), humidity_icon)
-    utils.draw_quantity(draw, (x_size//2 + offset, data_y_base + 200), utils.roundToString(state_in['humidity']), '%', fonts)
+    if reading is not None:
+      # Draw temperature and humidity below the name
+      value_y = y_offset + 90
+      temp_str = utils.roundToString(reading.temperature, 1) if reading.temperature is not None else utils.NAN_SYMBOL
+      humidity_str = utils.roundToString(reading.humidity) if reading.humidity is not None else utils.NAN_SYMBOL
 
-    # Signal strength
-    if (state_in['rssi'] is not None):
-      signal_strength_icon = icons.get_scaled_image(get_signal_strength_icon(state_in['rssi'], images), 70)
-      image.paste(signal_strength_icon, (x_size//2 + offset - 250, data_y_base + 140), signal_strength_icon)
-  else:
-    logger.info(f'Could not find mac {sensor_mac} in sensor data')
-    no_signal_icon = icons.get_scaled_image(images['misc']['no_signal'], 150)
-    image.paste(no_signal_icon, (x_size//2 - no_signal_icon.width//2, y_size//2 - no_signal_icon.height//2), no_signal_icon)
+      utils.draw_quantity(draw, (132, value_y), temp_str, '°C', fonts)
+      utils.draw_quantity(draw, (320, value_y), humidity_str, '%', fonts, font="font_xs", font_unit='font_xxs')
+
+    y_offset += row_height
 
   # Borders
-  if (config.draw_panel_borders):
-    draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
+  if config.draw_panel_borders:
+    draw.polygon([(0, 0), (x_size - 1, 0), (x_size - 1, y_size - 1), (0, y_size - 1), (0, 0)])
 
   return image
+
+
