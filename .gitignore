@@ -6,5 +6,6 @@ __pycache__/
 config.env
 logger.log
 .DS_Store
-config.ini
+config.toml
 .ideas*
+eInk-weather-display/image.png

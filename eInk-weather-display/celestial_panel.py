@@ -4,8 +4,8 @@ import logging
 import utils
 import icons
 import datetime
-from configparser import SectionProxy
 from type_alias import Fonts, Position, Datetime, Icons
+from app_config import AppConfig
 
 
 def parse_sunrise_sunset_time(datetime: Datetime) -> str:
@@ -32,7 +32,7 @@ def get_shade_color(shade: int) -> str:
   raise Exception('Unsupported shade')
 
 
-def get_celestial_panel(position: Position, position_name: str, fonts: Fonts, images: Icons, config: SectionProxy) -> Image.Image:
+def get_celestial_panel(position: Position, position_name: str, fonts: Fonts, images: Icons, config: AppConfig) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating celestial panel')
   x_size = 500
@@ -102,7 +102,7 @@ def get_celestial_panel(position: Position, position_name: str, fonts: Fonts, im
     image.paste(sunrise_icon, (x_base + tick_gap + tick_width + 10, length_y_position - sunrise_icon.height//2), sunrise_icon)
 
   # Borders
-  if (config.getboolean('DRAW_PANEL_BORDERS')):
+  if (config.draw_panel_borders):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
 
   return image

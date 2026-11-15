@@ -1,7 +1,6 @@
 import xml.etree.ElementTree as et
 from datetime import datetime
 import requests
-from configparser import SectionProxy
 from zoneinfo import ZoneInfo
 from itertools import zip_longest
 from logging import Logger
@@ -10,6 +9,7 @@ from type_alias import ObservationData, ForecastData, RadiationData
 from weather_data_mock import get_random_forecast_data, get_random_observation_data, get_random_radiation_data
 import utils
 from validate_data import validate_data, observation_data_mapping_schema, radiation_data_mapping_schema, forecast_data_mapping_schema
+from app_config import AppConfig
 
 FMI_API_URL = 'http://opendata.fmi.fi/wfs/eng'
 OBS_PARAMETERS = ['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wg_10min', 'n_man', 'wawa']
@@ -94,11 +94,11 @@ def get_position_name(xml_data: et.Element) -> str:
   return element.text
 
 
-def get_radiation_data(config: SectionProxy, observation_data: Optional[ObservationData], logger: Logger) -> Optional[RadiationData]:
+def get_radiation_data(config: AppConfig, observation_data: Optional[ObservationData], logger: Logger) -> Optional[RadiationData]:
   if (observation_data is None):
     return None
   try:
-    if (config.getboolean('DEV_MODE_RANDOM_WEATHER_DATA') and config.getboolean('DEV_MODE')):
+    if (config.dev_mode_random_weather_data and config.dev_mode):
       return get_random_radiation_data(logger)
     params = {
       'fmisid': observation_data[3],
@@ -114,12 +114,12 @@ def get_radiation_data(config: SectionProxy, observation_data: Optional[Observat
     return None
 
 
-def get_observation_data(config: SectionProxy, logger: Logger) -> Optional[ObservationData]:
+def get_observation_data(config: AppConfig, logger: Logger) -> Optional[ObservationData]:
   try:
-    if (config.getboolean('DEV_MODE_RANDOM_WEATHER_DATA') and config.getboolean('DEV_MODE')):
+    if (config.dev_mode_random_weather_data and config.dev_mode):
       return get_random_observation_data(logger)
     params = {
-      'place': config['FMI_OBSERVATION_LOCATION_OVERRIDE'] if config['FMI_OBSERVATION_LOCATION_OVERRIDE'] else config['FMI_LOCATION'],
+      'place': config.fmi_observation_location_override or config.fmi_location,
       'parameters': ','.join(OBS_PARAMETERS)
     }
     xml_data = fetch_data(OBS_QUERY, params)
@@ -136,12 +136,12 @@ def get_observation_data(config: SectionProxy, logger: Logger) -> Optional[Obser
     return None
 
 
-def get_forecast_data(config: SectionProxy, count: int, skip_count: Optional[int], logger: Logger) -> Optional[ForecastData]:
+def get_forecast_data(config: AppConfig, count: int, skip_count: Optional[int], logger: Logger) -> Optional[ForecastData]:
   try:
-    if (config.getboolean('DEV_MODE_RANDOM_WEATHER_DATA') and config.getboolean('DEV_MODE')):
+    if (config.dev_mode_random_weather_data and config.dev_mode):
       return get_random_forecast_data(logger)
     params = {
-      'place': config['FMI_LOCATION'],
+      'place': config.fmi_location,
       'parameters': ','.join(FORECAST_PARAMETERS),
       'starttime': utils.get_next_forecast_start_timestamp().isoformat()
     }

@@ -7,13 +7,13 @@ import utils
 import draw_utils
 import icons
 from feels_like_temperature import get_feels_like_temperature
-from configparser import SectionProxy
 from type_alias import Icons, Fonts, ObservationData, RadiationData
+from app_config import AppConfig
 
 
-def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   if (wawa not in images['observation']):
-    return utils.get_missing_weather_icon_icon(wawa, is_daylight, images, fonts)
+    return utils.get_missing_weather_icon_icon(wawa, is_daylight, images, fonts, config)
 
   # For codes 0 to 3 and 20 to 26, let's use cloud cover to determine the icon set
   if (((0 <= wawa <= 3) or (20 <= wawa <= 26)) and not math.isnan(cloud_coverage)):
@@ -32,7 +32,7 @@ def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, 
   return utils.get_icon_variant(is_daylight, icon_set)
 
 
-def get_observation_panel(observation_data: Optional[ObservationData], radiation_data: Optional[RadiationData], images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_observation_panel(observation_data: Optional[ObservationData], radiation_data: Optional[RadiationData], images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating observation panel')
   x_size = 730
@@ -111,13 +111,8 @@ def get_observation_panel(observation_data: Optional[ObservationData], radiation
   # Warning icon
   draw_utils.draw_warning_icons(latest["t2m"], latest_date_local, images, image, weather_icon, (right_column_x_base, data_y_base), config)
 
-  # Warning icon
-  # if (utils.show_temperature_warning_icon(latest["t2m"], latest_date_local, config)):
-  #   warning_icon = icons.get_scaled_image(images['misc']['warning'], 60)
-  #   image.paste(warning_icon, (right_column_x_base + weather_icon.width - 2*warning_icon.width//3, data_y_base + weather_icon.height - 2*warning_icon.height//3), warning_icon)
-
   # Borders
-  if (config.getboolean('DRAW_PANEL_BORDERS')):
+  if (config.draw_panel_borders):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])
 
   return image

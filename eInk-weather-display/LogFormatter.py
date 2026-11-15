@@ -3,7 +3,7 @@ import enum
 
 
 # Custom RGB colors for log output
-class CustomColors(str, enum.Enum):
+class CustomColors(enum.StrEnum):
     gray = "\x1b[38;2;150;150;150m"
     blue = "\x1b[38;2;80;150;255m"
     green = "\x1b[38;2;10;255;40m"

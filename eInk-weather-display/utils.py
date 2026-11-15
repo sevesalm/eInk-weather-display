@@ -4,44 +4,49 @@ import ctypes
 from PIL import ImageFont, ImageDraw, Image, features
 from dateutil.parser import parse
 from zoneinfo import ZoneInfo
-from configparser import SectionProxy
 from typing import Optional, Union
 from type_alias import Datetime, Fonts, Icons, DayNightIcons, WeatherWarning, Position
 from datetime import datetime, timedelta
 import logging
+from app_config import AppConfig
 
-SUPPORTED_EPD_MODELS = ['7.8', '10.3']
 NAN_SYMBOL = '?'
+
+TABULAR_NUMBERS_FEATURES = ["tnum"]  # OpenType feature for tabular numbers
+RAQM_SUPPORTED = features.check_feature('raqm')
+
+
+def get_features() -> Optional[list[str]]:
+  '''OpenType features used when drawing text. Disabled when Raqm is missing because Pillow raises without it.'''
+  return TABULAR_NUMBERS_FEATURES if RAQM_SUPPORTED else None
 
 
 def draw_quantity(draw: ImageDraw.ImageDraw, mid_point: tuple[int, int], value: str, unit: str, fonts: Fonts, font: str = 'font_sm', font_unit: str = 'font_xs') -> None:
   (x, y) = mid_point
   offset = 7
-  draw.text((x - offset, y), value, font=fonts[font], fill=0, anchor='rs', features=["tnum"])
+  draw.text((x - offset, y), value, font=fonts[font], fill=0, anchor='rs', features=get_features())
   draw.text((x + offset, y), unit, font=fonts[font_unit], fill=0, anchor='ls')
 
 
 def draw_time(draw: ImageDraw.ImageDraw, coordinate: tuple[int, int], minutes: str, hours: str, font: ImageFont.FreeTypeFont) -> None:
   offset = font.size//8
+  text_features = get_features()
   draw.text(coordinate, ":", font=font, fill=0, anchor='mm')
-  draw.text((coordinate[0]+offset, coordinate[1]), minutes, font=font, fill=0, anchor='lm', features=["tnum"])
-  draw.text((coordinate[0]-offset, coordinate[1]), hours, font=font, fill=0, anchor='rm', features=["tnum"])
+  draw.text((coordinate[0]+offset, coordinate[1]), minutes, font=font, fill=0, anchor='lm', features=text_features)
+  draw.text((coordinate[0]-offset, coordinate[1]), hours, font=font, fill=0, anchor='rm', features=text_features)
 
 
 def check_raqm_support(logger: logging.Logger) -> None:
   '''Check if the Raqm support is enabled. Used to enable OpenType font features.'''
-  is_raqm_supported = features.check_feature('raqm')
-  if is_raqm_supported:
+  if RAQM_SUPPORTED:
     logger.info("Raqm support detected")
   else:
-    logger.warn('Raqm not supported')
+    logger.warning('Raqm not supported')
 
 
 def check_python_version() -> None:
-  major = sys.version_info[0]
-  minor = sys.version_info[1]
-  if major < 3 or minor < 9:
-    raise Exception('Python 3.9 or newer required')
+  if sys.version_info < (3, 14):
+    raise Exception('Python 3.14 or newer required')
 
 
 def from_8bit_to_2bit(image: Image.Image) -> bytes:
@@ -65,21 +70,14 @@ def from_8bit_to_2bit(image: Image.Image) -> bytes:
   return bytes(result)
 
 
-def get_epd_data(config: SectionProxy) -> tuple[Optional[ctypes.CDLL], tuple[int, int]]:
-  if (is_supported_epd(config.get('EPD_MODEL'))):
-    if (config.getboolean('DEV_MODE')):
-      return (None, (1872, 1404))
-    else:
-      return (ctypes.CDLL("lib/epd78.so"), (1872, 1404))
-  else:
-    raise Exception(f'Unsupported model: {config.get("EPD_MODEL")}')
+def get_epd_data(config: AppConfig) -> tuple[Optional[ctypes.CDLL], tuple[int, int]]:
+  if (config.dev_mode):
+    return (None, (1872, 1404))
+  return (ctypes.CDLL("lib/epd78.so"), (1872, 1404))
 
 
-def get_fonts(config: SectionProxy) -> Fonts:
-  if (is_supported_epd(config.get('EPD_MODEL'))):
-    font_mult = 4
-  else:
-    raise Exception(f'Unsupported model: {config.get("EPD_MODEL")}')
+def get_fonts(config: AppConfig) -> Fonts:
+  font_mult = 4
 
   return {
     'font_lg': ImageFont.truetype('fonts/regular.woff', font_mult * 42),
@@ -92,7 +90,7 @@ def get_fonts(config: SectionProxy) -> Fonts:
   }
 
 
-def get_text_size(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont) -> tuple[int, int]:
+def get_text_size(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont) -> tuple[float, float]:
   b_box = draw.textbbox((0, 0), text, font)
   return (b_box[2] - b_box[0], b_box[3] - b_box[1])
 
@@ -119,22 +117,22 @@ def get_icon_variant(is_daylight: bool, icon_set: DayNightIcons) -> Image.Image:
   return icon_set['day']
 
 
-def get_missing_weather_icon_icon(icon_index: Union[float, int], is_daylight: bool, images: Icons, fonts: Fonts) -> Image.Image:
+def get_missing_weather_icon_icon(icon_index: Union[float, int], is_daylight: bool, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   icon = images['misc']['background_day'].copy() if is_daylight else images['misc']['background_night'].copy()
   draw = ImageDraw.Draw(icon)
   text = "NaN" if math.isnan(icon_index) else str(icon_index)
-  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=["tnum"])
+  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=get_features())
   return icon
 
 
-def get_cloud_cover_icon(cloud_cover: float, images: Icons, fonts: Fonts, config: SectionProxy) -> Image.Image:
+def get_cloud_cover_icon(cloud_cover: float, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   icon_index = math.nan if math.isnan(cloud_cover) else round(cloud_cover)
   if (not math.isnan(icon_index) and 0 <= icon_index <= 9):
     return images['misc'][f'cloud_cover_{icon_index}']
   icon = images['misc']['cloud_cover_0'].copy()
   draw = ImageDraw.Draw(icon)
   text = "NaN" if math.isnan(icon_index) else str(icon_index)
-  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=["tnum"])
+  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=get_features())
   return icon
 
 
@@ -142,33 +140,29 @@ def utc_datetime_string_to_local_datetime(date_string: str) -> Datetime:
   return parse(date_string).replace(tzinfo=ZoneInfo('UTC')).astimezone(tz=None)
 
 
-def get_weather_warning_level(temperature: float, time: Datetime, config: SectionProxy) -> WeatherWarning:
-  if temperature >= config.getint('EXTREME_HIGH_TEMPERATURE_WARNING_THRESHOLD'):
+def get_weather_warning_level(temperature: float, time: Datetime, config: AppConfig) -> WeatherWarning:
+  if temperature >= config.extreme_high_temperature_warning_threshold:
     return WeatherWarning.CRITICAL
 
-  if temperature >= config.getint('HIGH_TEMPERATURE_WARNING_THRESHOLD'):
+  if temperature >= config.high_temperature_warning_threshold:
     return WeatherWarning.WARNING
 
-  if temperature <= config.getint('EXTREME_LOW_TEMPERATURE_WARNING_THRESHOLD'):
+  if temperature <= config.extreme_low_temperature_warning_threshold:
     return WeatherWarning.CRITICAL
 
-  if temperature <= config.getint('LOW_TEMPERATURE_WARNING_THRESHOLD'):
+  if temperature <= config.low_temperature_warning_threshold:
     return WeatherWarning.WARNING
 
-  if temperature >= config.getint('TROPICAL_NIGHT_TEMPERATURE_WARNING_THRESHOLD') and (time.hour > 21 or time.hour < 8):
+  if temperature >= config.tropical_night_temperature_warning_threshold and (time.hour > 21 or time.hour < 8):
     return WeatherWarning.WARNING
 
   return WeatherWarning.NONE
 
 
-def get_config_override_position(config: SectionProxy) -> Position:
-  latitude = config.get('OVERRIDE_LATITUDE')
-  longitude = config.get('OVERRIDE_LONGITUDE')
+def get_config_override_position(config: AppConfig) -> Position:
+  latitude = str(config.override_latitude)
+  longitude = str(config.override_longitude)
   return (latitude, longitude)
-
-
-def is_supported_epd(epd_model: str) -> bool:
-  return epd_model in SUPPORTED_EPD_MODELS
 
 
 def roundToString(value: float, decimals: Optional[int] = None) -> str:

@@ -37,10 +37,13 @@ observation_data_mapping_schema = {
         'type': 'number'
       },
       'n_man': {
-        'type': 'integer'
+        'type': 'number'
       },
       'wawa': {
-        'type': 'integer'
+        'anyOf': [
+          {'type': 'number'},
+          {'const': 'NaN'},
+        ]
       }
     }
   }

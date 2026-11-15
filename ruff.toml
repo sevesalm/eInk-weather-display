@@ -1,0 +1,14 @@
+line-length = 250
+indent-width = 2
+target-version = "py314"
+
+[lint]
+# Most pycodestyle rules (blank lines, whitespace) are preview-only in ruff
+preview = true
+# Same rule families flake8 checks by default (pyflakes + pycodestyle errors/warnings)
+select = ["E", "F", "W"]
+# E111/E114 assume 4-space indentation regardless of indent-width; E226 is ignored by flake8 by default
+ignore = ["E111", "E114", "E226"]
+
+[format]
+quote-style = "preserve"
