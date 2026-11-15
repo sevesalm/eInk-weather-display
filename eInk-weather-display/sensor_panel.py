@@ -50,5 +50,3 @@ def get_sensor_panel_new(home_assistant_sensor_data: dict[UUID, Optional[SensorR
     draw.polygon([(0, 0), (x_size - 1, 0), (x_size - 1, y_size - 1), (0, y_size - 1), (0, 0)])
 
   return image
-
-

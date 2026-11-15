@@ -15,6 +15,7 @@ NAN_SYMBOL = '?'
 TABULAR_NUMBERS_FEATURES = ["tnum"]  # OpenType feature for tabular numbers
 RAQM_SUPPORTED = features.check_feature('raqm')
 
+
 def get_features() -> Optional[list[str]]:
   '''OpenType features used when drawing text. Disabled when Raqm is missing because Pillow raises without it.'''
   return TABULAR_NUMBERS_FEATURES if RAQM_SUPPORTED else None
@@ -91,7 +92,7 @@ def get_fonts(config: AppConfig) -> Fonts:
   }
 
 
-def get_text_size(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont) -> tuple[int, int]:
+def get_text_size(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont) -> tuple[float, float]:
   b_box = draw.textbbox((0, 0), text, font)
   return (b_box[2] - b_box[0], b_box[3] - b_box[1])
 

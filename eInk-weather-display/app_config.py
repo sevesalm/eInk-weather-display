@@ -17,6 +17,7 @@ class SensorBase(BaseModel):
   id: UUID = Field(default_factory=uuid4)
   name: str
 
+
 class RuuviSensor(SensorBase):
   type: Literal["Ruuvi"]
   mac: str = Field(pattern=r"^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$")
@@ -27,17 +28,21 @@ class RuuviSensor(SensorBase):
   def normalize_mac(cls, value: str) -> str:
     return value.upper()
 
+
 class HomeAssistantSensor(SensorBase):
   type: Literal["HomeAssistant"]
   temperature_sensor_id: str
   humidity_sensor_id: str
   battery_sensor_id: Optional[str] = None
 
+
 class HomeAssistantConfig(BaseModel):
   url: HttpUrl
   bearer_token: str
 
+
 SensorType = Union[RuuviSensor, HomeAssistantSensor]
+
 
 class AppConfig(BaseModel):
   model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
