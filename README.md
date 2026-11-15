@@ -2,11 +2,11 @@
 
 ![Badge](https://github.com/sevesalm/eInk-weather-display/actions/workflows/default.yml/badge.svg)
 
-This application is a project for building a weather data display using [Raspberry Pi](https://www.raspberrypi.org/products/), [Waveshare e-Paper Display](https://www.waveshare.com/product/raspberry-pi/displays/e-paper.htm) and [RuuviTag sensors](https://ruuvi.com/ruuvitag-specs/). The goal of the project is to have an e-Ink display showing:
+This application is a project for building a weather data display using [Raspberry Pi](https://www.raspberrypi.org/products/), [Waveshare e-Paper Display](https://www.waveshare.com/product/raspberry-pi/displays/e-paper.htm) and [RuuviTag sensors](https://ruuvi.com/ruuvitag-specs/) or [Home Assistant](https://www.home-assistant.io/) sensors. The goal of the project is to have an e-Ink display showing:
 
 - Current weather observations (temperature, windspeed, humidity etc.)
 - 48h weather forecast
-- Weather data from RuuviTag sensors
+- Weather data from RuuviTag and Home Assistant sensors
 - Sunrise and sunset times
 - Different twilight times: astronomical, nautical and civil dusk and dawn
 - "Feels like" temperature
@@ -19,7 +19,7 @@ The current hardware:
 
 - [Raspberry Pi 3 Model B+](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/) computer
 - [Waveshare 10.3" e-Paper HAT](https://www.waveshare.com/product/raspberry-pi/displays/e-paper/10.3inch-e-paper-hat.htm) e-Ink display (also works with the similar 7.8" display)
-- [RuuviTag](https://ruuvi.com/ruuvitag-specs/) sensors
+- [RuuviTag](https://ruuvi.com/ruuvitag-specs/) sensors and/or sensors available in [Home Assistant](https://www.home-assistant.io/)
 
 Note: This device/software is heavily customized to be used with the FMI (Finnish Meteorological Institute) Open API data which - in turn - is heavily targeted for people living in Finland. Other APIs might require extensive changes.
 
@@ -39,13 +39,20 @@ The script [scripts/deploy.sh](scripts/deploy.sh) is a small helper which copies
 
 Note: Scripts won't work unless dependencies are installed.
 
+## Configuration
+
+The app is configured with `eInk-weather-display/config.toml`. Create it from [config_example.toml](eInk-weather-display/config_example.toml), which documents all options. The config is validated on startup and invalid values are reported with a clear error. The previous `config.ini` format is no longer supported, so existing configs must be converted to TOML.
+
 ## Observations and forecast data
 
 The application shows real time weather observations and near term forecast data from the [open API by FMI](https://en.ilmatieteenlaitos.fi/open-data). The API offers accurate data updated regularly based on the given location.
 
-## RuuviTag data
+## Sensor data
 
-RuuviTag sensors measure temperature, barometric pressure and humidity every few seconds and broadcast it using Bluetooth 5. This data is read by Raspberry Pi and further showed on the display.
+The display shows readings from up to 6 sensors, configured as `[[sensors]]` entries in `config.toml`. Two sensor types are supported:
+
+- **RuuviTag**: RuuviTag sensors measure temperature, barometric pressure and humidity every few seconds and broadcast it using Bluetooth 5. This data is read by Raspberry Pi and further showed on the display.
+- **Home Assistant**: temperature, humidity and optionally battery level are read from Home Assistant entities. Configure the Home Assistant URL and a long-lived access token in the `[home_assistant]` section.
 
 ## Celestial data
 
