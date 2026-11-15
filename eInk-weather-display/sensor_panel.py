@@ -5,10 +5,10 @@ import logging
 import utils
 from type_alias import Fonts
 from app_config import AppConfig
-from home_assistant import SensorReading
+from sensor_data import SensorReading
 
 
-def get_sensor_panel_new(home_assistant_sensor_data: dict[UUID, Optional[SensorReading]], fonts: Fonts, config: AppConfig) -> Image.Image:
+def get_sensor_panel(sensor_data: dict[UUID, Optional[SensorReading]], fonts: Fonts, config: AppConfig) -> Image.Image:
   logger = logging.getLogger(__name__)
   logger.info('Generating new sensor panel')
 
@@ -28,7 +28,7 @@ def get_sensor_panel_new(home_assistant_sensor_data: dict[UUID, Optional[SensorR
   y_offset = 20
   row_height = 110
 
-  for sensor_id, reading in home_assistant_sensor_data.items():
+  for sensor_id, reading in sensor_data.items():
     sensor_name = sensor_names.get(sensor_id, str(sensor_id))
 
     # Draw sensor name

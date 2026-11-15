@@ -1,7 +1,7 @@
 from enum import Enum
 import datetime
 from PIL import Image, ImageFont
-from typing import Mapping, Optional, TypedDict
+from typing import Mapping, TypedDict
 
 Datetime = datetime.datetime
 
@@ -49,16 +49,6 @@ Position = tuple[str, str]
 ObservationData = tuple[Mapping[str, ObservationDataItem], tuple[str, str], str, str]
 ForecastData = tuple[Mapping[str, ForecastDataItem], tuple[str, str], str, str]
 RadiationData = Mapping[str, RadiationDataItem]
-
-
-class SingleSensorData(TypedDict):
-  temperature: float
-  humidity: float
-  battery: float
-  rssi: Optional[float]
-
-
-SensorData = Mapping[str, SingleSensorData]
 
 
 class WeatherWarning(Enum):

@@ -111,11 +111,6 @@ def get_observation_panel(observation_data: Optional[ObservationData], radiation
   # Warning icon
   draw_utils.draw_warning_icons(latest["t2m"], latest_date_local, images, image, weather_icon, (right_column_x_base, data_y_base), config)
 
-  # Warning icon
-  # if (utils.show_temperature_warning_icon(latest["t2m"], latest_date_local, config)):
-  #   warning_icon = icons.get_scaled_image(images['misc']['warning'], 60)
-  #   image.paste(warning_icon, (right_column_x_base + weather_icon.width - 2*warning_icon.width//3, data_y_base + weather_icon.height - 2*warning_icon.height//3), warning_icon)
-
   # Borders
   if (config.draw_panel_borders):
     draw.polygon([(0, 0), (x_size-1, 0), (x_size-1, y_size-1), (0, y_size-1), (0, 0)])

@@ -5,11 +5,7 @@ from typing import Any, Literal, Optional, Union, List, Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, HttpUrl, field_validator, model_validator
 from uuid import UUID, uuid4
-
-try:
-  import tomllib
-except ModuleNotFoundError:
-  import tomli as tomllib
+import tomllib
 
 
 class SensorBase(BaseModel):

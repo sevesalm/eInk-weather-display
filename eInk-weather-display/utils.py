@@ -41,7 +41,7 @@ def check_raqm_support(logger: logging.Logger) -> None:
   if RAQM_SUPPORTED:
     logger.info("Raqm support detected")
   else:
-    logger.warn('Raqm not supported')
+    logger.warning('Raqm not supported')
 
 
 def check_python_version() -> None:

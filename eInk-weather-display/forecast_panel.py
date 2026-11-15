@@ -58,7 +58,6 @@ def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fo
     if (data['SmartSymbol'] != 9):
       weather_icon = icons.get_scaled_image(get_smart_symbol_icon(data['SmartSymbol'], is_daylight, images, fonts, config), icon_width)
     else:
-      logger.info(f"SmartSymbol: {data['SmartSymbol']}, WeatherSymbol3: {data['WeatherSymbol3']}")
       logger.debug(f"SmartSymbol: {data['SmartSymbol']}, WeatherSymbol3: {data['WeatherSymbol3']}")
       weather_icon = icons.get_scaled_image(get_forecats_weather_icon(data['WeatherSymbol3'], is_daylight, images, fonts, config), icon_width)
 

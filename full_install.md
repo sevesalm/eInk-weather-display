@@ -107,4 +107,5 @@ Do the steps from the host machine:
 1. Install uv, Python and the Python dependencies on Raspberry: `scripts/install_deps.sh`
 1. Install host machine deps: `brew install librsvg`
 1. Convert SVG images: `mkdir -p eInk-weather-display/png_icons && scripts/convert.sh`
+1. Create `eInk-weather-display/config.toml` from [config_example.toml](eInk-weather-display/config_example.toml) and set `dev_mode = false` (and the `dev_mode_random_*` options to `false`). `scripts/deploy.sh` copies your local `config.toml` to the Raspberry as is, so a development config would be deployed too.
 1. Deploy: `scripts/deploy.sh`
