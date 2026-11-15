@@ -130,13 +130,13 @@ def get_home_assistant_sensor_data(config: AppConfig, logger: logging.Logger) ->
   # tojson, so quotes or backslashes in states or entity ids can't break the response.
   sensor_entries = []
   for sensor in ha_sensors:
-    sensor_entries.append(
-      f'{json.dumps(str(sensor.id))}: {{'
-      f'"temperature": states({json.dumps(sensor.temperature_sensor_id)}), '
-      f'"humidity": states({json.dumps(sensor.humidity_sensor_id)}), '
-      f'"battery": states({json.dumps(str(sensor.battery_sensor_id))})'
-      f'}}'
-    )
+    fields = [
+      f'"temperature": states({json.dumps(sensor.temperature_sensor_id)})',
+      f'"humidity": states({json.dumps(sensor.humidity_sensor_id)})',
+    ]
+    if sensor.battery_sensor_id is not None:
+      fields.append(f'"battery": states({json.dumps(sensor.battery_sensor_id)})')
+    sensor_entries.append(f'{json.dumps(str(sensor.id))}: {{{", ".join(fields)}}}')
 
   template_content = "{{ {" + ", ".join(sensor_entries) + "} | tojson }}"
   payload = {"template": template_content}
