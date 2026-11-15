@@ -65,6 +65,7 @@ tropical_night_temperature_warning_threshold = 20
 
 # Optional Home Assistant connection for reading sensor data.
 # Create a long-lived access token in Home Assistant under your user profile.
+# The token is sent with every request, so prefer an https:// URL where available.
 # [home_assistant]
 # url = "http://homeassistant.local:8123"
 # bearer_token = "YOUR_LONG_LIVED_ACCESS_TOKEN"
