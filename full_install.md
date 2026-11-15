@@ -93,8 +93,7 @@ Reboot and check that everything works and you can connect to Raspberry using SS
 Install dependencies on Raspberry Pi:
 
 1. Install [BCM2835 Driver](https://www.airspayce.com/mikem/bcm2835/)
-1. Install `python3-venv`: `sudo apt install python3-venv`
-1. Install `libpython3.13-dev`: `sudo apt install libpython3.13-dev`
+1. Install build tools for compiling Python packages with C extensions: `sudo apt install build-essential`
 1. Install `tmux`: `sudo apt install tmux`
 1. Install `Raqm`: `sudo apt install libraqm0`
 
@@ -105,7 +104,7 @@ Install dependencies on Raspberry Pi:
 Do the steps from the host machine:
 
 1. Add your configuration to `scripts/config.env` file. Please see [scripts/config.env.example](scripts/config.env.example) for an example.
-1. Install venv and Pip dependencies: `scripts/install_deps.sh`
+1. Install uv, Python and the Python dependencies on Raspberry: `scripts/install_deps.sh`
 1. Install host machine deps: `brew install librsvg`
-1. Convert SVG images: `scripts/convert.sh`
+1. Convert SVG images: `mkdir -p eInk-weather-display/png_icons && scripts/convert.sh`
 1. Deploy: `scripts/deploy.sh`

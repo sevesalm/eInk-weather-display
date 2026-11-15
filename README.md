@@ -71,10 +71,7 @@ Support for the 7.8" eInk has been added. The shared library [eInk-weather-displ
 
 ## Development
 
-Running tests:
-
-1. `cd eInk-weather-display`
-1. `python -m unittest`
+See [DEVELOPMENT.md](DEVELOPMENT.md) for how to run the tests, lint the code and run the app locally without the display or sensors.
 
 ## Used licenses
 
