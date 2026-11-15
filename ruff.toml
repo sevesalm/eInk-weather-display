@@ -1,0 +1,10 @@
+line-length = 250
+indent-width = 2
+target-version = "py314"
+
+[lint]
+# Same rule families flake8 checks by default (pyflakes + pycodestyle errors/warnings)
+select = ["E", "F", "W"]
+
+[format]
+quote-style = "preserve"

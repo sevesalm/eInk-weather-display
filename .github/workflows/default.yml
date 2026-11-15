@@ -19,7 +19,7 @@ jobs:
         run: pip install -r requirements/development.txt
       - name: Check the code compiles
         run: python -m compileall -q .
-      - name: Lint with flake8
-        run: flake8
+      - name: Lint with ruff
+        run: ruff check
       - name: Run tests
         run: python -m unittest discover -s eInk-weather-display
