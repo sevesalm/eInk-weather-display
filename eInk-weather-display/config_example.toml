@@ -42,10 +42,10 @@ epd_voltage = 1370
 # 4, 2 or 1 bits per pixel
 bits_per_pixel = 4
 
-# Minutes between doing a refresh with full init
+# Minutes between doing a refresh with full init (1-60, should divide 60 evenly)
 refresh_full_interval = 60
 
-# Minutes between doing a fast non-init refresh
+# Minutes between doing a fast non-init refresh (1-60, should divide 60 evenly)
 refresh_partial_interval = 1
 
 # Show a warning icon if the temperature is >= this value
@@ -60,7 +60,7 @@ low_temperature_warning_threshold = -20
 # Show an extreme warning icon if the temperature is <= this value
 extreme_low_temperature_warning_threshold = -30
 
-# Show a warning icon if the temperature is >= this value between 21.00 and 03.00 (exclusive)
+# Show a warning icon if the temperature is >= this value between 22.00 and 08.00
 tropical_night_temperature_warning_threshold = 20
 
 # Optional Home Assistant connection for reading sensor data.

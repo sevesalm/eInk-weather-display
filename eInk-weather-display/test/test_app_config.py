@@ -98,6 +98,39 @@ class TestAppConfig(unittest.TestCase):
     with self.assertRaisesRegex(ConfigLoadError, 'low_temperature_warning_threshold must be <='):
       load_config(str(config_file))
 
+  def test_invalid_tropical_night_threshold_fails(self):
+    invalid = VALID_CONFIG.replace(
+      "tropical_night_temperature_warning_threshold = 20",
+      "tropical_night_temperature_warning_threshold = 26",
+    )
+    config_file = self._write_temp_config(invalid)
+    with self.assertRaisesRegex(ConfigLoadError, 'tropical_night_temperature_warning_threshold must be'):
+      load_config(str(config_file))
+
+  def test_empty_string_fails(self):
+    invalid = VALID_CONFIG.replace('fmi_location = "Helsinki"', 'fmi_location = "  "')
+    config_file = self._write_temp_config(invalid)
+    with self.assertRaisesRegex(ConfigLoadError, r'fmi_location\s+String should have at least 1 character'):
+      load_config(str(config_file))
+
+  def test_latitude_out_of_range_fails(self):
+    invalid = VALID_CONFIG.replace('override_latitude = 60.1699', 'override_latitude = 91')
+    config_file = self._write_temp_config(invalid)
+    with self.assertRaisesRegex(ConfigLoadError, r'override_latitude\s+Input should be less than or equal to 90'):
+      load_config(str(config_file))
+
+  def test_refresh_interval_over_60_fails(self):
+    invalid = VALID_CONFIG.replace('refresh_full_interval = 60', 'refresh_full_interval = 120')
+    config_file = self._write_temp_config(invalid)
+    with self.assertRaisesRegex(ConfigLoadError, r'refresh_full_interval\s+Input should be less than or equal to 60'):
+      load_config(str(config_file))
+
+  def test_duplicate_sensor_names_fail(self):
+    duplicate = SENSORS_CONFIG.replace('name = "Living room"', 'name = "Out"')
+    config_file = self._write_temp_config(VALID_CONFIG + duplicate)
+    with self.assertRaisesRegex(ConfigLoadError, 'Sensor names must be unique, duplicates: Out'):
+      load_config(str(config_file))
+
   def test_sensors_parsed_by_type(self):
     config_file = self._write_temp_config(VALID_CONFIG + SENSORS_CONFIG)
     config = load_config(str(config_file))
