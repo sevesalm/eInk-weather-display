@@ -7,11 +7,10 @@ from info_panel import get_info_panel
 from forecast_panel import get_forecasts_panel
 from celestial_panel import get_celestial_panel
 from sensor_panel import get_sensor_panel_new
-from sensor_data import get_ruuvi_sensor_data
 from timeit import default_timer as timer
 from typing import Optional
 from type_alias import Icons, Fonts
-from multiprocessing import Process
+from multiprocessing import get_context
 from weather_data import get_observation_data, get_forecast_data, get_radiation_data
 from app_config import AppConfig
 from home_assistant import get_sensor_data
@@ -79,7 +78,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Ap
     if (epd_so):
       start_refresh_time = timer()
       try:
-        p = Process(target=epd_so.draw_image_8bit, args=(image_bytes, ctypes.c_bool(init), ctypes.c_int(config.epd_voltage), config.bits_per_pixel, c_logger))
+        p = get_context('fork').Process(target=epd_so.draw_image_8bit, args=(image_bytes, ctypes.c_bool(init), ctypes.c_int(config.epd_voltage), config.bits_per_pixel, c_logger))
         p.start()
         p.join(PROCESS_TIMEOPUT)
         logger.debug(f'Exit code: {p.exitcode}')
