@@ -11,4 +11,4 @@ ssh $HOSTNAME "test -x $UV || (set -o pipefail && curl -LsSf https://astral.sh/u
 ssh $HOSTNAME "mkdir -p $VENV_ROOT_DIRECTORY"
 rsync -av --delete requirements $HOSTNAME:$VENV_ROOT_DIRECTORY
 ssh $HOSTNAME "cd $VENV_ROOT_DIRECTORY && $UV venv --clear --python $PYTHON_VERSION $VENV_NAME"
-ssh $HOSTNAME "$UV pip install --python $VENV_DIRECTORY -r $VENV_ROOT_DIRECTORY/requirements/raspberry.txt && rm -rf $VENV_ROOT_DIRECTORY/requirements"
+ssh $HOSTNAME "$UV pip install --compile-bytecode --python $VENV_DIRECTORY -r $VENV_ROOT_DIRECTORY/requirements/raspberry.txt && rm -rf $VENV_ROOT_DIRECTORY/requirements"
