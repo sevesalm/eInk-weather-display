@@ -1,4 +1,4 @@
-# Raspberry Pi e-Ink Weather Data Display
+# Raspberry Pi e-Ink Weather Display
 
 ![Badge](https://github.com/sevesalm/eInk-weather-display/actions/workflows/default.yml/badge.svg)
 
@@ -33,7 +33,7 @@ The image below shows the display with fake data. It was a design decision to ke
 
 The development can be done on the host machine and the app can be deployed remotely using the provided scripts.
 
-For detailed instructions on how to setup RaspberryPi and install all dependencies, please see [Full Instructions](full_install.md). If you have Raspberry Pi up and running, skip to section [Install base dependencies](full_install.md#install-base-dependencies).
+For detailed instructions on how to setup RaspberryPi and install all dependencies, please see [Full Instructions](full_install.md). If you have Raspberry Pi up and running, skip to section [Install eInk Weather Display](full_install.md#install-eink-weather-display).
 
 The script [scripts/deploy.sh](scripts/deploy.sh) is a small helper which copies all the files over SSH to Raspberry Pi, activates venv and starts the application remotely. The script [scripts/compile.sh](scripts/compile.sh) allows compiling the shared C libraries on Raspberry Pi. The script [scripts/convert.sh](scripts/convert.sh) allows converting SVG icons to PNG format to be used by the application.
 

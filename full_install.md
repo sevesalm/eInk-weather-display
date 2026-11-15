@@ -1,105 +1,109 @@
-# Raspberry
-
-## Setup Raspberry in headeless mode
+# Setup Raspberry Pi in headless mode
 
 See: [Raspberry Pi Documentation](https://www.raspberrypi.com/documentation/computers/getting-started.html) for a more detailed guide.
 
-### Install Raspberry Pi OS on MicroSD card
+_Note_: The BCM2835 library does not work on Raspberry Pi 5. Use Raspberry Pi Zero 2 W, 3 or 4 (64-bit).
+
+## Install Raspberry Pi OS on MicroSD card
 
 _Note_: Be very careful when using `dd` command below. Wrong target device (`of` parameter) might do serious harm.
 
-1. Download the [OS Image](https://www.raspberrypi.com/software/)
+1. Download the [OS Image](https://www.raspberrypi.com/software/operating-systems). This manual has been tested with 64-bit Raspberry Pi OS 13 (trixie), image dated 6 Oct 2026, kernel 6.18.
+1. Uncompress the `.xz` file so you get the contained `.img` image.
 1. List your disks: `diskutil list`
-1. Unmount the MicroSD :`diskutil unmountDisk /dev/diskN`
+1. Unmount the MicroSD: `diskutil unmountDisk /dev/diskN`
 1. Write the image: `sudo dd bs=1m if=path_of_your_image.img of=/dev/rdiskN; sync`
-1. Eject the MicroSD: `sudo diskutil eject /dev/rdiskN`
 
-### Enable WiFi and SSH
+## Enable WiFi and SSH
 
-Create `wpa_supplicant.conf`:
+After `dd` has finished, macOS usually mounts the `bootfs` partition of the MicroSD at `/Volumes/bootfs`. If it does not, mount it: `diskutil mountDisk /dev/diskN`. The `network-config` and `user-data` files edited below are in that partition.
 
-```text
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-update_config=1
-country=FI
+Edit the `network-config` by adding the following:
 
-network={
-    ssid="[WiFi SSID name]"
-    psk="[Wifi Password]"
-}
+```yaml
+network:
+  version: 2
+  wifis:
+    wlan0:
+      dhcp4: true
+      optional: true
+      regulatory-domain: FI         # Replace with your country code
+      access-points:
+        "MY SSID":                  # Replace with your SSID
+          password: "mypassword"    # Replace with your WiFi password
 ```
 
-Create empty `ssh` file in the root.
+Replace the `user-data` contents with the following and replace the `<PLACEHOLDERS>` (including the angle brackets). The config installs BCM2835 library version 1.77. Newer versions may also work.
 
-### Enable static IP
-
-Edit `/etc/dhcpcd.conf` and use values for your own use case:
-
-```text
-interface wlan0
-static ip_address=192.168.0.253/24
-static routers=192.168.0.1
-static domain_name_servers=192.168.0.1
+```yaml
+#cloud-config
+hostname: <HOSTNAME>
+timezone: <TIMEZONE>   # e.g. Europe/Helsinki
+users:
+- name: <USERNAME>
+  groups: [sudo, gpio, spi, i2c, video]
+  shell: /bin/bash
+  sudo: ALL=(ALL) NOPASSWD:ALL
+  lock_passwd: true
+  ssh_authorized_keys:
+  - <PUBLIC_KEY>       # contents of ~/.ssh/id_ed25519.pub
+ssh_pwauth: false
+disable_root: true
+package_update: true
+package_upgrade: true
+packages:
+- unattended-upgrades
+- build-essential
+- wget
+- tmux
+- libraqm0
+- vim
+write_files:
+- path: /etc/ssh/sshd_config.d/10-hardening.conf
+  permissions: '0644'
+  content: |
+    PermitRootLogin no
+    PasswordAuthentication no
+    KbdInteractiveAuthentication no
+    AuthenticationMethods publickey
+    X11Forwarding no
+runcmd:
+- [systemctl, enable, --now, ssh]
+- [raspi-config, nonint, do_spi, "0"]
+- |
+  set -e
+  cd /tmp
+  wget -q https://www.airspayce.com/mikem/bcm2835/bcm2835-1.77.tar.gz
+  tar xzf bcm2835-1.77.tar.gz
+  cd bcm2835-1.77
+  ./configure
+  make
+  make install
+power_state:
+  mode: reboot
+  message: Rebooting to apply config.txt changes
+  condition: true
 ```
 
-### User account
+_Note_: SPI is enabled with `raspi-config` in `runcmd` instead of the `rpi` module, because the `rpi` module reboots immediately and interrupts the package installation. `power_state` reboots once after cloud-init has finished.
 
-1. Update Vim: `sudo apt update; sudo apt install vim`
-1. Create user: `sudo useradd [USERNAME]`
-1. Set password: `sudo passwd [USERNAME]`
-1. Copy SSH key from host: `ssh-copy-id -i [KEYFILE] [USERNAME]@[RASPBERRY_IP]`
-1. Add God Powers: `sudo visudo` and add: `[USERNAME] ALL=(ALL) NOPASSWD: ALL`
-1. Remove default user: `sudo deluser --remove-home pi`
+Eject the MicroSD: `diskutil eject /dev/diskN` and insert in Raspberry Pi and turn it on.
 
-### Hosts and Hostname
+## Verify
 
-1. Add `127.0.0.1 localhost raspberrypi` to `/etc/hosts`
+Start up the Raspberry Pi. The first boot can take several minutes as cloud-init upgrades packages and compiles the BCM2835 library, and then reboots once automatically. Do not power off or reboot it yourself during that time. Then check the setup:
 
-### Configure SSH
+1. Connect: `ssh <USERNAME>@<HOSTNAME>.local`
+1. Wait for cloud-init to finish: `cloud-init status --wait` (should print `status: done`)
+1. SPI is enabled: `ls /dev/spidev*` (should list `/dev/spidev0.0` and `/dev/spidev0.1`)
+1. BCM2835 is installed: `ls /usr/local/lib/libbcm2835.a`
+1. Timezone is set: `timedatectl`
 
-Edit `/etc/ssh/sshd_config`:
+If something failed, see `/var/log/cloud-init-output.log` and `/var/log/cloud-init.log`.
 
-```text
-PubkeyAcceptedKeyTypes ssh-ed25519,sk-ssh-ed25519@openssh.com
-PermitRootLogin no
-PermitEmptyPasswords no
-PubkeyAuthentication yes
-PasswordAuthentication no
-ChallengeResponseAuthentication no
-KerberosAuthentication no
-GSSAPIAuthentication no
-PrintMotd no
-X11Forwarding no
-UsePAM no
-AcceptEnv LANG LC_*
+# Setup and Deploy
 
-# AllowUsers [USERNAME]
-```
-
-Restart the SSH daemon: `sudo service ssh restart`
-
-### Set localization
-
-`sudo raspi-config`
-
-- Timezone
-
-### Verify
-
-Reboot and check that everything works and you can connect to Raspberry using SSH.
-
-## Install base dependencies
-
-Install dependencies on Raspberry Pi:
-
-1. Install [BCM2835 Driver](https://www.airspayce.com/mikem/bcm2835/)
-1. Install build tools for compiling Python packages with C extensions: `sudo apt install build-essential`
-1. Install `tmux`: `sudo apt install tmux`
-1. Install `Raqm`: `sudo apt install libraqm0`
-
-## Setup and Deploy
-
-### Install eInk-weather-display
+## Install eInk Weather Display
 
 Do the steps from the host machine:
 
