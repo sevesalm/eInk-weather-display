@@ -18,6 +18,7 @@ FORECAST_PARAMETERS = ['Temperature', 'WindSpeedMS', 'WindDirection', 'TotalClou
 FORECAST_QUERY = 'fmi::forecast::harmonie::surface::point::multipointcoverage'
 RADIATION_QUERY = 'fmi::observations::radiation::multipointcoverage'
 RADIATION_PARAMETERS = ['dir_1min']
+REQUEST_TIMEOUT = 10
 
 
 def split_in_chunks(data: List, size: int):
@@ -37,7 +38,7 @@ def fetch_data(query_type: str, extra_params: Dict[str, str] = {}) -> et.Element
 
   params = base_params | extra_params
 
-  response = requests.get(FMI_API_URL, params=params)
+  response = requests.get(FMI_API_URL, params=params, timeout=REQUEST_TIMEOUT)
   response.raise_for_status()
   return et.fromstring(response.content)
 
