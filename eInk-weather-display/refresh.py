@@ -1,5 +1,6 @@
 import ctypes
 import logging
+import sys
 from PIL import Image, ImageDraw
 from utils import get_config_override_position
 from observation_panel import get_observation_panel
@@ -16,6 +17,11 @@ from app_config import AppConfig
 from sensor_data import get_sensor_data
 
 PROCESS_TIMEOUT = 10  # In seconds
+
+
+def draw_image(epd_so: ctypes.CDLL, *args: object) -> None:
+  # Process discards the target's return value, so pass the C return code on as the exit code
+  sys.exit(epd_so.draw_image_8bit(*args))
 
 
 def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: AppConfig, epd_so: Optional[ctypes.CDLL], init: bool) -> None:
@@ -78,12 +84,16 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Ap
     if (epd_so):
       start_refresh_time = timer()
       try:
-        p = get_context('fork').Process(target=epd_so.draw_image_8bit, args=(image_bytes, ctypes.c_bool(init), ctypes.c_int(config.epd_voltage), config.bits_per_pixel, c_logger))
+        p = get_context('fork').Process(target=draw_image, args=(epd_so, image_bytes, ctypes.c_bool(init), ctypes.c_int(config.epd_voltage), config.bits_per_pixel, c_logger))
         p.start()
         p.join(PROCESS_TIMEOUT)
         logger.debug(f'Exit code: {p.exitcode}')
         if (p.exitcode is None):
-          logger.error('An error occured during draw_image_8bit()')
+          logger.error(f'draw_image_8bit() timed out after {PROCESS_TIMEOUT} s')
+        elif (p.exitcode < 0):
+          logger.error(f'draw_image_8bit() was killed by signal {-p.exitcode}')
+        elif (p.exitcode != 0):
+          logger.error(f'draw_image_8bit() failed with return code {p.exitcode}')
         p.terminate()
       except Exception as e:
         logger.exception('Unexpected error: %s', str(e))

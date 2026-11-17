@@ -73,7 +73,9 @@ def from_8bit_to_2bit(image: Image.Image) -> bytes:
 def get_epd_data(config: AppConfig) -> tuple[Optional[ctypes.CDLL], tuple[int, int]]:
   if (config.dev_mode):
     return (None, (1872, 1404))
-  return (ctypes.CDLL("lib/epd78.so"), (1872, 1404))
+  epd_so = ctypes.CDLL("lib/epd78.so")
+  epd_so.draw_image_8bit.restype = ctypes.c_int
+  return (epd_so, (1872, 1404))
 
 
 def get_fonts(config: AppConfig) -> Fonts:
