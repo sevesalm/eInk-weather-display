@@ -55,23 +55,24 @@ def get_ruuvi_sensor_data(logger: logging.Logger, config: AppConfig, macs: list[
       from reactivex import operators as ops
       ruuvis = RuuviTagReactive(macs)
       ruuvi_emissions = ruuvis.get_subject()
-      missing_data = ruuvi_emissions.pipe(
-                        ops.map(lambda x: x[0]),  # Only the mac address
-                        ops.buffer_with_time(config.sensor_poll_timeout),  # Buffer for some time
-                        ops.map(lambda x: set(x)),  # Convert macs into a set
-                        ops.first(),
-                        ops.flat_map(lambda x: list(set(macs).difference(x))),  # type: ignore # Emit once per each missing mac
-                        ops.map(lambda x: (x, None))
-                      )
+      try:
+        missing_data = ruuvi_emissions.pipe(
+                          ops.map(lambda x: x[0]),  # Only the mac address
+                          ops.buffer_with_time(config.sensor_poll_timeout),  # Buffer for some time
+                          ops.map(lambda x: set(x)),  # Convert macs into a set
+                          ops.first(),
+                          ops.flat_map(lambda x: list(set(macs).difference(x))),  # type: ignore # Emit once per each missing mac
+                          ops.map(lambda x: (x, None))
+                        )
 
-      sensor_data = ruuvi_emissions.pipe(
-                      ops.merge(missing_data),
-                      ops.scan(lambda acc, x: acc | {x[0]: x[1]}, {}),
-                      ops.filter(lambda x: len(x.keys()) == len(macs)),
-                      ops.first()
-                    ).run()
-
-      ruuvis.stop()
+        sensor_data = ruuvi_emissions.pipe(
+                        ops.merge(missing_data),
+                        ops.scan(lambda acc, x: acc | {x[0]: x[1]}, {}),
+                        ops.filter(lambda x: len(x.keys()) == len(macs)),
+                        ops.first()
+                      ).run()
+      finally:
+        ruuvis.stop()
       logger.info('Sensor data received: %s', repr(sensor_data))
 
       readings: dict[str, SensorReading] = {}
