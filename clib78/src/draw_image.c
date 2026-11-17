@@ -74,7 +74,7 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
 
   if (bits_per_pixel == 8) {
     logger(LOG_LEVEL_INFO, L"EPD_IT8951_8bp_Refresh()");
-    EPD_IT8951_8bp_Refresh(image_8bit, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr);
+    EPD_IT8951_8bp_Refresh(image_8bit, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr, true);
     log_fmt(logger, LOG_LEVEL_INFO, L"Timing: upload %ld ms", lap_ms(&lap));
   } else if (bits_per_pixel == 4 || bits_per_pixel == 2 || bits_per_pixel == 1) {
     log_fmt(logger, LOG_LEVEL_INFO, L"from_8bit_to_%dbit()", bits_per_pixel);

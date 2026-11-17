@@ -475,11 +475,12 @@ static void EPD_IT8951_HostAreaPackedPixelWrite_4bp(IT8951_Load_Img_Info *Load_I
 /******************************************************************************
 function :	EPD_IT8951_HostAreaPackedPixelWrite_8bp
 parameter:
-Precautions: Can't Packed Write
 ******************************************************************************/
 static void EPD_IT8951_HostAreaPackedPixelWrite_8bp(IT8951_Load_Img_Info *Load_Img_Info,
-                                                    IT8951_Area_Img_Info *Area_Img_Info) {
+                                                    IT8951_Area_Img_Info *Area_Img_Info,
+                                                    bool Packed_Write) {
   UWORD Source_Buffer_Width, Source_Buffer_Height;
+  UDOUBLE Source_Buffer_Length;
 
   UWORD *Source_Buffer = (UWORD *)Load_Img_Info->Source_Buffer_Addr;
   EPD_IT8951_SetTargetMemoryAddr(Load_Img_Info->Target_Memory_Addr);
@@ -488,13 +489,19 @@ static void EPD_IT8951_HostAreaPackedPixelWrite_8bp(IT8951_Load_Img_Info *Load_I
   // from byte to word
   Source_Buffer_Width = Area_Img_Info->Area_W / 2;
   Source_Buffer_Height = Area_Img_Info->Area_H;
+  Source_Buffer_Length = Source_Buffer_Width * Source_Buffer_Height;
 
-  for (UDOUBLE i = 0; i < Source_Buffer_Height; i++) {
-    for (UDOUBLE j = 0; j < Source_Buffer_Width; j++) {
-      EPD_IT8951_WriteData(*Source_Buffer);
-      Source_Buffer++;
+  if (Packed_Write == true) {
+    EPD_IT8951_WriteMultiData(Source_Buffer, Source_Buffer_Length);
+  } else {
+    for (UDOUBLE i = 0; i < Source_Buffer_Height; i++) {
+      for (UDOUBLE j = 0; j < Source_Buffer_Width; j++) {
+        EPD_IT8951_WriteData(*Source_Buffer);
+        Source_Buffer++;
+      }
     }
   }
+
   EPD_IT8951_LoadImgEnd();
 }
 
@@ -762,7 +769,7 @@ function :	EPD_IT8951_8bp_Refresh
 parameter:
 ******************************************************************************/
 void EPD_IT8951_8bp_Refresh(UBYTE *Frame_Buf, UWORD X, UWORD Y, UWORD W, UWORD H, bool Hold,
-                            UDOUBLE Target_Memory_Addr) {
+                            UDOUBLE Target_Memory_Addr, bool Packed_Write) {
   IT8951_Load_Img_Info Load_Img_Info;
   IT8951_Area_Img_Info Area_Img_Info;
 
@@ -779,7 +786,7 @@ void EPD_IT8951_8bp_Refresh(UBYTE *Frame_Buf, UWORD X, UWORD Y, UWORD W, UWORD H
   Area_Img_Info.Area_W = W;
   Area_Img_Info.Area_H = H;
 
-  EPD_IT8951_HostAreaPackedPixelWrite_8bp(&Load_Img_Info, &Area_Img_Info);
+  EPD_IT8951_HostAreaPackedPixelWrite_8bp(&Load_Img_Info, &Area_Img_Info, Packed_Write);
 
   if (Hold == true) {
     EPD_IT8951_Display_Area(X, Y, W, H, GC16_Mode);
