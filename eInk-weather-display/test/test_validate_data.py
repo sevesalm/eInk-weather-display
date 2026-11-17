@@ -1,7 +1,7 @@
 import logging
 import math
 import unittest
-from validate_data import validate_data, observation_data_mapping_schema, forecast_data_mapping_schema
+from validate_data import validate_data, observation_data_mapping_schema, radiation_data_mapping_schema, forecast_data_mapping_schema
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -49,6 +49,11 @@ class TestValidateData(unittest.TestCase):
       }
     }
     validate_data(data, observation_data_mapping_schema, logger)
+
+  def test_empty_data(self):
+    for schema in (observation_data_mapping_schema, radiation_data_mapping_schema, forecast_data_mapping_schema):
+      with self.assertRaises(Exception):
+        validate_data({}, schema, logger)
 
 
 if __name__ == '__main__':

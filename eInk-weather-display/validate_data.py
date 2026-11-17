@@ -13,6 +13,7 @@ def validate_data(data: Any, schema: Dict, logger: Logger) -> None:
 
 observation_data_mapping_schema = {
   'type': 'object',
+  'minProperties': 1,
   'additionalProperties': {
     'type': 'object',
     'required': ['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wg_10min', 'n_man', 'wawa'],
@@ -48,6 +49,7 @@ observation_data_mapping_schema = {
 
 radiation_data_mapping_schema = {
   'type': 'object',
+  'minProperties': 1,
   'additionalProperties': {
     'type': 'object',
     'required': ['dir_1min'],
@@ -62,6 +64,7 @@ radiation_data_mapping_schema = {
 
 forecast_data_mapping_schema = {
   'type': 'object',
+  'minProperties': 1,
   'additionalProperties': {
     'type': 'object',
     'required': ['Temperature', 'WindSpeedMS', 'WindDirection', 'TotalCloudCover', 'WeatherSymbol3', 'SmartSymbol'],
