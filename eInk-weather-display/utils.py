@@ -11,6 +11,7 @@ import logging
 from app_config import AppConfig
 
 NAN_SYMBOL = '?'
+FULL_REFRESH_MINUTE_OFFSET = 5
 
 TABULAR_NUMBERS_FEATURES = ["tnum"]  # OpenType feature for tabular numbers
 RAQM_SUPPORTED = features.check_feature('raqm')
@@ -181,3 +182,14 @@ def get_next_forecast_start_timestamp() -> Datetime:
   new_hour = ((now.hour-3)//6 + 1) * 6 + 3
   new_time = (now + timedelta(hours=new_hour - now.hour)).replace(minute=0, second=0, microsecond=0).astimezone(tz=None)
   return new_time
+
+
+def get_latest_full_refresh_slot(now: Datetime, interval: int) -> Datetime:
+  '''Latest scheduled full refresh time at or before now. Slots are at minutes 5, 5 + interval, ... of each hour.'''
+  hour = now.replace(minute=0, second=0, microsecond=0)
+  return hour + timedelta(minutes=now.minute - (now.minute - FULL_REFRESH_MINUTE_OFFSET) % interval)
+
+
+def should_full_refresh(now: Datetime, last_full_refresh: Optional[Datetime], interval: int) -> bool:
+  '''True when no full refresh has run since the latest slot, so a skipped slot is caught up on the next run.'''
+  return last_full_refresh is None or last_full_refresh < get_latest_full_refresh_slot(now, interval)
