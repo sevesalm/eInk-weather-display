@@ -52,5 +52,6 @@ To render the display locally, see [DEVELOPMENT.md](DEVELOPMENT.md#running-the-a
 - FMI data and icon mapping (`icon_mapping.py`, [weather_icon_codes.md](weather_icon_codes.md)) are Finland-specific.
 - `HomeAssistant` sensors fetch real data even in dev mode; random sensor data is only generated for `Ruuvi` sensors.
 - Don't commit `config.toml`, `scripts/config.env`, `png_icons/`, `image.png` or `logger.log`.
+- Write code reviews and similar reports as Markdown files in `reviews/` (gitignored), not in the repo root.
 - The `.so` files can't be rebuilt locally; C changes must be compiled on the Pi with `scripts/compile.sh`, which copies the results back into `eInk-weather-display/lib/`.
 - `deploy.sh` and `compile.sh` act on a real device over SSH; don't run them unless asked.
