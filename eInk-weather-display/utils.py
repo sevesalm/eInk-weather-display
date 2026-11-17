@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 import logging
 from app_config import AppConfig
 from paths import APP_DIR
+import icons
 
 NAN_SYMBOL = '?'
 FULL_REFRESH_MINUTE_OFFSET = 5
@@ -108,11 +109,11 @@ def get_icon_variant(is_daylight: bool, icon_set: DayNightIcons) -> Image.Image:
   return icon_set['day']
 
 
-def get_missing_weather_icon_icon(icon_index: Union[float, int], is_daylight: bool, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
-  icon = images['misc']['background_day'].copy() if is_daylight else images['misc']['background_night'].copy()
+def get_missing_weather_icon_icon(icon_index: Union[float, int], is_daylight: bool, size: int, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
+  icon = icons.get_scaled_image(images['misc']['background_day'] if is_daylight else images['misc']['background_night'], size)
   draw = ImageDraw.Draw(icon)
   text = "NaN" if math.isnan(icon_index) else str(icon_index)
-  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=get_features())
+  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_sm'], fill="black", anchor='mm', features=get_features())
   return icon
 
 
@@ -123,7 +124,7 @@ def get_cloud_cover_icon(cloud_cover: float, images: Icons, fonts: Fonts, config
   icon = images['misc']['cloud_cover_0'].copy()
   draw = ImageDraw.Draw(icon)
   text = "NaN" if math.isnan(icon_index) else str(icon_index)
-  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=get_features())
+  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_xxs'], fill="black", anchor='mm', features=get_features())
   return icon
 
 

@@ -22,7 +22,7 @@ def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fo
     logger.error('Missing data')
     utils.draw_title(draw, fonts['font_sm'], 'FORECAST', 'MISSING DATA', fonts['font_xxs'])
     return image
-  icon_width = 200
+  icon_width = icons.FORECAST_ICON_SIZE
   (forecasts, position, position_name, _) = forecast_data
   count = len(forecasts.keys())
 
@@ -35,9 +35,9 @@ def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fo
   x_step = (x_size - icon_column_width)//count
   x_base = x_step//2 + icon_column_width
 
-  temperature_icon = icons.get_scaled_image(images['misc']['temperature'], 70)
+  temperature_icon = images['misc']['temperature']
   image.paste(temperature_icon, (10, data_y_base + 290), temperature_icon)
-  wind_speed_icon = icons.get_scaled_image(images['misc']['wind'], 70)
+  wind_speed_icon = images['misc']['wind']
   image.paste(wind_speed_icon, (10, data_y_base + 370), wind_speed_icon)
 
   for date, i in zip(dates, range(len(dates))):
@@ -56,10 +56,10 @@ def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fo
     icon_position = (x_base + i*x_step - icon_width//2, data_y_base + 80)
     # WeatherSymbol3 seems to have more accurate fog data
     if (data['SmartSymbol'] != 9):
-      weather_icon = icons.get_scaled_image(get_smart_symbol_icon(data['SmartSymbol'], is_daylight, images, fonts, config), icon_width)
+      weather_icon = get_smart_symbol_icon(data['SmartSymbol'], is_daylight, images, fonts, config)
     else:
       logger.debug(f"SmartSymbol: {data['SmartSymbol']}, WeatherSymbol3: {data['WeatherSymbol3']}")
-      weather_icon = icons.get_scaled_image(get_forecats_weather_icon(data['WeatherSymbol3'], is_daylight, images, fonts, config), icon_width)
+      weather_icon = get_forecats_weather_icon(data['WeatherSymbol3'], is_daylight, images, fonts, config)
 
     image.paste(weather_icon, icon_position, weather_icon)
 
@@ -74,14 +74,13 @@ def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fo
     # Cloud cover
     cloud_cover_raw = data["TotalCloudCover"]
     cloud_cover = math.nan if math.isnan(cloud_cover_raw) else cloud_cover_raw / 100 * 8
-    cloud_cover_icon = icons.get_scaled_image(utils.get_cloud_cover_icon(cloud_cover, images, fonts, config), 160)
+    cloud_cover_icon = utils.get_cloud_cover_icon(cloud_cover, images, fonts, config)
     image.paste(cloud_cover_icon, (x_base + i*x_step - cloud_cover_icon.width//2, data_y_base + 450), cloud_cover_icon)
 
     # Wind direction
     w_dir = data['WindDirection']
     if (not math.isnan(w_dir)):
-      wind_image = icons.get_scaled_image(images['misc']['wind_icon'], 160)
-      wind_image_rot = wind_image.rotate(-w_dir + 180, fillcolor=0xff, resample=Image.Resampling.BICUBIC)
+      wind_image_rot = images['misc']['wind_icon'].rotate(-w_dir + 180, fillcolor=0xff, resample=Image.Resampling.BICUBIC)
       image.paste(wind_image_rot, (x_base + i*x_step - wind_image_rot.width//2, data_y_base + 450), wind_image_rot)
 
   # Borders
@@ -93,11 +92,11 @@ def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fo
 
 def get_forecats_weather_icon(weather_symbol_3, is_daylight: bool, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   if (math.isnan(weather_symbol_3)):
-    return utils.get_missing_weather_icon_icon(math.nan, is_daylight, images, fonts, config)
+    return utils.get_missing_weather_icon_icon(math.nan, is_daylight, icons.FORECAST_ICON_SIZE, images, fonts, config)
 
   icon_index = round(weather_symbol_3)
   if (icon_index not in images['weather_symbol_3']):
-    return utils.get_missing_weather_icon_icon(icon_index, is_daylight, images, fonts, config)
+    return utils.get_missing_weather_icon_icon(icon_index, is_daylight, icons.FORECAST_ICON_SIZE, images, fonts, config)
 
   icon_set = images['weather_symbol_3'][icon_index]
   return utils.get_icon_variant(is_daylight, icon_set)
@@ -105,13 +104,13 @@ def get_forecats_weather_icon(weather_symbol_3, is_daylight: bool, images: Icons
 
 def get_smart_symbol_icon(smart_symbol, is_daylight: bool, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   if (math.isnan(smart_symbol)):
-    return utils.get_missing_weather_icon_icon(math.nan, is_daylight, images, fonts, config)
+    return utils.get_missing_weather_icon_icon(math.nan, is_daylight, icons.FORECAST_ICON_SIZE, images, fonts, config)
 
   icon_index = round(smart_symbol)
   icon_index = icon_index if icon_index < 100 else icon_index - 100
 
   if (icon_index not in images['smart_symbol']):
-    return utils.get_missing_weather_icon_icon(icon_index, is_daylight, images, fonts, config)
+    return utils.get_missing_weather_icon_icon(icon_index, is_daylight, icons.FORECAST_ICON_SIZE, images, fonts, config)
 
   icon_set = images['smart_symbol'][icon_index]
   return utils.get_icon_variant(is_daylight, icon_set)

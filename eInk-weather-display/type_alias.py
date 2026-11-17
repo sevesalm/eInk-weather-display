@@ -37,6 +37,7 @@ class DayNightIcons(TypedDict):
 
 class Icons(TypedDict):
     observation: Mapping[int, DayNightIcons]
+    observation_cloud_cover: Mapping[int, DayNightIcons]
     weather_symbol_3: Mapping[int, DayNightIcons]
     smart_symbol: Mapping[int, DayNightIcons]
     misc: Mapping[str, Image.Image]

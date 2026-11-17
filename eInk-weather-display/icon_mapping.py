@@ -130,35 +130,4 @@ smart_symbol_mapping = {
   67: {'day': 'partially_cloudy_hail_rain', 'night': 'partially_cloudy_hail_rain_night'}
 }
 
-misc_icons = [
-  'wind_icon',
-  'wind',
-  'temperature',
-  'temperature_feel',
-  'humidity',
-  'pressure',
-  'sunrise',
-  'sunset',
-  'signal_high',
-  'signal_med',
-  'signal_low',
-  'no_signal',
-  'battery_full',
-  'battery_75',
-  'battery_50',
-  'battery_25',
-  'battery_empty',
-  'cloud_cover_0',
-  'cloud_cover_1',
-  'cloud_cover_2',
-  'cloud_cover_3',
-  'cloud_cover_4',
-  'cloud_cover_5',
-  'cloud_cover_6',
-  'cloud_cover_7',
-  'cloud_cover_8',
-  'cloud_cover_9',
-  'warning'
-]
-
 # FMI symbol descriptions: https://www.ilmatieteenlaitos.fi/latauspalvelun-pikaohje
