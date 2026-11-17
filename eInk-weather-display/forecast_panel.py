@@ -78,9 +78,11 @@ def get_forecasts_panel(forecast_data: Optional[ForecastData], images: Icons, fo
     image.paste(cloud_cover_icon, (x_base + i*x_step - cloud_cover_icon.width//2, data_y_base + 450), cloud_cover_icon)
 
     # Wind direction
-    wind_image = icons.get_scaled_image(images['misc']['wind_icon'], 160)
-    wind_image_rot = wind_image.rotate(-data['WindDirection'] + 180, fillcolor=0xff, resample=Image.BICUBIC)
-    image.paste(wind_image_rot, (x_base + i*x_step - wind_image_rot.width//2, data_y_base + 450), wind_image_rot)
+    w_dir = data['WindDirection']
+    if (not math.isnan(w_dir)):
+      wind_image = icons.get_scaled_image(images['misc']['wind_icon'], 160)
+      wind_image_rot = wind_image.rotate(-w_dir + 180, fillcolor=0xff, resample=Image.BICUBIC)
+      image.paste(wind_image_rot, (x_base + i*x_step - wind_image_rot.width//2, data_y_base + 450), wind_image_rot)
 
   # Borders
   if (config.draw_panel_borders):
