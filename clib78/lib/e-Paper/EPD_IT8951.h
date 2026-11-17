@@ -31,9 +31,22 @@
 #ifndef __EPD_IT8951_H_
 #define __EPD_IT8951_H_
 
+#include <setjmp.h>
 #include <stdbool.h>
 
 #include "../Config/DEV_Config.h"
+
+// Timeouts for waiting on the controller. A full GC16 refresh normally takes 1-2 s.
+#define EPD_IT8951_BUSY_TIMEOUT_MS 5000
+#define EPD_IT8951_DISPLAY_READY_TIMEOUT_MS 10000
+
+// Abort codes, also used as return codes of draw_image_8bit()
+enum { EPD_IT8951_BUSY_TIMEOUT = 2, EPD_IT8951_DISPLAY_READY_TIMEOUT = 3 };
+
+// The caller must setjmp() this before calling any EPD_IT8951 function that talks to the controller.
+// On a timeout the driver longjmps back with EPD_IT8951_Abort_Code set to one of the codes above.
+extern jmp_buf EPD_IT8951_Abort_Jmp;
+extern int EPD_IT8951_Abort_Code;
 
 // INIT mode, for every init or some time after A2 mode refresh
 extern UBYTE INIT_Mode;

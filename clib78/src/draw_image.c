@@ -9,6 +9,21 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
     return 1;
   }
 
+  int result = 0;
+  // Volatile so the value is still valid after a longjmp from the driver
+  UBYTE *volatile image_converted = NULL;
+
+  // The driver jumps back here if the controller stops responding
+  if (setjmp(EPD_IT8951_Abort_Jmp) != 0) {
+    result = EPD_IT8951_Abort_Code;
+    if (result == EPD_IT8951_BUSY_TIMEOUT) {
+      log_fmt(logger, LOG_LEVEL_ERROR, L"Timed out after %d ms waiting for the busy pin", EPD_IT8951_BUSY_TIMEOUT_MS);
+    } else {
+      log_fmt(logger, LOG_LEVEL_ERROR, L"Timed out after %d ms waiting for the display to be ready", EPD_IT8951_DISPLAY_READY_TIMEOUT_MS);
+    }
+    goto cleanup;
+  }
+
   IT8951_Dev_Info Dev_Info = EPD_IT8951_Init(voltage, logger);
 
   // get some important info from Dev_Info structure
@@ -23,7 +38,8 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
     A2_Mode = 6;
   } else {
     logger(LOG_LEVEL_WARNING, L"Unsupported LUT_Version");
-    return 1;
+    result = 1;
+    goto cleanup;
   }
 
   if (init == true) {
@@ -35,45 +51,47 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
   if (bits_per_pixel == 8) {
     logger(LOG_LEVEL_INFO, L"EPD_IT8951_8bp_Refresh()");
     EPD_IT8951_8bp_Refresh(image_8bit, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr);
-  } else if (bits_per_pixel == 4) {
-    logger(LOG_LEVEL_INFO, L"from_8bit_to_4bit()");
-    UBYTE *image_4bit = from_8bit_to_4bit(image_8bit, panel_size);
-    logger(LOG_LEVEL_INFO, L"EPD_IT8951_4bp_Refresh()");
-    EPD_IT8951_4bp_Refresh(image_4bit, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr, true);
-    if (image_4bit != NULL) {
-      free(image_4bit);
+  } else if (bits_per_pixel == 4 || bits_per_pixel == 2 || bits_per_pixel == 1) {
+    log_fmt(logger, LOG_LEVEL_INFO, L"from_8bit_to_%dbit()", bits_per_pixel);
+    image_converted = bits_per_pixel == 4 ? from_8bit_to_4bit(image_8bit, panel_size)
+                    : bits_per_pixel == 2 ? from_8bit_to_2bit(image_8bit, panel_size)
+                                          : from_8bit_to_1bit(image_8bit, panel_size);
+    if (image_converted == NULL) {
+      logger(LOG_LEVEL_ERROR, L"Out of memory");
+      result = 1;
+      goto cleanup;
     }
-  } else if (bits_per_pixel == 2) {
-    logger(LOG_LEVEL_INFO, L"from_8bit_to_2bit()");
-    UBYTE *image_2bit = from_8bit_to_2bit(image_8bit, panel_size);
-    logger(LOG_LEVEL_INFO, L"EPD_IT8951_2bp_Refresh()");
-    EPD_IT8951_2bp_Refresh(image_2bit, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr, true);
-    if (image_2bit != NULL) {
-      free(image_2bit);
-    }
-  } else if (bits_per_pixel == 1) {
-    logger(LOG_LEVEL_INFO, L"from_8bit_to_1bit()");
-    UBYTE *image_1bit = from_8bit_to_1bit(image_8bit, panel_size);
-    logger(LOG_LEVEL_INFO, L"EPD_IT8951_1bp_Refresh()");
-    EPD_IT8951_1bp_Refresh(image_1bit, 0, 0, Panel_Width, Panel_Height, GC16_Mode, Memory_Addr, true);
-    if (image_1bit != NULL) {
-      free(image_1bit);
+    log_fmt(logger, LOG_LEVEL_INFO, L"EPD_IT8951_%dbp_Refresh()", bits_per_pixel);
+    if (bits_per_pixel == 4) {
+      EPD_IT8951_4bp_Refresh(image_converted, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr, true);
+    } else if (bits_per_pixel == 2) {
+      EPD_IT8951_2bp_Refresh(image_converted, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr, true);
+    } else {
+      EPD_IT8951_1bp_Refresh(image_converted, 0, 0, Panel_Width, Panel_Height, GC16_Mode, Memory_Addr, true);
     }
   } else {
     logger(LOG_LEVEL_ERROR, L"Unsupported bit depth!");
-    return 1;
+    result = 1;
+    goto cleanup;
   }
 
   logger(LOG_LEVEL_INFO, L"EPD_IT8951_WaitForDisplayReady()");
   EPD_IT8951_WaitForDisplayReady();
   EPD_IT8951_Sleep(logger);
-  DEV_Module_Exit();
   logger(LOG_LEVEL_INFO, L"Exiting cleanly");
-  return 0;
+
+cleanup:
+  // Runs in the caller's process, so release everything on every path
+  free(image_converted);
+  DEV_Module_Exit();
+  return result;
 }
 
 UBYTE *from_8bit_to_4bit(UBYTE *image, size_t size) {
   UBYTE *buffer = malloc(size / 2);
+  if (buffer == NULL) {
+    return NULL;
+  }
   UBYTE bit_mask = 0b11110000;
   for (size_t i = 0; i < size / 2; i++) {
     UBYTE val = ((image[2 * i] & bit_mask) >> 4) | ((image[2 * i + 1] & bit_mask) >> 0);
@@ -84,6 +102,9 @@ UBYTE *from_8bit_to_4bit(UBYTE *image, size_t size) {
 
 UBYTE *from_8bit_to_2bit(UBYTE *image, size_t size) {
   UBYTE *buffer = malloc(size / 4);
+  if (buffer == NULL) {
+    return NULL;
+  }
   UBYTE bit_mask = 0b11000000;
 
   for (size_t i = 0; i < size / 4; i++) {
@@ -96,6 +117,9 @@ UBYTE *from_8bit_to_2bit(UBYTE *image, size_t size) {
 
 UBYTE *from_8bit_to_1bit(UBYTE *image, size_t size) {
   UBYTE *buffer = malloc(size / 8);
+  if (buffer == NULL) {
+    return NULL;
+  }
   UBYTE bit_mask = 0b10000000;
   for (size_t i = 0; i < size / 8; i++) {
     UBYTE val = ((image[8 * i] & bit_mask) >> 7) | ((image[8 * i + 1] & bit_mask) >> 6) |

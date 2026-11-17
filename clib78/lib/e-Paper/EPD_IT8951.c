@@ -38,6 +38,20 @@ UBYTE GC16_Mode = 2;
 // A2_Mode's value is not fixed, is decide by firmware's LUT
 UBYTE A2_Mode = 6;
 
+jmp_buf EPD_IT8951_Abort_Jmp;
+int EPD_IT8951_Abort_Code = 0;
+
+static long EPD_IT8951_Elapsed_ms(const struct timespec *start) {
+  struct timespec now;
+  clock_gettime(CLOCK_MONOTONIC, &now);
+  return (now.tv_sec - start->tv_sec) * 1000 + (now.tv_nsec - start->tv_nsec) / 1000000;
+}
+
+static void EPD_IT8951_Abort(int code) {
+  EPD_IT8951_Abort_Code = code;
+  longjmp(EPD_IT8951_Abort_Jmp, 1);
+}
+
 /******************************************************************************
 function :	Software reset
 parameter:
@@ -57,10 +71,13 @@ function :	Wait until the busy_pin goes HIGH
 parameter:
 ******************************************************************************/
 static void EPD_IT8951_ReadBusy(void) {
-  UBYTE Busy_State = DEV_Digital_Read(EPD_BUSY_PIN);
+  struct timespec start;
+  clock_gettime(CLOCK_MONOTONIC, &start);
   // 0: busy, 1: idle
-  while (Busy_State == 0) {
-    Busy_State = DEV_Digital_Read(EPD_BUSY_PIN);
+  while (DEV_Digital_Read(EPD_BUSY_PIN) == 0) {
+    if (EPD_IT8951_Elapsed_ms(&start) > EPD_IT8951_BUSY_TIMEOUT_MS) {
+      EPD_IT8951_Abort(EPD_IT8951_BUSY_TIMEOUT);
+    }
   }
 }
 
@@ -332,9 +349,13 @@ function :	EPD_IT8951_WaitForDisplayReady
 parameter:
 ******************************************************************************/
 void EPD_IT8951_WaitForDisplayReady(void) {
+  struct timespec start;
+  clock_gettime(CLOCK_MONOTONIC, &start);
   // Check IT8951 Register LUTAFSR => NonZero Busy, Zero - Free
   while (EPD_IT8951_ReadReg(LUTAFSR)) {
-    // wait in idle state
+    if (EPD_IT8951_Elapsed_ms(&start) > EPD_IT8951_DISPLAY_READY_TIMEOUT_MS) {
+      EPD_IT8951_Abort(EPD_IT8951_DISPLAY_READY_TIMEOUT);
+    }
   }
 }
 

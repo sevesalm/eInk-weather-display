@@ -19,7 +19,7 @@ RPI:RPI_DEV RPI_epd
 TARGET = epd
 CC = gcc
 MSG = -g -O -ffunction-sections -fdata-sections -Wall
-CFLAGS += $(MSG)
+CFLAGS += $(MSG) -fPIC
 
 RPI_epd:${OBJ_O}
 	$(CC) $(CFLAGS) -shared -fPIC -D RPI $(OBJ_O) -o epd37.so $(RPI_DEV_C) $(LIB_RPI) $(DEBUG)
