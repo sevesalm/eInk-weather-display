@@ -119,6 +119,12 @@ class TestAppConfig(unittest.TestCase):
     with self.assertRaisesRegex(ConfigLoadError, r'override_latitude\s+Input should be less than or equal to 90'):
       load_config(str(config_file))
 
+  def test_zero_sensor_poll_timeout_fails(self):
+    invalid = VALID_CONFIG.replace('sensor_poll_timeout = 10', 'sensor_poll_timeout = 0')
+    config_file = self._write_temp_config(invalid)
+    with self.assertRaisesRegex(ConfigLoadError, r'sensor_poll_timeout\s+Input should be greater than 0'):
+      load_config(str(config_file))
+
   def test_refresh_interval_over_60_fails(self):
     invalid = VALID_CONFIG.replace('refresh_full_interval = 60', 'refresh_full_interval = 120')
     config_file = self._write_temp_config(invalid)

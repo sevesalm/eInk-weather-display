@@ -59,7 +59,7 @@ class AppConfig(BaseModel):
   draw_panel_borders: bool
   draw_borders: bool
 
-  sensor_poll_timeout: int = Field(ge=0)
+  sensor_poll_timeout: int = Field(gt=0)
 
   home_assistant: Optional[HomeAssistantConfig] = None
   # The sensor panel has room for at most 6 rows

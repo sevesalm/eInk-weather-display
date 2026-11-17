@@ -28,7 +28,7 @@ def split_in_chunks(data: List, size: int):
     return zip_longest(*args)
 
 
-def fetch_data(query_type: str, extra_params: Dict[str, str] = {}) -> et.Element:
+def fetch_data(query_type: str, extra_params: Optional[Dict[str, str]] = None) -> et.Element:
   base_params = {
     'service': 'WFS',
     'version': '2.0.0',
@@ -36,7 +36,7 @@ def fetch_data(query_type: str, extra_params: Dict[str, str] = {}) -> et.Element
     'storedQuery_id': query_type,
     }
 
-  params = base_params | extra_params
+  params = base_params | (extra_params or {})
 
   response = requests.get(FMI_API_URL, params=params, timeout=REQUEST_TIMEOUT)
   response.raise_for_status()
