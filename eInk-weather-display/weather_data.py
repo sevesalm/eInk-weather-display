@@ -11,7 +11,7 @@ import utils
 from validate_data import validate_data, observation_data_mapping_schema, radiation_data_mapping_schema, forecast_data_mapping_schema
 from app_config import AppConfig
 
-FMI_API_URL = 'http://opendata.fmi.fi/wfs/eng'
+FMI_API_URL = 'https://opendata.fmi.fi/wfs/eng'
 OBS_PARAMETERS = ['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wg_10min', 'n_man', 'wawa']
 OBS_QUERY = 'fmi::observations::weather::multipointcoverage'
 FORECAST_PARAMETERS = ['Temperature', 'WindSpeedMS', 'WindDirection', 'TotalCloudCover', 'WeatherSymbol3', 'SmartSymbol']
