@@ -1,8 +1,9 @@
 import logging
 import logging.handlers
 import LogFormatter
+from paths import APP_DIR
 
-DEFAULT_FILENAME = 'logger.log'
+DEFAULT_FILENAME = APP_DIR / 'logger.log'
 MAX_BYTES = 1024 * 1024
 BACKUP_COUNT = 3
 

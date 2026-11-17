@@ -10,6 +10,7 @@ from type_alias import Datetime, Fonts, Icons, DayNightIcons, WeatherWarning, Po
 from datetime import datetime, timedelta
 import logging
 from app_config import AppConfig
+from paths import APP_DIR
 
 NAN_SYMBOL = '?'
 FULL_REFRESH_MINUTE_OFFSET = 5
@@ -81,22 +82,23 @@ def get_peak_memory_mb() -> float:
 def get_epd_data(config: AppConfig) -> tuple[Optional[ctypes.CDLL], tuple[int, int]]:
   if (config.dev_mode):
     return (None, (1872, 1404))
-  epd_so = ctypes.CDLL("lib/epd78.so")
+  epd_so = ctypes.CDLL(str(APP_DIR / 'lib' / 'epd78.so'))
   epd_so.draw_image_8bit.restype = ctypes.c_int
   return (epd_so, (1872, 1404))
 
 
 def get_fonts(config: AppConfig) -> Fonts:
   font_mult = 4
+  font_dir = APP_DIR / 'fonts'
 
   return {
-    'font_lg': ImageFont.truetype('fonts/regular.woff', font_mult * 42),
-    'font_md': ImageFont.truetype('fonts/regular.woff', font_mult * 32),
-    'font_sm': ImageFont.truetype('fonts/regular.woff', font_mult * 18),
-    'font_sm_bold': ImageFont.truetype('fonts/bold.woff', font_mult * 18),
-    'font_xs': ImageFont.truetype('fonts/regular.woff', font_mult * 14),
-    'font_xxs': ImageFont.truetype('fonts/regular.woff', font_mult * 9),
-    'font_misc_md': ImageFont.truetype('fonts/misc.woff', font_mult * 32)
+    'font_lg': ImageFont.truetype(font_dir / 'regular.woff', font_mult * 42),
+    'font_md': ImageFont.truetype(font_dir / 'regular.woff', font_mult * 32),
+    'font_sm': ImageFont.truetype(font_dir / 'regular.woff', font_mult * 18),
+    'font_sm_bold': ImageFont.truetype(font_dir / 'bold.woff', font_mult * 18),
+    'font_xs': ImageFont.truetype(font_dir / 'regular.woff', font_mult * 14),
+    'font_xxs': ImageFont.truetype(font_dir / 'regular.woff', font_mult * 9),
+    'font_misc_md': ImageFont.truetype(font_dir / 'misc.woff', font_mult * 32)
   }
 
 

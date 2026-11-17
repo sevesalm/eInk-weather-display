@@ -36,7 +36,7 @@ python -m unittest discover -s eInk-weather-display  # CI: tests
 
 Run all four before finishing a change; CI ([.github/workflows/default.yml](.github/workflows/default.yml)) runs exactly these.
 
-To render the display locally, see [DEVELOPMENT.md](DEVELOPMENT.md#running-the-app-locally): generate PNG icons with `./scripts/convert.sh`, create `eInk-weather-display/config.toml` with `dev_mode = true` and the random-data flags, then run `python weather-display.py` **from inside `eInk-weather-display/`** (config, fonts, icons and `lib/` are resolved relative to the CWD). Output is `image.png`; check it visually after any drawing change.
+To render the display locally, see [DEVELOPMENT.md](DEVELOPMENT.md#running-the-app-locally): generate PNG icons with `./scripts/convert.sh`, create `eInk-weather-display/config.toml` with `dev_mode = true` and the random-data flags, then run `python eInk-weather-display/weather-display.py` (config, fonts, icons, `lib/`, the log and the output image are resolved from the app directory via `paths.APP_DIR`, so any working directory works). Output is `eInk-weather-display/image.png`; check it visually after any drawing change.
 
 ## Code style
 

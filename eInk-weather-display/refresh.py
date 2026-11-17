@@ -14,6 +14,7 @@ from type_alias import Icons, Fonts
 from weather_data import get_observation_data, get_forecast_data, get_radiation_data
 from app_config import AppConfig
 from sensor_data import get_sensor_data
+from paths import APP_DIR
 
 
 def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: AppConfig, epd_so: Optional[ctypes.CDLL], init: bool) -> None:
@@ -69,7 +70,7 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Ap
     draw.line([observation_panel.width + sensor_panel.width + celestial_panel.width, 0, observation_panel.width + sensor_panel.width + celestial_panel.width, observation_panel.height - panel_size[1]//20], fill=border_color, width=draw_width)
 
   if (config.dev_mode):
-    filename = config.dev_mode_output_filename
+    filename = APP_DIR / config.dev_mode_output_filename
     logger.info(f'Saving image to {filename}')
     full_image.save(filename)
     elapsed_refresh_time = 0

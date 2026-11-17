@@ -4,6 +4,7 @@ from PIL import Image
 from icon_mapping import observation_mapping, weather_symbol_3_mapping, smart_symbol_mapping, misc_icons
 from typing import Optional, Mapping
 from type_alias import Icons, DayNightIcons
+from paths import APP_DIR
 
 
 def get_weather_images() -> Icons:
@@ -58,7 +59,7 @@ def get_weather_images() -> Icons:
 
 
 def read_weather_icon(icon_name: str, background: Optional[Image.Image]) -> Image.Image:
-  mask = Image.open(f'png_icons/{icon_name}.png')
+  mask = Image.open(APP_DIR / 'png_icons' / f'{icon_name}.png')
   icon = Image.new('RGBA', (mask.width, mask.height), '#ffffff00')
   if (background is not None):
     icon.paste(background, (0, 0), background)

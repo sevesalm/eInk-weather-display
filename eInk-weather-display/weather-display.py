@@ -12,8 +12,9 @@ import ctypes
 from typing import Optional
 from type_alias import Icons, Fonts
 from app_config import AppConfig, ConfigLoadError, load_config
+from paths import APP_DIR
 
-CONFIG_FILENAME = 'config.toml'
+CONFIG_FILENAME = APP_DIR / 'config.toml'
 
 
 class RefreshLoop:

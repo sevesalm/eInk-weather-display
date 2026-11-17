@@ -6,6 +6,7 @@ from typing import Any, Literal, Optional, Union, List, Annotated
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, HttpUrl, field_validator, model_validator
 from uuid import UUID, uuid4
 import tomllib
+from paths import APP_DIR
 
 
 class SensorBase(BaseModel):
@@ -116,7 +117,7 @@ def _read_toml(path: Path) -> dict[str, Any]:
     return tomllib.load(file_obj)
 
 
-def load_config(path: str = 'config.toml') -> AppConfig:
+def load_config(path: Union[str, Path] = APP_DIR / 'config.toml') -> AppConfig:
   config_path = Path(path)
   try:
     raw_config = _read_toml(config_path)
