@@ -19,7 +19,7 @@ A Python app that renders a weather dashboard (FMI Open API observations/forecas
   - `test/` – `unittest` tests.
 - `clib78/` (7.8"/10.3" IT8951) and `clib/` (legacy 3.7") – C sources for the display libraries. Built on the Pi against `bcm2835` via `scripts/compile.sh`.
 - `svg_icons/` – source icons. PNGs in `eInk-weather-display/png_icons/` are generated and gitignored.
-- `scripts/` – `deploy.sh`, `compile.sh`, `convert.sh`, `install_deps.sh`, etc. Remote scripts read `scripts/config.env` (copy from `config.env.example`; gitignored).
+- `scripts/` – `deploy.sh` (installs deps, copies the app and restarts it; `--fresh` recreates the venv), `compile.sh`, `convert.sh`, etc. Remote scripts read `scripts/config.env` (copy from `config.env.example`; gitignored).
 - `requirements/` – `common.txt` (app), `development.txt` (+ ruff), `raspberry.txt` (+ Pi-only: `RPi.GPIO`, `spidev`, `bleson`, `ruuvitag-sensor`).
 
 ## Commands

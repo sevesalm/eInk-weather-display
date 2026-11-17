@@ -108,8 +108,7 @@ If something failed, see `/var/log/cloud-init-output.log` and `/var/log/cloud-in
 Do the steps from the host machine:
 
 1. Add your configuration to `scripts/config.env` file. Please see [scripts/config.env.example](scripts/config.env.example) for an example.
-1. Install uv, Python and the Python dependencies on Raspberry: `scripts/install_deps.sh`
 1. Install host machine deps: `brew install librsvg`
 1. Convert SVG images: `mkdir -p eInk-weather-display/png_icons && scripts/convert.sh`
 1. Create `eInk-weather-display/config.toml` from [config_example.toml](eInk-weather-display/config_example.toml) and set `dev_mode = false` (and the `dev_mode_random_*` options to `false`). `scripts/deploy.sh` copies your local `config.toml` to the Raspberry as is, so a development config would be deployed too.
-1. Deploy: `scripts/deploy.sh`
+1. Deploy: `scripts/deploy.sh`. This installs uv, Python and the Python dependencies on Raspberry, copies the app and starts it. Run it again after any change; use `scripts/deploy.sh --fresh` to recreate the virtual env from scratch (e.g. after a Python upgrade or to remove packages dropped from the requirements).
