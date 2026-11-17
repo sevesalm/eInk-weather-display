@@ -105,7 +105,7 @@ def get_observation_panel(observation_data: Optional[ObservationData], radiation
   w_dir = latest['wd_10min']
   if (not math.isnan(w_dir)):
     wind_image = icons.get_scaled_image(images['misc']['wind_icon'], 160)
-    wind_image_rot = wind_image.rotate(-w_dir + 180, fillcolor=0xff, resample=Image.BICUBIC)
+    wind_image_rot = wind_image.rotate(-w_dir + 180, fillcolor=0xff, resample=Image.Resampling.BICUBIC)
     image.paste(wind_image_rot, (right_column_x_base + weather_icon_size//2 - cloud_cover_icon.width//2, data_y_base + weather_icon.height + margin), wind_image_rot)
 
   # Warning icon

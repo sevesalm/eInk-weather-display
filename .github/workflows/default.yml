@@ -21,5 +21,7 @@ jobs:
         run: python -m compileall -q .
       - name: Lint with ruff
         run: ruff check
+      - name: Type check with ty
+        run: ty check --python "$(python -c 'import sys; print(sys.prefix)')"
       - name: Run tests
         run: python -m unittest discover -s eInk-weather-display

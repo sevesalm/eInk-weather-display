@@ -1,0 +1,9 @@
+[environment]
+python-version = "3.14"
+
+[src]
+include = ["eInk-weather-display"]
+
+[analysis]
+# Pi-only dependencies (requirements/raspberry.txt), imported lazily in sensor_data.py
+allowed-unresolved-imports = ["ruuvitag_sensor.**", "reactivex.**"]

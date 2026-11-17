@@ -61,7 +61,7 @@ def get_ruuvi_sensor_data(logger: logging.Logger, config: AppConfig, macs: list[
                           ops.buffer_with_time(config.sensor_poll_timeout),  # Buffer for some time
                           ops.map(lambda x: set(x)),  # Convert macs into a set
                           ops.first(),
-                          ops.flat_map(lambda x: list(set(macs).difference(x))),  # type: ignore # Emit once per each missing mac
+                          ops.flat_map(lambda x: list(set(macs).difference(x))),  # Emit once per each missing mac
                           ops.map(lambda x: (x, None))
                         )
 

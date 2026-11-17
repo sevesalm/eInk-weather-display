@@ -135,17 +135,20 @@ class TestAppConfig(unittest.TestCase):
     config_file = self._write_temp_config(VALID_CONFIG + SENSORS_CONFIG)
     config = load_config(str(config_file))
     self.assertEqual(len(config.sensors), 2)
-    self.assertIsInstance(config.sensors[0], RuuviSensor)
-    self.assertEqual(config.sensors[0].mac, 'AA:BB:CC:DD:EE:FF')
-    self.assertIsInstance(config.sensors[1], HomeAssistantSensor)
-    self.assertIsNone(config.sensors[1].battery_sensor_id)
+    (ruuvi, home_assistant) = config.sensors
+    assert isinstance(ruuvi, RuuviSensor)
+    self.assertEqual(ruuvi.mac, 'AA:BB:CC:DD:EE:FF')
+    assert isinstance(home_assistant, HomeAssistantSensor)
+    self.assertIsNone(home_assistant.battery_sensor_id)
     self.assertIsNotNone(config.home_assistant)
 
   def test_ruuvi_mac_normalized_to_uppercase(self):
     lowercase = SENSORS_CONFIG.replace('"AA:BB:CC:DD:EE:FF"', '"aa:bb:cc:dd:ee:ff"')
     config_file = self._write_temp_config(VALID_CONFIG + lowercase)
     config = load_config(str(config_file))
-    self.assertEqual(config.sensors[0].mac, 'AA:BB:CC:DD:EE:FF')
+    ruuvi = config.sensors[0]
+    assert isinstance(ruuvi, RuuviSensor)
+    self.assertEqual(ruuvi.mac, 'AA:BB:CC:DD:EE:FF')
 
   def test_too_many_sensors_fails(self):
     # SENSORS_CONFIG has 2 sensors, add 5 more

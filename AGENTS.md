@@ -20,7 +20,7 @@ A Python app that renders a weather dashboard (FMI Open API observations/forecas
 - `clib78/` (7.8"/10.3" IT8951) and `clib/` (legacy 3.7") – C sources for the display libraries. Built on the Pi against `bcm2835` via `scripts/compile.sh`.
 - `svg_icons/` – source icons. PNGs in `eInk-weather-display/png_icons/` are generated and gitignored.
 - `scripts/` – `deploy.sh` (installs deps, copies the app and restarts it; `--fresh` recreates the venv), `compile.sh`, `convert.sh`, etc. Remote scripts read `scripts/config.env` (copy from `config.env.example`; gitignored).
-- `requirements/` – `common.txt` (app), `development.txt` (+ ruff), `raspberry.txt` (+ Pi-only: `RPi.GPIO`, `spidev`, `bleson`, `ruuvitag-sensor`).
+- `requirements/` – `common.txt` (app), `development.txt` (+ ruff, ty), `raspberry.txt` (+ Pi-only: `RPi.GPIO`, `spidev`, `bleson`, `ruuvitag-sensor`).
 
 ## Commands
 
@@ -30,10 +30,11 @@ Run from the repo root with the `.venv` activated (Python 3.14, managed with `uv
 uv pip install -r requirements/development.txt
 python -m compileall -q .                          # CI: code compiles
 ruff check                                         # CI: lint
+ty check                                           # CI: type check
 python -m unittest discover -s eInk-weather-display  # CI: tests
 ```
 
-Run all three before finishing a change; CI ([.github/workflows/default.yml](.github/workflows/default.yml)) runs exactly these.
+Run all four before finishing a change; CI ([.github/workflows/default.yml](.github/workflows/default.yml)) runs exactly these.
 
 To render the display locally, see [DEVELOPMENT.md](DEVELOPMENT.md#running-the-app-locally): generate PNG icons with `./scripts/convert.sh`, create `eInk-weather-display/config.toml` with `dev_mode = true` and the random-data flags, then run `python weather-display.py` **from inside `eInk-weather-display/`** (config, fonts, icons and `lib/` are resolved relative to the CWD). Output is `image.png`; check it visually after any drawing change.
 

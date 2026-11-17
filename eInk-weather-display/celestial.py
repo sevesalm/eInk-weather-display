@@ -34,7 +34,7 @@ def get_is_daylight(position: Position, utc_datetime_string: str) -> bool:
   observer.lon = position[1]
   observer.date = utc_datetime_string.replace('T', ' ').replace('+00:00', '').replace('Z', '')
 
-  sun = ephem.Sun()   # type: ignore
+  sun = ephem.Sun()
   sun.compute(observer)
   is_above_horizon = sun.alt + sun.radius > 0
   return is_above_horizon
@@ -48,7 +48,7 @@ def get_observer(position: Position, aware_datetime: Datetime) -> ephem.Observer
   return observer
 
 
-def get_twilight(sun: ephem._sun) -> int:
+def get_twilight(sun: ephem.Sun) -> int:
   if (sun.alt + sun.radius > 0):
     return 0
   if (sun.alt >= ephem.degrees(CIVIL_TWILIGHT_HORIZON)):
@@ -62,7 +62,7 @@ def get_twilight(sun: ephem._sun) -> int:
 
 def get_nearest_sun_transit(position: Position, aware_datetime: Datetime) -> tuple[Datetime, int]:
   observer = get_observer(position, aware_datetime)
-  sun = ephem.Sun()  # type: ignore
+  sun = ephem.Sun()
 
   next_transit = ephem.localtime(observer.next_transit(sun)).astimezone(tz=None)
   previous_transit = ephem.localtime(observer.previous_transit(sun)).astimezone(tz=None)
@@ -78,7 +78,7 @@ def remove_odd(transit_datetime: Datetime, d: Datetime) -> Optional[Datetime]:
   return d if abs(transit_datetime - d) < datetime.timedelta(days=1) else None
 
 
-def get_previous_rising(location: ephem.Observer, sun: ephem._sun, transit_datetime: Datetime, use_center: bool = False) -> Optional[Datetime]:
+def get_previous_rising(location: ephem.Observer, sun: ephem.Sun, transit_datetime: Datetime, use_center: bool = False) -> Optional[Datetime]:
   try:
     d = ephem.localtime(location.previous_rising(sun, use_center=use_center)).astimezone(tz=None)
     return remove_odd(transit_datetime, d)
@@ -86,7 +86,7 @@ def get_previous_rising(location: ephem.Observer, sun: ephem._sun, transit_datet
     return None
 
 
-def get_next_setting(location: ephem.Observer, sun: ephem._sun, transit_datetime: Datetime, use_center: bool = False) -> Optional[Datetime]:
+def get_next_setting(location: ephem.Observer, sun: ephem.Sun, transit_datetime: Datetime, use_center: bool = False) -> Optional[Datetime]:
   try:
     d = ephem.localtime(location.next_setting(sun, use_center=use_center)).astimezone(tz=None)
     return remove_odd(transit_datetime, d)
@@ -101,7 +101,7 @@ def get_dusks_and_dawns(position: Position, now: Datetime) -> DusksAndDawns:
   (transit_datetime, transit_twilight) = get_nearest_sun_transit(position, now)
   location.date = transit_datetime.astimezone(tz=ZoneInfo('UTC'))
 
-  sun = ephem.Sun()  # type: ignore
+  sun = ephem.Sun()
   previous_sunrise = get_previous_rising(location, sun, transit_datetime)
   next_sunset = get_next_setting(location, sun, transit_datetime)
 

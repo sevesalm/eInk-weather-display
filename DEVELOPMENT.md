@@ -15,7 +15,7 @@ uv venv --python 3.14
 uv pip install -r requirements/development.txt
 ```
 
-`requirements/development.txt` includes the common app dependencies and `ruff`. The Raspberry Pi only dependencies (`RPi.GPIO`, `spidev`, `bleson`, `ruuvitag-sensor`) are not needed on macOS.
+`requirements/development.txt` includes the common app dependencies, `ruff` and `ty`. The Raspberry Pi only dependencies (`RPi.GPIO`, `spidev`, `bleson`, `ruuvitag-sensor`) are not needed on macOS.
 
 Note: Avoid Python versions newer than the pinned packages support. For example, `Pillow==11.3.0` has no prebuilt wheel for Python 3.15 and fails to install.
 
@@ -34,6 +34,12 @@ ruff check
 ```
 
 Many issues can be fixed automatically with `ruff check --fix`.
+
+The type checker is [ty](https://docs.astral.sh/ty/), configured in [ty.toml](ty.toml). It finds the activated `.venv` automatically:
+
+```sh
+ty check
+```
 
 CI ([.github/workflows/default.yml](.github/workflows/default.yml)) also checks that all the code compiles:
 
