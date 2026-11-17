@@ -1,10 +1,9 @@
 png_icons/
-logger.log
+logger.log*
 .ideas
 .vscode/
 __pycache__/
 config.env
-logger.log
 .DS_Store
 config.toml
 .ideas*

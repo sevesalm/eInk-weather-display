@@ -1,7 +1,10 @@
 import logging
+import logging.handlers
 import LogFormatter
 
 DEFAULT_FILENAME = 'logger.log'
+MAX_BYTES = 1024 * 1024
+BACKUP_COUNT = 3
 
 
 def set_module_log_levels() -> None:
@@ -12,7 +15,7 @@ def set_module_log_levels() -> None:
 
 def setup(loglevel=logging.DEBUG) -> None:
     set_module_log_levels()
-    fileHandler = logging.FileHandler(DEFAULT_FILENAME)
+    fileHandler = logging.handlers.RotatingFileHandler(DEFAULT_FILENAME, maxBytes=MAX_BYTES, backupCount=BACKUP_COUNT)
     fileHandler.setLevel(logging.WARN)
     fileHandler.setFormatter(LogFormatter.LogFormatter())
     stream_handler = logging.StreamHandler()
