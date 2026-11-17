@@ -13,8 +13,8 @@ class ObservationDataItem(TypedDict):
   ws_10min: float
   wd_10min: float
   wg_10min: float
-  n_man: int
-  wawa: int
+  n_man: float
+  wawa: float
 
 
 class ForecastDataItem(TypedDict):
@@ -22,8 +22,8 @@ class ForecastDataItem(TypedDict):
   WindSpeedMS: float
   WindDirection: float
   TotalCloudCover: float
-  WeatherSymbol3: int
-  SmartSymbol: int
+  WeatherSymbol3: float
+  SmartSymbol: float
 
 
 class RadiationDataItem(TypedDict):

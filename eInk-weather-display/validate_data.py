@@ -40,10 +40,7 @@ observation_data_mapping_schema = {
         'type': 'number'
       },
       'wawa': {
-        'anyOf': [
-          {'type': 'number'},
-          {'const': 'NaN'},
-        ]
+        'type': 'number'
       }
     }
   }
@@ -83,10 +80,10 @@ forecast_data_mapping_schema = {
         'type': 'number'
       },
       'WeatherSymbol3': {
-        'type': 'integer'
+        'type': 'number'
       },
       'SmartSymbol': {
-        'type': 'integer'
+        'type': 'number'
       },
     }
   }
