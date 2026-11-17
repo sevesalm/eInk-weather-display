@@ -8,12 +8,6 @@ from type_alias import Fonts, Position, Datetime, Icons
 from app_config import AppConfig
 
 
-def parse_sunrise_sunset_time(datetime: Datetime) -> str:
-  if (datetime is None):
-    return 'N/A'
-  return datetime.astimezone(tz=None).strftime('%-H:%M')
-
-
 def parse_sunrise_sunset_hour_minute(datetime: Datetime) -> tuple[str, str]:
   return (datetime.astimezone(tz=None).strftime('%-H'), datetime.astimezone(tz=None).strftime('%M'))
 

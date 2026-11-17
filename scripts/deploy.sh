@@ -31,7 +31,7 @@ rsync -av --delete requirements $HOSTNAME:$VENV_ROOT_DIRECTORY
 ssh $HOSTNAME "$UV pip install --compile-bytecode --python $VENV_DIRECTORY -r $VENV_ROOT_DIRECTORY/requirements/raspberry.txt && rm -rf $VENV_ROOT_DIRECTORY/requirements"
 
 # App. This copies all needed files (and a bit more) on Raspberry
-rsync -av --rsync-path="sudo rsync" --delete --exclude battery.log --exclude "logger.log*" ./${APP_NAME} ${HOSTNAME}:${APP_ROOT_DIRECTORY}
+rsync -av --rsync-path="sudo rsync" --delete --exclude "logger.log*" ./${APP_NAME} ${HOSTNAME}:${APP_ROOT_DIRECTORY}
 rsync -av --rsync-path="sudo rsync" scripts/run.sh scripts/start_tmux_session.sh scripts/config.env ${HOSTNAME}:${APP_DIRECTORY}
 
 ssh ${HOSTNAME} "cd ${APP_DIRECTORY}; ./start_tmux_session.sh"
