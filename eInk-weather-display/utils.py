@@ -139,7 +139,10 @@ def get_cloud_cover_icon(cloud_cover: float, images: Icons, fonts: Fonts, config
 
 
 def utc_datetime_string_to_local_datetime(date_string: str) -> Datetime:
-  return parse(date_string).replace(tzinfo=ZoneInfo('UTC')).astimezone(tz=None)
+  date = parse(date_string)
+  if date.tzinfo is None:
+    date = date.replace(tzinfo=ZoneInfo('UTC'))
+  return date.astimezone(tz=None)
 
 
 def get_weather_warning_level(temperature: float, time: Datetime, config: AppConfig) -> WeatherWarning:
