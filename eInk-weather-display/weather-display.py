@@ -54,6 +54,7 @@ def main():
 
     fonts = utils.get_fonts(config)
     images = get_weather_images()
+    logger.info(f'Peak memory after startup: {utils.get_peak_memory_mb():.1f} MiB')
 
     logger.info('Import epd control library')
     (epd_so, panel_size) = utils.get_epd_data(config)

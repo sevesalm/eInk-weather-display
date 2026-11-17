@@ -1,7 +1,8 @@
 import ctypes
 import logging
+import time
 from PIL import Image, ImageDraw
-from utils import get_config_override_position
+from utils import get_config_override_position, get_peak_memory_mb
 from observation_panel import get_observation_panel
 from info_panel import get_info_panel
 from forecast_panel import get_forecasts_panel
@@ -19,12 +20,18 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Ap
   logger = logging.getLogger(__name__)
   logger.info('Refresh started')
   start_time = timer()
+  start_cpu_time = time.process_time()
 
   # Fetch data
   start_fetch_time = timer()
   observation_data = get_observation_data(config, logger)
+  elapsed_observation_time = timer() - start_fetch_time
+  start_radiation_time = timer()
   radiation_data = get_radiation_data(config, observation_data, logger)
+  elapsed_radiation_time = timer() - start_radiation_time
+  start_forecast_time = timer()
   forecast_data = get_forecast_data(config, 7, 6, logger)
+  elapsed_forecast_time = timer() - start_forecast_time
   elapsed_fetch_time = timer() - start_fetch_time
 
   start_sensor_time = timer()
@@ -66,11 +73,14 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Ap
     logger.info(f'Saving image to {filename}')
     full_image.save(filename)
     elapsed_refresh_time = 0
+    elapsed_transform_time = 0
   else:
     logger.info(f'Sending image to EPD, {"full" if init else "partial"} refresh')
+    start_transform_time = timer()
     if (config.mirror_horizontal):
       full_image = full_image.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
     image_bytes = full_image.rotate(0 if not config.rotate_180 else 180, expand=True).tobytes()
+    elapsed_transform_time = timer() - start_transform_time
     c_logger = ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_wchar_p)(logging.getLogger('esp.so').log)
     if (epd_so):
       start_refresh_time = timer()
@@ -88,5 +98,9 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Ap
       raise Exception('epd_so not defined')
 
   elapsed_time = timer() - start_time
-  logger.info(f'Total time: {round(elapsed_time, 1)} s, refresh: {round(elapsed_refresh_time, 1)} s, API fetch: {round(elapsed_fetch_time, 1)} s, sensor poll: {round(elapsed_sensor_time, 1)}, draw time: {round(elapsed_draw_time, 1)} s')
+  # Includes CPU time spent inside the C library, which runs in this process
+  elapsed_cpu_time = time.process_time() - start_cpu_time
+  logger.info(f'Total time: {elapsed_time:.2f} s, CPU time: {elapsed_cpu_time:.2f} s, refresh: {elapsed_refresh_time:.2f} s, '
+              f'API fetch: {elapsed_fetch_time:.2f} s (observation: {elapsed_observation_time:.2f} s, radiation: {elapsed_radiation_time:.2f} s, forecast: {elapsed_forecast_time:.2f} s), '
+              f'sensor poll: {elapsed_sensor_time:.2f} s, draw time: {elapsed_draw_time:.2f} s, image transform: {elapsed_transform_time:.2f} s, peak memory: {get_peak_memory_mb():.1f} MiB')
   logger.info('Refresh complete')

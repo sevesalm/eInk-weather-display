@@ -1,5 +1,6 @@
 import sys
 import math
+import resource
 import ctypes
 from PIL import ImageFont, ImageDraw, Image, features
 from dateutil.parser import parse
@@ -69,6 +70,12 @@ def from_8bit_to_2bit(image: Image.Image) -> bytes:
       new_px = px0 | px1 | px2 | px3
       result.append(new_px)
   return bytes(result)
+
+
+def get_peak_memory_mb() -> float:
+  '''Peak resident set size of the process in MiB. ru_maxrss is in bytes on macOS and in kilobytes on Linux.'''
+  max_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+  return max_rss / (1024 * 1024) if sys.platform == 'darwin' else max_rss / 1024
 
 
 def get_epd_data(config: AppConfig) -> tuple[Optional[ctypes.CDLL], tuple[int, int]]:

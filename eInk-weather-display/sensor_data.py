@@ -6,6 +6,7 @@ import random
 import requests
 from typing import TYPE_CHECKING, Any, Optional
 from uuid import UUID
+from timeit import default_timer as timer
 
 from pydantic import BaseModel, field_validator, ValidationError
 
@@ -39,7 +40,14 @@ class SensorReading(BaseModel):
 
 def get_sensor_data(config: AppConfig, logger: logging.Logger) -> dict[UUID, SensorReading | None]:
   """Fetch sensor data for all configured sensors, keyed by sensor id in config order."""
-  data = get_home_assistant_sensor_data(config, logger) | get_ruuvi_sensor_readings(config, logger)
+  start_time = timer()
+  home_assistant_data = get_home_assistant_sensor_data(config, logger)
+  home_assistant_time = timer() - start_time
+  start_time = timer()
+  ruuvi_data = get_ruuvi_sensor_readings(config, logger)
+  ruuvi_time = timer() - start_time
+  logger.info(f'Sensor poll times: Home Assistant {home_assistant_time:.2f} s, Ruuvi {ruuvi_time:.2f} s')
+  data = home_assistant_data | ruuvi_data
   return {sensor.id: data.get(sensor.id) for sensor in config.sensors}
 
 

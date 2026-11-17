@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as et
 from datetime import datetime
 import requests
+import logging
+from timeit import default_timer as timer
 from zoneinfo import ZoneInfo
 from itertools import zip_longest
 from logging import Logger
@@ -38,8 +40,10 @@ def fetch_data(query_type: str, extra_params: Optional[Dict[str, str]] = None) -
 
   params = base_params | (extra_params or {})
 
+  start_time = timer()
   response = requests.get(FMI_API_URL, params=params, timeout=REQUEST_TIMEOUT)
   response.raise_for_status()
+  logging.getLogger(__name__).info(f'Fetched {query_type}: {len(response.content)} bytes in {timer() - start_time:.2f} s')
   return et.fromstring(response.content)
 
 

@@ -1,4 +1,5 @@
 import logging
+from timeit import default_timer as timer
 from PIL import Image
 from icon_mapping import observation_mapping, weather_symbol_3_mapping, smart_symbol_mapping, misc_icons
 from typing import Optional, Mapping
@@ -8,6 +9,7 @@ from type_alias import Icons, DayNightIcons
 def get_weather_images() -> Icons:
   logger = logging.getLogger(__name__)
   logger.info('Importing icons')
+  start_time = timer()
 
   misc_images: Mapping[str, Image.Image] = {}
   for icon_name in misc_icons:
@@ -50,6 +52,8 @@ def get_weather_images() -> Icons:
     "misc": misc_images,
   }
 
+  icon_count = len(misc_images) + sum(len(icon_set) for group in (observation_images, weather_symbol_3, smart_symbol) for icon_set in group.values())
+  logger.info(f'Imported {icon_count} icons in {timer() - start_time:.2f} s')
   return result
 
 
