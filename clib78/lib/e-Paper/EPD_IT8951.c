@@ -156,9 +156,16 @@ static void EPD_IT8951_WriteMultiData(UWORD *Data_Buf, UDOUBLE Length) {
 
   EPD_IT8951_ReadBusy();
 
-  for (UDOUBLE i = 0; i < Length; i++) {
-    DEV_SPI_WriteByte(Data_Buf[i] >> 8);
-    DEV_SPI_WriteByte(Data_Buf[i]);
+  // Send in chunks: one bulk transfer per chunk instead of one bcm2835_spi_transfer call per byte.
+  // The controller wants each word MSB first, so swap the bytes into the chunk buffer.
+  static char chunk[EPD_IT8951_SPI_CHUNK_WORDS * 2];
+  for (UDOUBLE i = 0; i < Length; i += EPD_IT8951_SPI_CHUNK_WORDS) {
+    UDOUBLE words = Length - i < EPD_IT8951_SPI_CHUNK_WORDS ? Length - i : EPD_IT8951_SPI_CHUNK_WORDS;
+    for (UDOUBLE j = 0; j < words; j++) {
+      chunk[2 * j] = Data_Buf[i + j] >> 8;
+      chunk[2 * j + 1] = Data_Buf[i + j];
+    }
+    DEV_SPI_WriteBytes(chunk, words * 2);
   }
   DEV_Digital_Write(EPD_CS_PIN, HIGH);
 }

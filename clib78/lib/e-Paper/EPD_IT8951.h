@@ -45,6 +45,9 @@
 #define EPD_IT8951_BUSY_SLEEP_US 100
 #define EPD_IT8951_DISPLAY_READY_SLEEP_US 2000
 
+// Words per bulk SPI transfer when uploading image data (2 bytes each)
+#define EPD_IT8951_SPI_CHUNK_WORDS 16384
+
 // Abort codes, also used as return codes of draw_image_8bit()
 enum { EPD_IT8951_BUSY_TIMEOUT = 2, EPD_IT8951_DISPLAY_READY_TIMEOUT = 3 };
 

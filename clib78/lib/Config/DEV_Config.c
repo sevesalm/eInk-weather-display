@@ -63,6 +63,18 @@ void DEV_SPI_WriteByte(UBYTE Value)
 }
 
 /******************************************************************************
+function:	SPI Write multiple bytes in one transfer
+parameter:
+Info:		Runs at DEV_SPI_WRITE_CLOCK_DIVIDER, then restores the default clock
+******************************************************************************/
+void DEV_SPI_WriteBytes(const char *Buf, uint32_t Length)
+{
+	bcm2835_spi_setClockDivider(DEV_SPI_WRITE_CLOCK_DIVIDER);
+	bcm2835_spi_writenb(Buf, Length);
+	bcm2835_spi_setClockDivider(DEV_SPI_CLOCK_DIVIDER);
+}
+
+/******************************************************************************
 function:	SPI Read
 parameter:
 Info:
@@ -129,8 +141,7 @@ Info:
 UBYTE DEV_Module_Init(t_logger logger)
 {
 	// See: https://www.airspayce.com/mikem/bcm2835/group__constants.html#gaf2e0ca069b8caef24602a02e8a00884e
-	const uint16_t bcm2835_spi_clock_divider = BCM2835_SPI_CLOCK_DIVIDER_32; 
-	log_fmt(logger, LOG_LEVEL_DEBUG, L"SPI Clock Divider = %d", bcm2835_spi_clock_divider);
+	log_fmt(logger, LOG_LEVEL_DEBUG, L"SPI Clock Divider = %d, bulk write divider = %d", DEV_SPI_CLOCK_DIVIDER, DEV_SPI_WRITE_CLOCK_DIVIDER);
 
 	if (!bcm2835_init())
 	{
@@ -141,7 +152,7 @@ UBYTE DEV_Module_Init(t_logger logger)
 	bcm2835_spi_begin();																		 //Start spi interface, set spi pin for the reuse function
 	bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST); //High first transmission
 	bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);							 //spi mode 0
-	bcm2835_spi_setClockDivider(bcm2835_spi_clock_divider); 
+	bcm2835_spi_setClockDivider(DEV_SPI_CLOCK_DIVIDER);
 	/* SPI clock reference link：*/
 	/*http://www.airspayce.com/mikem/bcm2835/group__constants.html#gaf2e0ca069b8caef24602a02e8a00884e*/
 
