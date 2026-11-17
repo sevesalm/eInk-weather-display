@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 import datetime
+from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.blocking import BlockingScheduler
 import log
 import logging
@@ -42,12 +43,15 @@ def main():
     logger.info('Import epd control library')
     (epd_so, panel_size) = utils.get_epd_data(config)
 
-    logger.info("Initial refresh")
-    refresh.refresh(panel_size, fonts, images, config, epd_so, True)  # Once in the beginning
-
-    if not config.dev_mode:
+    if config.dev_mode:
+      logger.info("Single refresh (dev mode)")
+      refresh.refresh(panel_size, fonts, images, config, epd_so, True)
+    else:
       logger.info('Starting scheduler')
-      scheduler = BlockingScheduler()
+      # One worker so the initial refresh and the cron job never drive the display at the same time
+      scheduler = BlockingScheduler(executors={'default': ThreadPoolExecutor(max_workers=1)})
+      # Initial full refresh runs as a job so a failure is logged by APScheduler instead of stopping the app
+      scheduler.add_job(lambda: refresh.refresh(panel_size, fonts, images, config, epd_so, True), next_run_time=datetime.datetime.now())
       scheduler.add_job(lambda: main_loop(panel_size, fonts, images, config, epd_so), 'cron', minute='*/1')
       scheduler.start()
 
