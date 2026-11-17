@@ -47,6 +47,12 @@ static long EPD_IT8951_Elapsed_ms(const struct timespec *start) {
   return (now.tv_sec - start->tv_sec) * 1000 + (now.tv_nsec - start->tv_nsec) / 1000000;
 }
 
+// Sleep with nanosleep: DEV_Delay_us (bcm2835_delayMicroseconds) busy-waits for short delays
+static void EPD_IT8951_Sleep_us(long us) {
+  struct timespec ts = {.tv_sec = us / 1000000, .tv_nsec = (us % 1000000) * 1000};
+  nanosleep(&ts, NULL);
+}
+
 static void EPD_IT8951_Abort(int code) {
   EPD_IT8951_Abort_Code = code;
   longjmp(EPD_IT8951_Abort_Jmp, 1);
@@ -71,13 +77,19 @@ function :	Wait until the busy_pin goes HIGH
 parameter:
 ******************************************************************************/
 static void EPD_IT8951_ReadBusy(void) {
+  // 0: busy, 1: idle. Called for every transferred word and usually idle at once, so spin briefly before sleeping
+  for (int i = 0; i < EPD_IT8951_BUSY_SPIN_COUNT; i++) {
+    if (DEV_Digital_Read(EPD_BUSY_PIN) != 0) {
+      return;
+    }
+  }
   struct timespec start;
   clock_gettime(CLOCK_MONOTONIC, &start);
-  // 0: busy, 1: idle
   while (DEV_Digital_Read(EPD_BUSY_PIN) == 0) {
     if (EPD_IT8951_Elapsed_ms(&start) > EPD_IT8951_BUSY_TIMEOUT_MS) {
       EPD_IT8951_Abort(EPD_IT8951_BUSY_TIMEOUT);
     }
+    EPD_IT8951_Sleep_us(EPD_IT8951_BUSY_SLEEP_US);
   }
 }
 
@@ -356,6 +368,7 @@ void EPD_IT8951_WaitForDisplayReady(void) {
     if (EPD_IT8951_Elapsed_ms(&start) > EPD_IT8951_DISPLAY_READY_TIMEOUT_MS) {
       EPD_IT8951_Abort(EPD_IT8951_DISPLAY_READY_TIMEOUT);
     }
+    EPD_IT8951_Sleep_us(EPD_IT8951_DISPLAY_READY_SLEEP_US);
   }
 }
 
@@ -612,35 +625,10 @@ IT8951_Dev_Info EPD_IT8951_Init(UWORD VCOM, t_logger logger) {
 function :	EPD_IT8951_Init_Fresh
 parameter:
 ******************************************************************************/
-void EPD_IT8951_Init_Refresh(IT8951_Dev_Info Dev_Info, UDOUBLE Target_Memory_Addr, bool Packed_Write) {
-  UDOUBLE ImageSize = ((Dev_Info.Panel_W * 4 % 8 == 0) ? (Dev_Info.Panel_W * 4 / 8)
-                                                       : (Dev_Info.Panel_W * 4 / 8 + 1)) *
-                      Dev_Info.Panel_H;
-  UBYTE *Frame_Buf = malloc(ImageSize);
-  memset(Frame_Buf, 0xFF, ImageSize);
-
-  IT8951_Load_Img_Info Load_Img_Info;
-  IT8951_Area_Img_Info Area_Img_Info;
-
+void EPD_IT8951_Init_Refresh(IT8951_Dev_Info Dev_Info) {
+  // INIT clears the panel to white regardless of the image buffer, so no white frame needs to be uploaded first
   EPD_IT8951_WaitForDisplayReady();
-
-  Load_Img_Info.Source_Buffer_Addr = (UDOUBLE)Frame_Buf;
-  Load_Img_Info.Endian_Type = IT8951_LDIMG_L_ENDIAN;
-  Load_Img_Info.Pixel_Format = IT8951_4BPP;
-  Load_Img_Info.Rotate = IT8951_ROTATE_0;
-  Load_Img_Info.Target_Memory_Addr = Target_Memory_Addr;
-
-  Area_Img_Info.Area_X = 0;
-  Area_Img_Info.Area_Y = 0;
-  Area_Img_Info.Area_W = Dev_Info.Panel_W;
-  Area_Img_Info.Area_H = Dev_Info.Panel_H;
-
-  EPD_IT8951_HostAreaPackedPixelWrite_4bp(&Load_Img_Info, &Area_Img_Info, Packed_Write);
-
   EPD_IT8951_Display_Area(0, 0, Dev_Info.Panel_W, Dev_Info.Panel_H, INIT_Mode);
-
-  free(Frame_Buf);
-  Frame_Buf = NULL;
 }
 
 /******************************************************************************

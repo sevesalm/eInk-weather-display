@@ -63,9 +63,9 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
 
   if (init == true) {
     logger(LOG_LEVEL_INFO, L"EPD_IT8951_Init_Refresh()");
-    EPD_IT8951_Init_Refresh(Dev_Info, Memory_Addr, true);
-    log_fmt(logger, LOG_LEVEL_INFO, L"Timing: INIT upload %ld ms", lap_ms(&lap));
-    // The next refresh would wait for this anyway; waiting here separates the INIT waveform from the upload timing
+    EPD_IT8951_Init_Refresh(Dev_Info);
+    log_fmt(logger, LOG_LEVEL_INFO, L"Timing: INIT command %ld ms", lap_ms(&lap));
+    // The next refresh would wait for this anyway; waiting here separates the INIT waveform from the command timing
     EPD_IT8951_WaitForDisplayReady();
     log_fmt(logger, LOG_LEVEL_INFO, L"Timing: INIT waveform %ld ms", lap_ms(&lap));
   }

@@ -40,6 +40,11 @@
 #define EPD_IT8951_BUSY_TIMEOUT_MS 5000
 #define EPD_IT8951_DISPLAY_READY_TIMEOUT_MS 10000
 
+// Polling: spin this many reads of the busy pin before sleeping between reads
+#define EPD_IT8951_BUSY_SPIN_COUNT 1000
+#define EPD_IT8951_BUSY_SLEEP_US 100
+#define EPD_IT8951_DISPLAY_READY_SLEEP_US 2000
+
 // Abort codes, also used as return codes of draw_image_8bit()
 enum { EPD_IT8951_BUSY_TIMEOUT = 2, EPD_IT8951_DISPLAY_READY_TIMEOUT = 3 };
 
@@ -202,7 +207,7 @@ void EPD_IT8951_Sleep(t_logger logger);
 
 IT8951_Dev_Info EPD_IT8951_Init(UWORD VCOM, t_logger logger);
 
-void EPD_IT8951_Init_Refresh(IT8951_Dev_Info Dev_Info, UDOUBLE Target_Memory_Addr, bool Packed_Write);
+void EPD_IT8951_Init_Refresh(IT8951_Dev_Info Dev_Info);
 
 void EPD_IT8951_1bp_Refresh(UBYTE *Frame_Buf, UWORD X, UWORD Y, UWORD W, UWORD H, UBYTE Mode, UDOUBLE Target_Memory_Addr, bool Packed_Write);
 void EPD_IT8951_1bp_Multi_Frame_Write(UBYTE *Frame_Buf, UWORD X, UWORD Y, UWORD W, UWORD H, UDOUBLE Target_Memory_Addr, bool Packed_Write);
