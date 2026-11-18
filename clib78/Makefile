@@ -11,8 +11,10 @@ TARGET = epd78.so
 
 CC = gcc
 
-MSG = -g -O0 -Wall
-DEBUG = -D USE_DEBUG
+# Frame buffers are written as bytes and read back as UWORDs, so keep strict aliasing off.
+# Debug.h checks DEBUG, e.g. `make DEBUG=-DDEBUG` for file/line in Debug() output.
+MSG = -O2 -fno-strict-aliasing -Wall
+DEBUG =
 STD = # -std=c99 <--- Removed for off_t error
 
 CFLAGS += $(MSG) $(DEBUG) $(STD) -fPIC 
