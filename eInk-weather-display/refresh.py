@@ -16,8 +16,12 @@ from app_config import AppConfig
 from sensor_data import get_sensor_data
 from paths import APP_DIR
 
+# Last frame the display accepted, so an identical partial refresh can be skipped
+_previous_image_bytes: Optional[bytes] = None
+
 
 def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: AppConfig, epd_so: Optional[ctypes.CDLL], init: bool) -> None:
+  global _previous_image_bytes
   logger = logging.getLogger(__name__)
   logger.info('Refresh started')
   start_time = timer()
@@ -83,20 +87,28 @@ def refresh(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: Ap
     image_bytes = full_image.rotate(0 if not config.rotate_180 else 180, expand=True).tobytes()
     elapsed_transform_time = timer() - start_transform_time
     c_logger = ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_wchar_p)(logging.getLogger('esp.so').log)
-    if (epd_so):
+    if (not epd_so):
+      raise Exception('epd_so not defined')
+    if (not init and image_bytes == _previous_image_bytes):
+      # Full refreshes always draw to clear ghosting
+      logger.info('Image unchanged, skipping partial refresh')
+      elapsed_refresh_time = 0
+    else:
+      # Forget the previous frame until this one is known to be on the display, so a failed draw is retried next time
+      _previous_image_bytes = None
       start_refresh_time = timer()
       try:
         # The C library times out on its own if the controller stops responding
         return_code = epd_so.draw_image_8bit(image_bytes, ctypes.c_bool(init), ctypes.c_int(config.epd_voltage), config.bits_per_pixel, c_logger)
         logger.debug(f'Return code: {return_code}')
-        if (return_code != 0):
+        if (return_code == 0):
+          _previous_image_bytes = image_bytes
+        else:
           logger.error(f'draw_image_8bit() failed with return code {return_code}')
       except Exception as e:
         logger.exception('Unexpected error: %s', str(e))
       finally:
         elapsed_refresh_time = timer() - start_refresh_time
-    else:
-      raise Exception('epd_so not defined')
 
   elapsed_time = timer() - start_time
   # Includes CPU time spent inside the C library, which runs in this process
