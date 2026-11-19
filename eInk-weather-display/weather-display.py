@@ -70,7 +70,8 @@ def main():
       refresh_loop = RefreshLoop(panel_size, fonts, images, config, epd_so)
       # Initial full refresh runs as a job so a failure is logged by APScheduler instead of stopping the app
       scheduler.add_job(refresh_loop.full_refresh, next_run_time=datetime.datetime.now())
-      scheduler.add_job(refresh_loop.main_loop, 'cron', minute='*/1')
+      # Grace time so a run queued behind a slow refresh (e.g. the initial one) runs late instead of being skipped
+      scheduler.add_job(refresh_loop.main_loop, 'cron', minute='*/1', misfire_grace_time=30, coalesce=True)
       scheduler.start()
 
   except KeyboardInterrupt:
