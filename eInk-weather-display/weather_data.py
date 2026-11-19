@@ -10,7 +10,7 @@ from typing import Optional, Dict, List
 from type_alias import ObservationData, ForecastData, RadiationData
 from weather_data_mock import get_random_forecast_data, get_random_observation_data, get_random_radiation_data
 import utils
-from validate_data import validate_data, observation_data_mapping_schema, radiation_data_mapping_schema, forecast_data_mapping_schema
+from validate_data import validate_data, observation_data_adapter, radiation_data_adapter, forecast_data_adapter
 from app_config import AppConfig
 
 FMI_API_URL = 'https://opendata.fmi.fi/wfs/eng'
@@ -111,7 +111,7 @@ def get_radiation_data(config: AppConfig, observation_data: Optional[Observation
     }
     xml_data = fetch_data(RADIATION_QUERY, params)
     radiation_data = parse_multipoint_data(xml_data, 1)
-    validate_data(radiation_data, radiation_data_mapping_schema, logger)
+    radiation_data = validate_data(radiation_data, radiation_data_adapter, logger)
     logger.info('Received radiation data: %s', repr(radiation_data))
     return radiation_data
   except Exception as e:
@@ -129,7 +129,7 @@ def get_observation_data(config: AppConfig, logger: Logger) -> Optional[Observat
     }
     xml_data = fetch_data(OBS_QUERY, params)
     observation_data = parse_multipoint_data(xml_data, 1)
-    validate_data(observation_data, observation_data_mapping_schema, logger)
+    observation_data = validate_data(observation_data, observation_data_adapter, logger)
     position = get_position(xml_data)
     position_name = get_position_name(xml_data)
     fmisid = get_fmisid(xml_data)
@@ -152,7 +152,7 @@ def get_forecast_data(config: AppConfig, count: int, skip_count: Optional[int], 
     }
     xml_data = fetch_data(FORECAST_QUERY, params)
     forecast_data = parse_multipoint_data(xml_data, count, skip_count, True)
-    validate_data(forecast_data, forecast_data_mapping_schema, logger)
+    forecast_data = validate_data(forecast_data, forecast_data_adapter, logger)
     position = get_position(xml_data)
     position_name = get_position_name(xml_data)
     fmisid = get_fmisid(xml_data)

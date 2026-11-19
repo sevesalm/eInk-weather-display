@@ -2,10 +2,15 @@ from enum import Enum
 import datetime
 from PIL import Image, ImageFont
 from typing import Mapping, TypedDict
+from pydantic import ConfigDict, with_config
+
+# Weather data items are validated with pydantic (see validate_data.py): no missing or extra parameters, values must be numbers (NaN allowed)
+WEATHER_DATA_CONFIG = ConfigDict(extra='forbid', strict=True)
 
 Datetime = datetime.datetime
 
 
+@with_config(WEATHER_DATA_CONFIG)
 class ObservationDataItem(TypedDict):
   t2m: float
   rh: float
@@ -17,6 +22,7 @@ class ObservationDataItem(TypedDict):
   wawa: float
 
 
+@with_config(WEATHER_DATA_CONFIG)
 class ForecastDataItem(TypedDict):
   Temperature: float
   WindSpeedMS: float
@@ -26,6 +32,7 @@ class ForecastDataItem(TypedDict):
   SmartSymbol: float
 
 
+@with_config(WEATHER_DATA_CONFIG)
 class RadiationDataItem(TypedDict):
   dir_1min: float
 

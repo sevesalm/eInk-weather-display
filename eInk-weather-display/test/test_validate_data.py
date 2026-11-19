@@ -1,7 +1,7 @@
 import logging
 import math
 import unittest
-from validate_data import validate_data, observation_data_mapping_schema, radiation_data_mapping_schema, forecast_data_mapping_schema
+from validate_data import validate_data, observation_data_adapter, radiation_data_adapter, forecast_data_adapter
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -20,7 +20,7 @@ class TestValidateData(unittest.TestCase):
         'SmartSymbol': math.nan,
       }
     }
-    validate_data(data, forecast_data_mapping_schema, logger)
+    validate_data(data, forecast_data_adapter, logger)
 
   def test_forecast_missing_symbol(self):
     data = {
@@ -33,7 +33,7 @@ class TestValidateData(unittest.TestCase):
       }
     }
     with self.assertRaises(Exception):
-      validate_data(data, forecast_data_mapping_schema, logger)
+      validate_data(data, forecast_data_adapter, logger)
 
   def test_observation_nan_wawa(self):
     data = {
@@ -48,10 +48,24 @@ class TestValidateData(unittest.TestCase):
         'wawa': math.nan,
       }
     }
-    validate_data(data, observation_data_mapping_schema, logger)
+    validate_data(data, observation_data_adapter, logger)
+
+  def test_radiation_valid(self):
+    data = {'2026-11-17T12:00:00+00:00': {'dir_1min': 12.5}}
+    self.assertEqual(validate_data(data, radiation_data_adapter, logger), data)
+
+  def test_extra_parameter(self):
+    data = {'2026-11-17T12:00:00+00:00': {'dir_1min': 12.5, 'glob_1min': 3.0}}
+    with self.assertRaises(Exception):
+      validate_data(data, radiation_data_adapter, logger)
+
+  def test_non_number_value(self):
+    data = {'2026-11-17T12:00:00+00:00': {'dir_1min': '12.5'}}
+    with self.assertRaises(Exception):
+      validate_data(data, radiation_data_adapter, logger)
 
   def test_empty_data(self):
-    for schema in (observation_data_mapping_schema, radiation_data_mapping_schema, forecast_data_mapping_schema):
+    for schema in (observation_data_adapter, radiation_data_adapter, forecast_data_adapter):
       with self.assertRaises(Exception):
         validate_data({}, schema, logger)
 
