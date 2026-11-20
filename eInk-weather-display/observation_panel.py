@@ -13,16 +13,16 @@ from app_config import AppConfig
 
 def get_observation_icon(wawa: float, cloud_coverage: float, is_daylight: bool, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
   if (wawa not in images['observation']):
-    return utils.get_missing_weather_icon_icon(wawa, is_daylight, images, fonts, config)
+    return utils.get_missing_weather_icon_icon(wawa, is_daylight, icons.OBSERVATION_ICON_SIZE, images, fonts, config)
 
   # For codes 0 to 3 and 20 to 26, let's use cloud cover to determine the icon set
   if (((0 <= wawa <= 3) or (20 <= wawa <= 26)) and not math.isnan(cloud_coverage)):
     if (cloud_coverage <= 1):  # Clear sky
-      icon_set = images['weather_symbol_3'].get(1)
+      icon_set = images['observation_cloud_cover'].get(1)
     elif (2 <= cloud_coverage <= 6):  # Partially cloudy
-      icon_set = images['weather_symbol_3'].get(2)
+      icon_set = images['observation_cloud_cover'].get(2)
     elif (7 <= cloud_coverage <= 8):  # Overcast
-      icon_set = images['weather_symbol_3'].get(3)
+      icon_set = images['observation_cloud_cover'].get(3)
     else:  # Lolwut?
       icon_set = images['observation'].get(0)
   else:
@@ -45,7 +45,7 @@ def get_observation_panel(observation_data: Optional[ObservationData], radiation
     utils.draw_title(draw, fonts['font_sm'], 'OUT', 'MISSING DATA', fonts['font_xxs'])
     return image
 
-  weather_icon_size = 280
+  weather_icon_size = icons.OBSERVATION_ICON_SIZE
   (observations, position, position_name, _) = observation_data
   latest_date = max(observations.keys())
   latest_date_local = utils.utc_datetime_string_to_local_datetime(latest_date)
@@ -71,22 +71,22 @@ def get_observation_panel(observation_data: Optional[ObservationData], radiation
 
   # Feels like temperature
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 210), utils.roundToString(temp_feels), '°C', fonts)
-  temperature_feel_icon = icons.get_scaled_image_by_height(images['misc']['temperature_feel'], 70)
+  temperature_feel_icon = images['misc']['temperature_feel']
   image.paste(temperature_feel_icon, (10, data_y_base + 210-65), temperature_feel_icon)
 
   # Relative humidity
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 290), utils.roundToString(latest["rh"]), '%', fonts)
-  humidity_icon = icons.get_scaled_image(images['misc']['humidity'], 70)
+  humidity_icon = images['misc']['humidity']
   image.paste(humidity_icon, (10, data_y_base + 290-65), humidity_icon)
 
   # Barometric pressure
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 370), utils.roundToString(latest["p_sea"]), 'hPa', fonts)
-  pressure_icon = icons.get_scaled_image(images['misc']['pressure'], 70)
+  pressure_icon = images['misc']['pressure']
   image.paste(pressure_icon, (10, data_y_base + 370-65), pressure_icon)
 
   # Wind speed
   utils.draw_quantity(draw, (delimiter_x, data_y_base + 450), f'{utils.roundToString(latest["ws_10min"])} – {utils.roundToString(latest["wg_10min"])}', 'm/s', fonts)
-  wind_icon = icons.get_scaled_image(images['misc']['wind'], 70)
+  wind_icon = images['misc']['wind']
   image.paste(wind_icon, (10, data_y_base + 450-65), wind_icon)
 
   margin = 15
@@ -94,18 +94,17 @@ def get_observation_panel(observation_data: Optional[ObservationData], radiation
   cloud_coverage = latest['n_man']
 
   # Weather icon
-  weather_icon = icons.get_scaled_image(get_observation_icon(latest['wawa'], cloud_coverage, is_daylight, images, fonts, config), weather_icon_size)
+  weather_icon = get_observation_icon(latest['wawa'], cloud_coverage, is_daylight, images, fonts, config)
   image.paste(weather_icon, (right_column_x_base, data_y_base), weather_icon)
 
   # Cloud cover icon
-  cloud_cover_icon = icons.get_scaled_image(utils.get_cloud_cover_icon(cloud_coverage, images, fonts, config), 160)
+  cloud_cover_icon = utils.get_cloud_cover_icon(cloud_coverage, images, fonts, config)
   image.paste(cloud_cover_icon, (right_column_x_base + weather_icon_size//2 - cloud_cover_icon.width//2, data_y_base + weather_icon.height + margin), cloud_cover_icon)
 
   # Wind direction
   w_dir = latest['wd_10min']
   if (not math.isnan(w_dir)):
-    wind_image = icons.get_scaled_image(images['misc']['wind_icon'], 160)
-    wind_image_rot = wind_image.rotate(-w_dir + 180, fillcolor=0xff, resample=Image.BICUBIC)
+    wind_image_rot = images['misc']['wind_icon'].rotate(-w_dir + 180, fillcolor=0xff, resample=Image.Resampling.BICUBIC)
     image.paste(wind_image_rot, (right_column_x_base + weather_icon_size//2 - cloud_cover_icon.width//2, data_y_base + weather_icon.height + margin), wind_image_rot)
 
   # Warning icon

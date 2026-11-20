@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 import datetime
+from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.blocking import BlockingScheduler
 import log
 import logging
@@ -11,18 +12,34 @@ import ctypes
 from typing import Optional
 from type_alias import Icons, Fonts
 from app_config import AppConfig, ConfigLoadError, load_config
+from paths import APP_DIR
 
-CONFIG_FILENAME = 'config.toml'
+CONFIG_FILENAME = APP_DIR / 'config.toml'
 
 
-def main_loop(panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: AppConfig, epd_so: Optional[ctypes.CDLL]) -> None:
-  logger = logging.getLogger(__name__)
-  logger.info("main_loop() started")
-  wakeup_time = datetime.datetime.now()
-  if ((wakeup_time.minute - 5) % config.refresh_full_interval == 0):
-    refresh.refresh(panel_size, fonts, images, config, epd_so, True)
-  elif (wakeup_time.minute % config.refresh_partial_interval == 0):
-    refresh.refresh(panel_size, fonts, images, config, epd_so, False)
+class RefreshLoop:
+  '''Chooses between full and partial refreshes. A full refresh skipped because the previous run overlapped it is done on the next run.'''
+
+  def __init__(self, panel_size: tuple[int, int], fonts: Fonts, images: Icons, config: AppConfig, epd_so: Optional[ctypes.CDLL]) -> None:
+    self.panel_size = panel_size
+    self.fonts = fonts
+    self.images = images
+    self.config = config
+    self.epd_so = epd_so
+    self.last_full_refresh: Optional[datetime.datetime] = None
+
+  def full_refresh(self) -> None:
+    self.last_full_refresh = datetime.datetime.now()
+    refresh.refresh(self.panel_size, self.fonts, self.images, self.config, self.epd_so, True)
+
+  def main_loop(self) -> None:
+    logger = logging.getLogger(__name__)
+    logger.info("main_loop() started")
+    wakeup_time = datetime.datetime.now()
+    if utils.should_full_refresh(wakeup_time, self.last_full_refresh, self.config.refresh_full_interval):
+      self.full_refresh()
+    elif (wakeup_time.minute % self.config.refresh_partial_interval == 0):
+      refresh.refresh(self.panel_size, self.fonts, self.images, self.config, self.epd_so, False)
 
 
 def main():
@@ -38,17 +55,23 @@ def main():
 
     fonts = utils.get_fonts(config)
     images = get_weather_images()
+    logger.info(f'Peak memory after startup: {utils.get_peak_memory_mb():.1f} MiB')
 
     logger.info('Import epd control library')
     (epd_so, panel_size) = utils.get_epd_data(config)
 
-    logger.info("Initial refresh")
-    refresh.refresh(panel_size, fonts, images, config, epd_so, True)  # Once in the beginning
-
-    if not config.dev_mode:
+    if config.dev_mode:
+      logger.info("Single refresh (dev mode)")
+      refresh.refresh(panel_size, fonts, images, config, epd_so, True)
+    else:
       logger.info('Starting scheduler')
-      scheduler = BlockingScheduler()
-      scheduler.add_job(lambda: main_loop(panel_size, fonts, images, config, epd_so), 'cron', minute='*/1')
+      # One worker so the initial refresh and the cron job never drive the display at the same time
+      scheduler = BlockingScheduler(executors={'default': ThreadPoolExecutor(max_workers=1)})
+      refresh_loop = RefreshLoop(panel_size, fonts, images, config, epd_so)
+      # Initial full refresh runs as a job so a failure is logged by APScheduler instead of stopping the app
+      scheduler.add_job(refresh_loop.full_refresh, next_run_time=datetime.datetime.now())
+      # Grace time so a run queued behind a slow refresh (e.g. the initial one) runs late instead of being skipped
+      scheduler.add_job(refresh_loop.main_loop, 'cron', minute='*/1', misfire_grace_time=30, coalesce=True)
       scheduler.start()
 
   except KeyboardInterrupt:

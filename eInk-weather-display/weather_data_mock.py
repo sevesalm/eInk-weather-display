@@ -14,7 +14,7 @@ def get_random_coordinates() -> Tuple[str, str]:
 
 def get_random_observation_data(logger: Logger) -> ObservationData:
   ws_10min = random.uniform(0, 20)
-  now = datetime.today().isoformat()
+  now = datetime.now(tz=ZoneInfo('UTC')).isoformat()
   observation_data: Mapping[str, ObservationDataItem] = {
     now: {
       't2m': random.uniform(-30, 40),
@@ -34,9 +34,7 @@ def get_random_observation_data(logger: Logger) -> ObservationData:
 
 
 def get_random_radiation_data(logger: Logger) -> RadiationData:
-  start_date = datetime.today()
-  now = start_date.astimezone(tz=ZoneInfo('UTC')).isoformat()
-  now = datetime.today().isoformat()
+  now = datetime.now(tz=ZoneInfo('UTC')).isoformat()
   radiation_data: RadiationData = {now: {
     'dir_1min': random.uniform(0, 200)
   }}

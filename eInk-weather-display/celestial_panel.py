@@ -2,16 +2,9 @@ from PIL import Image, ImageDraw
 from celestial import get_moon_phase, get_moon_phase_chr, get_dusks_and_dawns, get_daytime_length, Twilight
 import logging
 import utils
-import icons
 import datetime
 from type_alias import Fonts, Position, Datetime, Icons
 from app_config import AppConfig
-
-
-def parse_sunrise_sunset_time(datetime: Datetime) -> str:
-  if (datetime is None):
-    return 'N/A'
-  return datetime.astimezone(tz=None).strftime('%-H:%M')
 
 
 def parse_sunrise_sunset_hour_minute(datetime: Datetime) -> tuple[str, str]:
@@ -98,7 +91,7 @@ def get_celestial_panel(position: Position, position_name: str, fonts: Fonts, im
     text = ' '.join([hours, minutes])
     draw.text((x_base + tick_gap + tick_width + 90, length_y_position), text, font=fonts['font_xs'], fill=0, anchor='lm')
     # Sunrise icon
-    sunrise_icon = icons.get_scaled_image_by_height(images['misc']['sunrise'], 50)
+    sunrise_icon = images['misc']['sunrise']
     image.paste(sunrise_icon, (x_base + tick_gap + tick_width + 10, length_y_position - sunrise_icon.height//2), sunrise_icon)
 
   # Borders

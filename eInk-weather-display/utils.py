@@ -1,5 +1,6 @@
 import sys
 import math
+import resource
 import ctypes
 from PIL import ImageFont, ImageDraw, Image, features
 from dateutil.parser import parse
@@ -9,8 +10,11 @@ from type_alias import Datetime, Fonts, Icons, DayNightIcons, WeatherWarning, Po
 from datetime import datetime, timedelta
 import logging
 from app_config import AppConfig
+from paths import APP_DIR
+import icons
 
 NAN_SYMBOL = '?'
+FULL_REFRESH_MINUTE_OFFSET = 5
 
 TABULAR_NUMBERS_FEATURES = ["tnum"]  # OpenType feature for tabular numbers
 RAQM_SUPPORTED = features.check_feature('raqm')
@@ -49,44 +53,32 @@ def check_python_version() -> None:
     raise Exception('Python 3.14 or newer required')
 
 
-def from_8bit_to_2bit(image: Image.Image) -> bytes:
-  '''Converts a 8-bit image into a packed 2-bit image which can be fed to EPD.'''
-  if (image.mode != 'L'):
-    raise Exception('Image mode must be \'L\'')
-  if (image.width % 4 != 0):
-    raise Exception('Image width % 4 must be 0')
-
-  image_bytes = image.tobytes()
-  result = bytearray()
-  for y in range(image.height):
-    for x in range(image.width // 4):
-      px0 = (image_bytes[y*image.width + x*4 + 0] & (0x3 << 6)) >> 0
-      px1 = (image_bytes[y*image.width + x*4 + 1] & (0x3 << 6)) >> 2
-      px2 = (image_bytes[y*image.width + x*4 + 2] & (0x3 << 6)) >> 4
-      px3 = (image_bytes[y*image.width + x*4 + 3] & (0x3 << 6)) >> 6
-
-      new_px = px0 | px1 | px2 | px3
-      result.append(new_px)
-  return bytes(result)
+def get_peak_memory_mb() -> float:
+  '''Peak resident set size of the process in MiB. ru_maxrss is in bytes on macOS and in kilobytes on Linux.'''
+  max_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+  return max_rss / (1024 * 1024) if sys.platform == 'darwin' else max_rss / 1024
 
 
 def get_epd_data(config: AppConfig) -> tuple[Optional[ctypes.CDLL], tuple[int, int]]:
   if (config.dev_mode):
     return (None, (1872, 1404))
-  return (ctypes.CDLL("lib/epd78.so"), (1872, 1404))
+  epd_so = ctypes.CDLL(str(APP_DIR / 'lib' / 'epd78.so'))
+  epd_so.draw_image_8bit.restype = ctypes.c_int
+  return (epd_so, (1872, 1404))
 
 
 def get_fonts(config: AppConfig) -> Fonts:
   font_mult = 4
+  font_dir = APP_DIR / 'fonts'
 
   return {
-    'font_lg': ImageFont.truetype('fonts/regular.woff', font_mult * 42),
-    'font_md': ImageFont.truetype('fonts/regular.woff', font_mult * 32),
-    'font_sm': ImageFont.truetype('fonts/regular.woff', font_mult * 18),
-    'font_sm_bold': ImageFont.truetype('fonts/bold.woff', font_mult * 18),
-    'font_xs': ImageFont.truetype('fonts/regular.woff', font_mult * 14),
-    'font_xxs': ImageFont.truetype('fonts/regular.woff', font_mult * 9),
-    'font_misc_md': ImageFont.truetype('fonts/misc.woff', font_mult * 32)
+    'font_lg': ImageFont.truetype(font_dir / 'regular.woff', font_mult * 42),
+    'font_md': ImageFont.truetype(font_dir / 'regular.woff', font_mult * 32),
+    'font_sm': ImageFont.truetype(font_dir / 'regular.woff', font_mult * 18),
+    'font_sm_bold': ImageFont.truetype(font_dir / 'bold.woff', font_mult * 18),
+    'font_xs': ImageFont.truetype(font_dir / 'regular.woff', font_mult * 14),
+    'font_xxs': ImageFont.truetype(font_dir / 'regular.woff', font_mult * 9),
+    'font_misc_md': ImageFont.truetype(font_dir / 'misc.woff', font_mult * 32)
   }
 
 
@@ -117,11 +109,11 @@ def get_icon_variant(is_daylight: bool, icon_set: DayNightIcons) -> Image.Image:
   return icon_set['day']
 
 
-def get_missing_weather_icon_icon(icon_index: Union[float, int], is_daylight: bool, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
-  icon = images['misc']['background_day'].copy() if is_daylight else images['misc']['background_night'].copy()
+def get_missing_weather_icon_icon(icon_index: Union[float, int], is_daylight: bool, size: int, images: Icons, fonts: Fonts, config: AppConfig) -> Image.Image:
+  icon = icons.get_scaled_image(images['misc']['background_day'] if is_daylight else images['misc']['background_night'], size)
   draw = ImageDraw.Draw(icon)
   text = "NaN" if math.isnan(icon_index) else str(icon_index)
-  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=get_features())
+  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_sm'], fill="black", anchor='mm', features=get_features())
   return icon
 
 
@@ -132,12 +124,15 @@ def get_cloud_cover_icon(cloud_cover: float, images: Icons, fonts: Fonts, config
   icon = images['misc']['cloud_cover_0'].copy()
   draw = ImageDraw.Draw(icon)
   text = "NaN" if math.isnan(icon_index) else str(icon_index)
-  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_md'], fill="black", anchor='mm', features=get_features())
+  draw.text((icon.width//2, icon.height//2), text, font=fonts['font_xxs'], fill="black", anchor='mm', features=get_features())
   return icon
 
 
 def utc_datetime_string_to_local_datetime(date_string: str) -> Datetime:
-  return parse(date_string).replace(tzinfo=ZoneInfo('UTC')).astimezone(tz=None)
+  date = parse(date_string)
+  if date.tzinfo is None:
+    date = date.replace(tzinfo=ZoneInfo('UTC'))
+  return date.astimezone(tz=None)
 
 
 def get_weather_warning_level(temperature: float, time: Datetime, config: AppConfig) -> WeatherWarning:
@@ -176,3 +171,14 @@ def get_next_forecast_start_timestamp() -> Datetime:
   new_hour = ((now.hour-3)//6 + 1) * 6 + 3
   new_time = (now + timedelta(hours=new_hour - now.hour)).replace(minute=0, second=0, microsecond=0).astimezone(tz=None)
   return new_time
+
+
+def get_latest_full_refresh_slot(now: Datetime, interval: int) -> Datetime:
+  '''Latest scheduled full refresh time at or before now. Slots are at minutes 5, 5 + interval, ... of each hour.'''
+  hour = now.replace(minute=0, second=0, microsecond=0)
+  return hour + timedelta(minutes=now.minute - (now.minute - FULL_REFRESH_MINUTE_OFFSET) % interval)
+
+
+def should_full_refresh(now: Datetime, last_full_refresh: Optional[Datetime], interval: int) -> bool:
+  '''True when no full refresh has run since the latest slot, so a skipped slot is caught up on the next run.'''
+  return last_full_refresh is None or last_full_refresh < get_latest_full_refresh_slot(now, interval)

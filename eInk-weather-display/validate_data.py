@@ -1,93 +1,19 @@
-from jsonschema import validate
 from logging import Logger
-from typing import Dict, Any
+from typing import Annotated, Mapping, TypeVar
+from pydantic import Field, TypeAdapter, ValidationError
+from type_alias import ObservationDataItem, ForecastDataItem, RadiationDataItem
+
+T = TypeVar('T')
+
+# Built once at import; each maps an ISO timestamp to one row of parameters and requires at least one row
+observation_data_adapter = TypeAdapter(Annotated[Mapping[str, ObservationDataItem], Field(min_length=1)])
+radiation_data_adapter = TypeAdapter(Annotated[Mapping[str, RadiationDataItem], Field(min_length=1)])
+forecast_data_adapter = TypeAdapter(Annotated[Mapping[str, ForecastDataItem], Field(min_length=1)])
 
 
-def validate_data(data: Any, schema: Dict, logger: Logger) -> None:
+def validate_data(data: object, adapter: TypeAdapter[T], logger: Logger) -> T:
   try:
-    validate(data, schema)
-  except Exception as e:
-    logger.error('Schema validation failed: %s', repr(e))
-    raise Exception('Schema validation failed')
-
-
-observation_data_mapping_schema = {
-  'type': 'object',
-  'additionalProperties': {
-    'type': 'object',
-    'required': ['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wg_10min', 'n_man', 'wawa'],
-    'additionalProperties': False,
-    'properties': {
-      't2m': {
-        'type': 'number'
-      },
-      'rh': {
-        'type': 'number'
-      },
-      'p_sea': {
-        'type': 'number'
-      },
-      'ws_10min': {
-        'type': 'number'
-      },
-      'wd_10min': {
-        'type': 'number'
-      },
-      'wg_10min': {
-        'type': 'number'
-      },
-      'n_man': {
-        'type': 'number'
-      },
-      'wawa': {
-        'anyOf': [
-          {'type': 'number'},
-          {'const': 'NaN'},
-        ]
-      }
-    }
-  }
-}
-
-radiation_data_mapping_schema = {
-  'type': 'object',
-  'additionalProperties': {
-    'type': 'object',
-    'required': ['dir_1min'],
-    'additionalProperties': False,
-    'properties': {
-      'dir_1min': {
-        'type': 'number'
-      }
-    }
-  }
-}
-
-forecast_data_mapping_schema = {
-  'type': 'object',
-  'additionalProperties': {
-    'type': 'object',
-    'required': ['Temperature', 'WindSpeedMS', 'WindDirection', 'TotalCloudCover', 'WeatherSymbol3', 'SmartSymbol'],
-    'additionalProperties': False,
-    'properties': {
-      'Temperature': {
-        'type': 'number'
-      },
-      'WindSpeedMS': {
-        'type': 'number'
-      },
-      'WindDirection': {
-        'type': 'number'
-      },
-      'TotalCloudCover': {
-        'type': 'number'
-      },
-      'WeatherSymbol3': {
-        'type': 'integer'
-      },
-      'SmartSymbol': {
-        'type': 'integer'
-      },
-    }
-  }
-}
+    return adapter.validate_python(data)
+  except ValidationError as e:
+    logger.error('Schema validation failed: %s', e)
+    raise Exception('Schema validation failed') from e

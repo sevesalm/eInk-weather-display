@@ -69,6 +69,13 @@
 #define EPD_BUSY_PIN 24
 
 /**
+ * SPI clock: the core clock divided by this. Reads from the IT8951 return corrupted data at divider 16,
+ * so only the bulk image writes (DEV_SPI_WriteBytes) use the faster clock.
+**/
+#define DEV_SPI_CLOCK_DIVIDER BCM2835_SPI_CLOCK_DIVIDER_32
+#define DEV_SPI_WRITE_CLOCK_DIVIDER BCM2835_SPI_CLOCK_DIVIDER_16
+
+/**
  * data
 **/
 #define UBYTE uint8_t
@@ -80,6 +87,7 @@ void DEV_Digital_Write(UWORD Pin, UBYTE Value);
 UBYTE DEV_Digital_Read(UWORD Pin);
 
 void DEV_SPI_WriteByte(UBYTE Value);
+void DEV_SPI_WriteBytes(const char *Buf, uint32_t Length);
 UBYTE DEV_SPI_ReadByte();
 
 void DEV_Delay_ms(UDOUBLE xms);

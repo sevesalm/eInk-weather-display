@@ -38,6 +38,26 @@ UBYTE GC16_Mode = 2;
 // A2_Mode's value is not fixed, is decide by firmware's LUT
 UBYTE A2_Mode = 6;
 
+jmp_buf EPD_IT8951_Abort_Jmp;
+int EPD_IT8951_Abort_Code = 0;
+
+static long EPD_IT8951_Elapsed_ms(const struct timespec *start) {
+  struct timespec now;
+  clock_gettime(CLOCK_MONOTONIC, &now);
+  return (now.tv_sec - start->tv_sec) * 1000 + (now.tv_nsec - start->tv_nsec) / 1000000;
+}
+
+// Sleep with nanosleep: DEV_Delay_us (bcm2835_delayMicroseconds) busy-waits for short delays
+static void EPD_IT8951_Sleep_us(long us) {
+  struct timespec ts = {.tv_sec = us / 1000000, .tv_nsec = (us % 1000000) * 1000};
+  nanosleep(&ts, NULL);
+}
+
+static void EPD_IT8951_Abort(int code) {
+  EPD_IT8951_Abort_Code = code;
+  longjmp(EPD_IT8951_Abort_Jmp, 1);
+}
+
 /******************************************************************************
 function :	Software reset
 parameter:
@@ -57,10 +77,19 @@ function :	Wait until the busy_pin goes HIGH
 parameter:
 ******************************************************************************/
 static void EPD_IT8951_ReadBusy(void) {
-  UBYTE Busy_State = DEV_Digital_Read(EPD_BUSY_PIN);
-  // 0: busy, 1: idle
-  while (Busy_State == 0) {
-    Busy_State = DEV_Digital_Read(EPD_BUSY_PIN);
+  // 0: busy, 1: idle. Called for every transferred word and usually idle at once, so spin briefly before sleeping
+  for (int i = 0; i < EPD_IT8951_BUSY_SPIN_COUNT; i++) {
+    if (DEV_Digital_Read(EPD_BUSY_PIN) != 0) {
+      return;
+    }
+  }
+  struct timespec start;
+  clock_gettime(CLOCK_MONOTONIC, &start);
+  while (DEV_Digital_Read(EPD_BUSY_PIN) == 0) {
+    if (EPD_IT8951_Elapsed_ms(&start) > EPD_IT8951_BUSY_TIMEOUT_MS) {
+      EPD_IT8951_Abort(EPD_IT8951_BUSY_TIMEOUT);
+    }
+    EPD_IT8951_Sleep_us(EPD_IT8951_BUSY_SLEEP_US);
   }
 }
 
@@ -127,9 +156,16 @@ static void EPD_IT8951_WriteMultiData(UWORD *Data_Buf, UDOUBLE Length) {
 
   EPD_IT8951_ReadBusy();
 
-  for (UDOUBLE i = 0; i < Length; i++) {
-    DEV_SPI_WriteByte(Data_Buf[i] >> 8);
-    DEV_SPI_WriteByte(Data_Buf[i]);
+  // Send in chunks: one bulk transfer per chunk instead of one bcm2835_spi_transfer call per byte.
+  // The controller wants each word MSB first, so swap the bytes into the chunk buffer.
+  static char chunk[EPD_IT8951_SPI_CHUNK_WORDS * 2];
+  for (UDOUBLE i = 0; i < Length; i += EPD_IT8951_SPI_CHUNK_WORDS) {
+    UDOUBLE words = Length - i < EPD_IT8951_SPI_CHUNK_WORDS ? Length - i : EPD_IT8951_SPI_CHUNK_WORDS;
+    for (UDOUBLE j = 0; j < words; j++) {
+      chunk[2 * j] = Data_Buf[i + j] >> 8;
+      chunk[2 * j + 1] = Data_Buf[i + j];
+    }
+    DEV_SPI_WriteBytes(chunk, words * 2);
   }
   DEV_Digital_Write(EPD_CS_PIN, HIGH);
 }
@@ -332,9 +368,14 @@ function :	EPD_IT8951_WaitForDisplayReady
 parameter:
 ******************************************************************************/
 void EPD_IT8951_WaitForDisplayReady(void) {
+  struct timespec start;
+  clock_gettime(CLOCK_MONOTONIC, &start);
   // Check IT8951 Register LUTAFSR => NonZero Busy, Zero - Free
   while (EPD_IT8951_ReadReg(LUTAFSR)) {
-    // wait in idle state
+    if (EPD_IT8951_Elapsed_ms(&start) > EPD_IT8951_DISPLAY_READY_TIMEOUT_MS) {
+      EPD_IT8951_Abort(EPD_IT8951_DISPLAY_READY_TIMEOUT);
+    }
+    EPD_IT8951_Sleep_us(EPD_IT8951_DISPLAY_READY_SLEEP_US);
   }
 }
 
@@ -441,11 +482,12 @@ static void EPD_IT8951_HostAreaPackedPixelWrite_4bp(IT8951_Load_Img_Info *Load_I
 /******************************************************************************
 function :	EPD_IT8951_HostAreaPackedPixelWrite_8bp
 parameter:
-Precautions: Can't Packed Write
 ******************************************************************************/
 static void EPD_IT8951_HostAreaPackedPixelWrite_8bp(IT8951_Load_Img_Info *Load_Img_Info,
-                                                    IT8951_Area_Img_Info *Area_Img_Info) {
+                                                    IT8951_Area_Img_Info *Area_Img_Info,
+                                                    bool Packed_Write) {
   UWORD Source_Buffer_Width, Source_Buffer_Height;
+  UDOUBLE Source_Buffer_Length;
 
   UWORD *Source_Buffer = (UWORD *)Load_Img_Info->Source_Buffer_Addr;
   EPD_IT8951_SetTargetMemoryAddr(Load_Img_Info->Target_Memory_Addr);
@@ -454,13 +496,19 @@ static void EPD_IT8951_HostAreaPackedPixelWrite_8bp(IT8951_Load_Img_Info *Load_I
   // from byte to word
   Source_Buffer_Width = Area_Img_Info->Area_W / 2;
   Source_Buffer_Height = Area_Img_Info->Area_H;
+  Source_Buffer_Length = Source_Buffer_Width * Source_Buffer_Height;
 
-  for (UDOUBLE i = 0; i < Source_Buffer_Height; i++) {
-    for (UDOUBLE j = 0; j < Source_Buffer_Width; j++) {
-      EPD_IT8951_WriteData(*Source_Buffer);
-      Source_Buffer++;
+  if (Packed_Write == true) {
+    EPD_IT8951_WriteMultiData(Source_Buffer, Source_Buffer_Length);
+  } else {
+    for (UDOUBLE i = 0; i < Source_Buffer_Height; i++) {
+      for (UDOUBLE j = 0; j < Source_Buffer_Width; j++) {
+        EPD_IT8951_WriteData(*Source_Buffer);
+        Source_Buffer++;
+      }
     }
   }
+
   EPD_IT8951_LoadImgEnd();
 }
 
@@ -591,35 +639,10 @@ IT8951_Dev_Info EPD_IT8951_Init(UWORD VCOM, t_logger logger) {
 function :	EPD_IT8951_Init_Fresh
 parameter:
 ******************************************************************************/
-void EPD_IT8951_Init_Refresh(IT8951_Dev_Info Dev_Info, UDOUBLE Target_Memory_Addr, bool Packed_Write) {
-  UDOUBLE ImageSize = ((Dev_Info.Panel_W * 4 % 8 == 0) ? (Dev_Info.Panel_W * 4 / 8)
-                                                       : (Dev_Info.Panel_W * 4 / 8 + 1)) *
-                      Dev_Info.Panel_H;
-  UBYTE *Frame_Buf = malloc(ImageSize);
-  memset(Frame_Buf, 0xFF, ImageSize);
-
-  IT8951_Load_Img_Info Load_Img_Info;
-  IT8951_Area_Img_Info Area_Img_Info;
-
+void EPD_IT8951_Init_Refresh(IT8951_Dev_Info Dev_Info) {
+  // INIT clears the panel to white regardless of the image buffer, so no white frame needs to be uploaded first
   EPD_IT8951_WaitForDisplayReady();
-
-  Load_Img_Info.Source_Buffer_Addr = (UDOUBLE)Frame_Buf;
-  Load_Img_Info.Endian_Type = IT8951_LDIMG_L_ENDIAN;
-  Load_Img_Info.Pixel_Format = IT8951_4BPP;
-  Load_Img_Info.Rotate = IT8951_ROTATE_0;
-  Load_Img_Info.Target_Memory_Addr = Target_Memory_Addr;
-
-  Area_Img_Info.Area_X = 0;
-  Area_Img_Info.Area_Y = 0;
-  Area_Img_Info.Area_W = Dev_Info.Panel_W;
-  Area_Img_Info.Area_H = Dev_Info.Panel_H;
-
-  EPD_IT8951_HostAreaPackedPixelWrite_4bp(&Load_Img_Info, &Area_Img_Info, Packed_Write);
-
   EPD_IT8951_Display_Area(0, 0, Dev_Info.Panel_W, Dev_Info.Panel_H, INIT_Mode);
-
-  free(Frame_Buf);
-  Frame_Buf = NULL;
 }
 
 /******************************************************************************
@@ -753,7 +776,7 @@ function :	EPD_IT8951_8bp_Refresh
 parameter:
 ******************************************************************************/
 void EPD_IT8951_8bp_Refresh(UBYTE *Frame_Buf, UWORD X, UWORD Y, UWORD W, UWORD H, bool Hold,
-                            UDOUBLE Target_Memory_Addr) {
+                            UDOUBLE Target_Memory_Addr, bool Packed_Write) {
   IT8951_Load_Img_Info Load_Img_Info;
   IT8951_Area_Img_Info Area_Img_Info;
 
@@ -770,7 +793,7 @@ void EPD_IT8951_8bp_Refresh(UBYTE *Frame_Buf, UWORD X, UWORD Y, UWORD W, UWORD H
   Area_Img_Info.Area_W = W;
   Area_Img_Info.Area_H = H;
 
-  EPD_IT8951_HostAreaPackedPixelWrite_8bp(&Load_Img_Info, &Area_Img_Info);
+  EPD_IT8951_HostAreaPackedPixelWrite_8bp(&Load_Img_Info, &Area_Img_Info, Packed_Write);
 
   if (Hold == true) {
     EPD_IT8951_Display_Area(X, Y, W, H, GC16_Mode);

@@ -3,5 +3,4 @@ ephem==4.2.1
 Pillow==13.0.0
 python-dateutil==4.0.0
 requests==2.34.2
-jsonschema==4.26.0
 pydantic==2.14.3

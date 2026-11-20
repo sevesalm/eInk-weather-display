@@ -6,6 +6,7 @@ import random
 import requests
 from typing import TYPE_CHECKING, Any, Optional
 from uuid import UUID
+from timeit import default_timer as timer
 
 from pydantic import BaseModel, field_validator, ValidationError
 
@@ -39,7 +40,14 @@ class SensorReading(BaseModel):
 
 def get_sensor_data(config: AppConfig, logger: logging.Logger) -> dict[UUID, SensorReading | None]:
   """Fetch sensor data for all configured sensors, keyed by sensor id in config order."""
-  data = get_home_assistant_sensor_data(config, logger) | get_ruuvi_sensor_readings(config, logger)
+  start_time = timer()
+  home_assistant_data = get_home_assistant_sensor_data(config, logger)
+  home_assistant_time = timer() - start_time
+  start_time = timer()
+  ruuvi_data = get_ruuvi_sensor_readings(config, logger)
+  ruuvi_time = timer() - start_time
+  logger.info(f'Sensor poll times: Home Assistant {home_assistant_time:.2f} s, Ruuvi {ruuvi_time:.2f} s')
+  data = home_assistant_data | ruuvi_data
   return {sensor.id: data.get(sensor.id) for sensor in config.sensors}
 
 
@@ -55,23 +63,24 @@ def get_ruuvi_sensor_data(logger: logging.Logger, config: AppConfig, macs: list[
       from reactivex import operators as ops
       ruuvis = RuuviTagReactive(macs)
       ruuvi_emissions = ruuvis.get_subject()
-      missing_data = ruuvi_emissions.pipe(
-                        ops.map(lambda x: x[0]),  # Only the mac address
-                        ops.buffer_with_time(config.sensor_poll_timeout),  # Buffer for some time
-                        ops.map(lambda x: set(x)),  # Convert macs into a set
-                        ops.first(),
-                        ops.flat_map(lambda x: list(set(macs).difference(x))),  # type: ignore # Emit once per each missing mac
-                        ops.map(lambda x: (x, None))
-                      )
+      try:
+        missing_data = ruuvi_emissions.pipe(
+                          ops.map(lambda x: x[0]),  # Only the mac address
+                          ops.buffer_with_time(config.sensor_poll_timeout),  # Buffer for some time
+                          ops.map(lambda x: set(x)),  # Convert macs into a set
+                          ops.first(),
+                          ops.flat_map(lambda x: list(set(macs).difference(x))),  # Emit once per each missing mac
+                          ops.map(lambda x: (x, None))
+                        )
 
-      sensor_data = ruuvi_emissions.pipe(
-                      ops.merge(missing_data),
-                      ops.scan(lambda acc, x: acc | {x[0]: x[1]}, {}),
-                      ops.filter(lambda x: len(x.keys()) == len(macs)),
-                      ops.first()
-                    ).run()
-
-      ruuvis.stop()
+        sensor_data = ruuvi_emissions.pipe(
+                        ops.merge(missing_data),
+                        ops.scan(lambda acc, x: acc | {x[0]: x[1]}, {}),
+                        ops.filter(lambda x: len(x.keys()) == len(macs)),
+                        ops.first()
+                      ).run()
+      finally:
+        ruuvis.stop()
       logger.info('Sensor data received: %s', repr(sensor_data))
 
       readings: dict[str, SensorReading] = {}

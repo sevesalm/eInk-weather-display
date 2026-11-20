@@ -13,3 +13,6 @@ if [ $? == 0 ]; then
 fi
 
 tmux new-session -d -s ${SESSION_NAME} ./run.sh
+
+# Scroll with the mouse wheel instead of sending arrow keys to the app
+tmux set-option -t ${SESSION_NAME} mouse on

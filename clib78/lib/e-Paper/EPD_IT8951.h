@@ -31,9 +31,30 @@
 #ifndef __EPD_IT8951_H_
 #define __EPD_IT8951_H_
 
+#include <setjmp.h>
 #include <stdbool.h>
 
 #include "../Config/DEV_Config.h"
+
+// Timeouts for waiting on the controller. A full GC16 refresh normally takes 1-2 s.
+#define EPD_IT8951_BUSY_TIMEOUT_MS 5000
+#define EPD_IT8951_DISPLAY_READY_TIMEOUT_MS 10000
+
+// Polling: spin this many reads of the busy pin before sleeping between reads
+#define EPD_IT8951_BUSY_SPIN_COUNT 1000
+#define EPD_IT8951_BUSY_SLEEP_US 100
+#define EPD_IT8951_DISPLAY_READY_SLEEP_US 2000
+
+// Words per bulk SPI transfer when uploading image data (2 bytes each)
+#define EPD_IT8951_SPI_CHUNK_WORDS 16384
+
+// Abort codes, also used as return codes of draw_image_8bit()
+enum { EPD_IT8951_BUSY_TIMEOUT = 2, EPD_IT8951_DISPLAY_READY_TIMEOUT = 3 };
+
+// The caller must setjmp() this before calling any EPD_IT8951 function that talks to the controller.
+// On a timeout the driver longjmps back with EPD_IT8951_Abort_Code set to one of the codes above.
+extern jmp_buf EPD_IT8951_Abort_Jmp;
+extern int EPD_IT8951_Abort_Code;
 
 // INIT mode, for every init or some time after A2 mode refresh
 extern UBYTE INIT_Mode;
@@ -167,7 +188,7 @@ void EPD_IT8951_SetTargetMemoryAddr(UDOUBLE Target_Memory_Addr);
 void EPD_IT8951_WaitForDisplayReady(void);
 
 
-void EPD_IT8951_HostAreaPackedPixelWrite_8bp(IT8951_Load_Img_Info*Load_Img_Info,IT8951_Area_Img_Info*Area_Img_Info);
+void EPD_IT8951_HostAreaPackedPixelWrite_8bp(IT8951_Load_Img_Info*Load_Img_Info,IT8951_Area_Img_Info*Area_Img_Info, bool Packed_Write);
 
 void EPD_IT8951_HostAreaPackedPixelWrite_1bp(IT8951_Load_Img_Info*Load_Img_Info,IT8951_Area_Img_Info*Area_Img_Info, bool Packed_Write);
 
@@ -189,7 +210,7 @@ void EPD_IT8951_Sleep(t_logger logger);
 
 IT8951_Dev_Info EPD_IT8951_Init(UWORD VCOM, t_logger logger);
 
-void EPD_IT8951_Init_Refresh(IT8951_Dev_Info Dev_Info, UDOUBLE Target_Memory_Addr, bool Packed_Write);
+void EPD_IT8951_Init_Refresh(IT8951_Dev_Info Dev_Info);
 
 void EPD_IT8951_1bp_Refresh(UBYTE *Frame_Buf, UWORD X, UWORD Y, UWORD W, UWORD H, UBYTE Mode, UDOUBLE Target_Memory_Addr, bool Packed_Write);
 void EPD_IT8951_1bp_Multi_Frame_Write(UBYTE *Frame_Buf, UWORD X, UWORD Y, UWORD W, UWORD H, UDOUBLE Target_Memory_Addr, bool Packed_Write);
@@ -199,7 +220,7 @@ void EPD_IT8951_2bp_Refresh(UBYTE *Frame_Buf, UWORD X, UWORD Y, UWORD W, UWORD H
 
 void EPD_IT8951_4bp_Refresh(UBYTE *Frame_Buf, UWORD X, UWORD Y, UWORD W, UWORD H, bool Hold, UDOUBLE Target_Memory_Addr, bool Packed_Write);
 
-void EPD_IT8951_8bp_Refresh(UBYTE *Frame_Buf, UWORD X, UWORD Y, UWORD W, UWORD H, bool Hold, UDOUBLE Target_Memory_Addr);
+void EPD_IT8951_8bp_Refresh(UBYTE *Frame_Buf, UWORD X, UWORD Y, UWORD W, UWORD H, bool Hold, UDOUBLE Target_Memory_Addr, bool Packed_Write);
 
 void EPD_IT8951_WaitForDisplayReady(void);
 

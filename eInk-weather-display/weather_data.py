@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as et
 from datetime import datetime
 import requests
+import logging
+from timeit import default_timer as timer
 from zoneinfo import ZoneInfo
 from itertools import zip_longest
 from logging import Logger
@@ -8,10 +10,10 @@ from typing import Optional, Dict, List
 from type_alias import ObservationData, ForecastData, RadiationData
 from weather_data_mock import get_random_forecast_data, get_random_observation_data, get_random_radiation_data
 import utils
-from validate_data import validate_data, observation_data_mapping_schema, radiation_data_mapping_schema, forecast_data_mapping_schema
+from validate_data import validate_data, observation_data_adapter, radiation_data_adapter, forecast_data_adapter
 from app_config import AppConfig
 
-FMI_API_URL = 'http://opendata.fmi.fi/wfs/eng'
+FMI_API_URL = 'https://opendata.fmi.fi/wfs/eng'
 OBS_PARAMETERS = ['t2m', 'rh', 'p_sea', 'ws_10min', 'wd_10min', 'wg_10min', 'n_man', 'wawa']
 OBS_QUERY = 'fmi::observations::weather::multipointcoverage'
 FORECAST_PARAMETERS = ['Temperature', 'WindSpeedMS', 'WindDirection', 'TotalCloudCover', 'WeatherSymbol3', 'SmartSymbol']
@@ -28,7 +30,7 @@ def split_in_chunks(data: List, size: int):
     return zip_longest(*args)
 
 
-def fetch_data(query_type: str, extra_params: Dict[str, str] = {}) -> et.Element:
+def fetch_data(query_type: str, extra_params: Optional[Dict[str, str]] = None) -> et.Element:
   base_params = {
     'service': 'WFS',
     'version': '2.0.0',
@@ -36,10 +38,12 @@ def fetch_data(query_type: str, extra_params: Dict[str, str] = {}) -> et.Element
     'storedQuery_id': query_type,
     }
 
-  params = base_params | extra_params
+  params = base_params | (extra_params or {})
 
+  start_time = timer()
   response = requests.get(FMI_API_URL, params=params, timeout=REQUEST_TIMEOUT)
   response.raise_for_status()
+  logging.getLogger(__name__).info(f'Fetched {query_type}: {len(response.content)} bytes in {timer() - start_time:.2f} s')
   return et.fromstring(response.content)
 
 
@@ -107,7 +111,7 @@ def get_radiation_data(config: AppConfig, observation_data: Optional[Observation
     }
     xml_data = fetch_data(RADIATION_QUERY, params)
     radiation_data = parse_multipoint_data(xml_data, 1)
-    validate_data(radiation_data, radiation_data_mapping_schema, logger)
+    radiation_data = validate_data(radiation_data, radiation_data_adapter, logger)
     logger.info('Received radiation data: %s', repr(radiation_data))
     return radiation_data
   except Exception as e:
@@ -125,7 +129,7 @@ def get_observation_data(config: AppConfig, logger: Logger) -> Optional[Observat
     }
     xml_data = fetch_data(OBS_QUERY, params)
     observation_data = parse_multipoint_data(xml_data, 1)
-    validate_data(observation_data, observation_data_mapping_schema, logger)
+    observation_data = validate_data(observation_data, observation_data_adapter, logger)
     position = get_position(xml_data)
     position_name = get_position_name(xml_data)
     fmisid = get_fmisid(xml_data)
@@ -148,7 +152,7 @@ def get_forecast_data(config: AppConfig, count: int, skip_count: Optional[int], 
     }
     xml_data = fetch_data(FORECAST_QUERY, params)
     forecast_data = parse_multipoint_data(xml_data, count, skip_count, True)
-    validate_data(forecast_data, forecast_data_mapping_schema, logger)
+    forecast_data = validate_data(forecast_data, forecast_data_adapter, logger)
     position = get_position(xml_data)
     position_name = get_position_name(xml_data)
     fmisid = get_fmisid(xml_data)
