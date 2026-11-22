@@ -42,11 +42,11 @@ epd_voltage = 1370
 # 4, 2 or 1 bits per pixel
 bits_per_pixel = 4
 
-# Minutes between doing a refresh with full init (1-60, should divide 60 evenly)
-refresh_full_interval = 60
+# Seconds between full refreshes: INIT and redraw of the whole panel to clear ghosting (must divide 3600 evenly)
+full_refresh_interval = 3600
 
-# Minutes between doing a fast non-init refresh (1-60, should divide 60 evenly)
-refresh_partial_interval = 1
+# Seconds between updates, which redraw only the changed areas (must divide 3600 evenly)
+update_interval = 60
 
 # Show a warning icon if the temperature is >= this value
 high_temperature_warning_threshold = 25

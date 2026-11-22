@@ -48,7 +48,7 @@
 // Words per bulk SPI transfer when uploading image data (2 bytes each)
 #define EPD_IT8951_SPI_CHUNK_WORDS 16384
 
-// Abort codes, also used as return codes of draw_image_8bit()
+// Abort codes, also used as return codes of draw_image_8bit_areas()
 enum { EPD_IT8951_BUSY_TIMEOUT = 2, EPD_IT8951_DISPLAY_READY_TIMEOUT = 3 };
 
 // The caller must setjmp() this before calling any EPD_IT8951 function that talks to the controller.
