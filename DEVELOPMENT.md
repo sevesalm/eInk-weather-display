@@ -51,7 +51,7 @@ python -m compileall -q .
 
 In dev mode the app draws the display image once, saves it as a PNG file and exits. The e-Ink display library is not loaded, and the weather and sensor data can be replaced with random data.
 
-The icons are rendered at startup straight from the SVG files in [eInk-weather-display/svg_icons](eInk-weather-display/svg_icons) with [resvg-py](https://pypi.org/project/resvg-py/), so there is no conversion step. Edit an SVG and run the app again to see the change. `scripts/convert_preview.sh` (needs `brew install librsvg`) regenerates the small preview PNGs shown in the [icon gallery](eInk-weather-display/svg_icons/README.md).
+The icons are rendered at startup straight from the SVG files in [eInk-weather-display/svg_icons](eInk-weather-display/svg_icons) with [resvg-py](https://pypi.org/project/resvg-py/), so there is no conversion step. Edit an SVG and run the app again to see the change. The [icon gallery](eInk-weather-display/svg_icons/README.md) shows the SVGs directly, so it stays up to date too.
 
 ### 1. Create a config file
 
