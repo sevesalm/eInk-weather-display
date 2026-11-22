@@ -10,7 +10,20 @@ static long lap_ms(struct timespec *lap) {
   return elapsed;
 }
 
-int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int bits_per_pixel, t_logger logger) {
+static bool is_valid_area(const int *area, int panel_width, int panel_height) {
+  const int x = area[0], y = area[1], w = area[2], h = area[3];
+  return x >= 0 && y >= 0 && w > 0 && h > 0 && x + w <= panel_width && y + h <= panel_height && x % AREA_ALIGN == 0 && w % AREA_ALIGN == 0;
+}
+
+// Uploads the 8-bit image as is or packed to bits_per_pixel and starts a GC16 waveform on the area.
+// image_8bit is the whole frame; areas holds area_count rectangles as x, y, w, h. A full refresh (init) or
+// area_count 0 draws the whole panel.
+int draw_image_8bit_areas(UBYTE *image_8bit, bool init, const int voltage, const int bits_per_pixel, const int *areas, const int area_count, t_logger logger) {
+  if (bits_per_pixel != 8 && bits_per_pixel != 4 && bits_per_pixel != 2 && bits_per_pixel != 1) {
+    logger(LOG_LEVEL_ERROR, L"Unsupported bit depth!");
+    return 1;
+  }
+
   // Not modified after setjmp, so it's still valid in cleanup after a longjmp
   struct timespec start;
   clock_gettime(CLOCK_MONOTONIC, &start);
@@ -27,7 +40,7 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
 
   int result = 0;
   // Volatile so the value is still valid after a longjmp from the driver
-  UBYTE *volatile image_converted = NULL;
+  UBYTE *volatile area_buffer = NULL;
 
   // The driver jumps back here if the controller stops responding
   if (setjmp(EPD_IT8951_Abort_Jmp) != 0) {
@@ -61,6 +74,21 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
     goto cleanup;
   }
 
+  const int full_area[4] = {0, 0, Panel_Width, Panel_Height};
+  const bool whole_panel = init || area_count == 0;
+  const int *draw_areas = whole_panel ? full_area : areas;
+  const int draw_area_count = whole_panel ? 1 : area_count;
+
+  // Check every area before drawing any, so a bad one doesn't leave the panel half updated
+  for (int i = 0; i < draw_area_count; i++) {
+    const int *area = &draw_areas[4 * i];
+    if (!is_valid_area(area, Panel_Width, Panel_Height)) {
+      log_fmt(logger, LOG_LEVEL_ERROR, L"Invalid area %d: x=%d y=%d w=%d h=%d", i, area[0], area[1], area[2], area[3]);
+      result = 1;
+      goto cleanup;
+    }
+  }
+
   if (init == true) {
     logger(LOG_LEVEL_INFO, L"EPD_IT8951_Init_Refresh()");
     EPD_IT8951_Init_Refresh(Dev_Info);
@@ -70,37 +98,34 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
     log_fmt(logger, LOG_LEVEL_INFO, L"Timing: INIT waveform %ld ms", lap_ms(&lap));
   }
 
-  const size_t panel_size = Panel_Width * Panel_Height;
+  for (int i = 0; i < draw_area_count; i++) {
+    const int x = draw_areas[4 * i], y = draw_areas[4 * i + 1], w = draw_areas[4 * i + 2], h = draw_areas[4 * i + 3];
+    log_fmt(logger, LOG_LEVEL_INFO, L"Area %d/%d: x=%d y=%d w=%d h=%d", i + 1, draw_area_count, x, y, w, h);
 
-  if (bits_per_pixel == 8) {
-    logger(LOG_LEVEL_INFO, L"EPD_IT8951_8bp_Refresh()");
-    EPD_IT8951_8bp_Refresh(image_8bit, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr, true);
-    log_fmt(logger, LOG_LEVEL_INFO, L"Timing: upload %ld ms", lap_ms(&lap));
-  } else if (bits_per_pixel == 4 || bits_per_pixel == 2 || bits_per_pixel == 1) {
-    log_fmt(logger, LOG_LEVEL_INFO, L"from_8bit_to_%dbit()", bits_per_pixel);
-    image_converted = bits_per_pixel == 4 ? from_8bit_to_4bit(image_8bit, panel_size)
-                    : bits_per_pixel == 2 ? from_8bit_to_2bit(image_8bit, panel_size)
-                                          : from_8bit_to_1bit(image_8bit, panel_size);
-    if (image_converted == NULL) {
+    area_buffer = pack_area(image_8bit, Panel_Width, x, y, w, h, bits_per_pixel);
+    if (area_buffer == NULL) {
       logger(LOG_LEVEL_ERROR, L"Out of memory");
       result = 1;
       goto cleanup;
     }
     log_fmt(logger, LOG_LEVEL_INFO, L"Timing: conversion %ld ms", lap_ms(&lap));
-    log_fmt(logger, LOG_LEVEL_INFO, L"EPD_IT8951_%dbp_Refresh()", bits_per_pixel);
-    if (bits_per_pixel == 4) {
-      EPD_IT8951_4bp_Refresh(image_converted, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr, true);
+
+    // Each refresh first waits for the previous area's waveform to finish
+    if (bits_per_pixel == 8) {
+      EPD_IT8951_8bp_Refresh(area_buffer, x, y, w, h, false, Memory_Addr, true);
+    } else if (bits_per_pixel == 4) {
+      EPD_IT8951_4bp_Refresh(area_buffer, x, y, w, h, false, Memory_Addr, true);
     } else if (bits_per_pixel == 2) {
-      EPD_IT8951_2bp_Refresh(image_converted, 0, 0, Panel_Width, Panel_Height, false, Memory_Addr, true);
+      EPD_IT8951_2bp_Refresh(area_buffer, x, y, w, h, false, Memory_Addr, true);
     } else {
-      EPD_IT8951_1bp_Refresh(image_converted, 0, 0, Panel_Width, Panel_Height, GC16_Mode, Memory_Addr, true);
+      EPD_IT8951_1bp_Refresh(area_buffer, x, y, w, h, GC16_Mode, Memory_Addr, true);
     }
-    // 1 bpp waits for the waveform inside EPD_IT8951_Display_1bp, so its upload time includes the waveform
+    // 1 bpp waits for the waveform inside EPD_IT8951_Display_1bp, so its upload time includes the waveform.
+    // From the second area on, the upload time also includes waiting for the previous area's waveform.
     log_fmt(logger, LOG_LEVEL_INFO, L"Timing: upload %ld ms", lap_ms(&lap));
-  } else {
-    logger(LOG_LEVEL_ERROR, L"Unsupported bit depth!");
-    result = 1;
-    goto cleanup;
+
+    free(area_buffer);
+    area_buffer = NULL;
   }
 
   logger(LOG_LEVEL_INFO, L"EPD_IT8951_WaitForDisplayReady()");
@@ -111,52 +136,44 @@ int draw_image_8bit(UBYTE *image_8bit, bool init, const int voltage, const int b
 
 cleanup:
   // Runs in the caller's process, so release everything on every path
-  free(image_converted);
+  free(area_buffer);
   DEV_Module_Exit();
-  log_fmt(logger, LOG_LEVEL_INFO, L"Timing: draw_image_8bit total %ld ms", lap_ms(&start));
+  log_fmt(logger, LOG_LEVEL_INFO, L"Timing: draw_image_8bit_areas total %ld ms", lap_ms(&start));
   return result;
 }
 
-UBYTE *from_8bit_to_4bit(UBYTE *image, size_t size) {
-  UBYTE *buffer = malloc(size / 2);
-  if (buffer == NULL) {
-    return NULL;
+// Packs one row of 8-bit pixels, keeping the top bits of each and putting the first pixel in the lowest bits.
+// Inlined with a constant bits_per_pixel, so each bit depth gets its own unrolled loop.
+static inline void pack_row(const UBYTE *in, UBYTE *out, size_t out_bytes, const int bits_per_pixel) {
+  const int pixels_per_byte = 8 / bits_per_pixel;
+  const UBYTE mask = (UBYTE)(0xFF << (8 - bits_per_pixel));
+  for (size_t i = 0; i < out_bytes; i++) {
+    UBYTE val = 0;
+    for (int p = 0; p < pixels_per_byte; p++) {
+      val |= (in[p] & mask) >> (8 - bits_per_pixel * (p + 1));
+    }
+    out[i] = val;
+    in += pixels_per_byte;
   }
-  UBYTE bit_mask = 0b11110000;
-  for (size_t i = 0; i < size / 2; i++) {
-    UBYTE val = ((image[2 * i] & bit_mask) >> 4) | ((image[2 * i + 1] & bit_mask) >> 0);
-    buffer[i] = val;
-  }
-  return buffer;
 }
 
-UBYTE *from_8bit_to_2bit(UBYTE *image, size_t size) {
-  UBYTE *buffer = malloc(size / 4);
+// Copies the area out of the 8-bit image (stride bytes per row) into a new buffer, packed to bits_per_pixel.
+// w must be a multiple of 8 / bits_per_pixel. The caller frees the result.
+UBYTE *pack_area(const UBYTE *image, size_t stride, int x, int y, int w, int h, int bits_per_pixel) {
+  const size_t row_bytes = (size_t)w * bits_per_pixel / 8;
+  UBYTE *buffer = malloc(row_bytes * h);
   if (buffer == NULL) {
     return NULL;
   }
-  UBYTE bit_mask = 0b11000000;
-
-  for (size_t i = 0; i < size / 4; i++) {
-    UBYTE val = ((image[4 * i] & bit_mask) >> 6) | ((image[4 * i + 1] & bit_mask) >> 4) |
-                ((image[4 * i + 2] & bit_mask) >> 2) | ((image[4 * i + 3] & bit_mask) >> 0);
-    buffer[i] = val;
-  }
-  return buffer;
-}
-
-UBYTE *from_8bit_to_1bit(UBYTE *image, size_t size) {
-  UBYTE *buffer = malloc(size / 8);
-  if (buffer == NULL) {
-    return NULL;
-  }
-  UBYTE bit_mask = 0b10000000;
-  for (size_t i = 0; i < size / 8; i++) {
-    UBYTE val = ((image[8 * i] & bit_mask) >> 7) | ((image[8 * i + 1] & bit_mask) >> 6) |
-                ((image[8 * i + 2] & bit_mask) >> 5) | ((image[8 * i + 3] & bit_mask) >> 4) |
-                ((image[8 * i + 4] & bit_mask) >> 3) | ((image[8 * i + 5] & bit_mask) >> 2) |
-                ((image[8 * i + 6] & bit_mask) >> 1) | ((image[8 * i + 7] & bit_mask) >> 0);
-    buffer[i] = val;
+  for (int row = 0; row < h; row++) {
+    const UBYTE *in = image + (size_t)(y + row) * stride + x;
+    UBYTE *out = buffer + (size_t)row * row_bytes;
+    switch (bits_per_pixel) {
+      case 8: memcpy(out, in, row_bytes); break;
+      case 4: pack_row(in, out, row_bytes, 4); break;
+      case 2: pack_row(in, out, row_bytes, 2); break;
+      default: pack_row(in, out, row_bytes, 1); break;
+    }
   }
   return buffer;
 }

@@ -63,7 +63,7 @@ def get_epd_data(config: AppConfig) -> tuple[Optional[ctypes.CDLL], tuple[int, i
   if (config.dev_mode):
     return (None, (1872, 1404))
   epd_so = ctypes.CDLL(str(APP_DIR / 'lib' / 'epd78.so'))
-  epd_so.draw_image_8bit.restype = ctypes.c_int
+  epd_so.draw_image_8bit_areas.restype = ctypes.c_int
   return (epd_so, (1872, 1404))
 
 

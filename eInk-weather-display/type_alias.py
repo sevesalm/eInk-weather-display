@@ -54,6 +54,9 @@ Fonts = Mapping[str, ImageFont.FreeTypeFont]
 
 Position = tuple[str, str]
 
+# x, y, width, height in pixels
+Rect = tuple[int, int, int, int]
+
 ObservationData = tuple[Mapping[str, ObservationDataItem], tuple[str, str], str, str]
 ForecastData = tuple[Mapping[str, ForecastDataItem], tuple[str, str], str, str]
 RadiationData = Mapping[str, RadiationDataItem]

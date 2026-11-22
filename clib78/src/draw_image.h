@@ -5,8 +5,10 @@
 #include "../lib/Config/logger.h"
 #include "../lib/e-Paper/EPD_IT8951.h"
 
-int draw_image_8bit(UBYTE *image, bool init, const int voltage, const int bits_per_pixel, t_logger logger);
-UBYTE *from_8bit_to_4bit(UBYTE *image, size_t size);
-UBYTE *from_8bit_to_2bit(UBYTE *image, size_t size);
-UBYTE *from_8bit_to_1bit(UBYTE *image, size_t size);
+// Area x and width must be multiples of this so every bit depth packs whole words per row (1 bpp needs 16 px).
+// Must match AREA_ALIGN in display_areas.py.
+#define AREA_ALIGN 16
+
+int draw_image_8bit_areas(UBYTE *image, bool init, const int voltage, const int bits_per_pixel, const int *areas, const int area_count, t_logger logger);
+UBYTE *pack_area(const UBYTE *image, size_t stride, int x, int y, int w, int h, int bits_per_pixel);
 #endif
