@@ -9,3 +9,4 @@ config.toml
 .ideas*
 eInk-weather-display/image.png
 reviews/
+.claude/worktrees/

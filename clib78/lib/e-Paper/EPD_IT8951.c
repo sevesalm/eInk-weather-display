@@ -610,10 +610,11 @@ void EPD_IT8951_Sleep(t_logger logger) {
 function :	EPD_IT8951_Init
 parameter:
 ******************************************************************************/
+// Hardware reset and full setup. Slow (~1.9 s, mostly the controller booting after the reset).
 IT8951_Dev_Info EPD_IT8951_Init(UWORD VCOM, t_logger logger) {
   IT8951_Dev_Info Dev_Info;
 
-  logger(LOG_LEVEL_INFO, L"EPD_IT8951_Init()");
+  logger(LOG_LEVEL_INFO, L"EPD_IT8951_Init(): reset");
 
   EPD_IT8951_Reset(logger);
 
@@ -633,6 +634,21 @@ IT8951_Dev_Info EPD_IT8951_Init(UWORD VCOM, t_logger logger) {
   log_fmt(logger, LOG_LEVEL_DEBUG, L"VCOM = -%.02fV", (float)EPD_IT8951_GetVCOM() / 1000);
 
   return Dev_Info;
+}
+
+/******************************************************************************
+function :	EPD_IT8951_Wake
+parameter:
+******************************************************************************/
+// Wakes a controller that was put to SLEEP after a successful EPD_IT8951_Init, without a reset.
+// Device info and VCOM are kept from that init.
+void EPD_IT8951_Wake(t_logger logger) {
+  logger(LOG_LEVEL_INFO, L"EPD_IT8951_Init(): wake");
+
+  EPD_IT8951_SystemRun(logger);
+
+  // Cheap, and makes sure packed writes are on even if SLEEP didn't keep the register
+  EPD_IT8951_WriteReg(I80CPCR, 0x0001);
 }
 
 /******************************************************************************
