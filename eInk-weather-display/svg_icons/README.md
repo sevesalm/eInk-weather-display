@@ -6,131 +6,60 @@ This is a set of custom made icons to be used with FMI observation and forecast 
 
 ### General
 
-![no_phenomenon.png](preview/no_phenomenon.png)
-![clear.png](preview/clear.png)
-![clear_night.png](preview/clear_night.png)
-![clouds.png](preview/clouds.png)
-![cloudy.png](preview/cloudy.png)
-![partially_cloudy.png](preview/partially_cloudy.png)
-![partially_cloudy_night.png](preview/partially_cloudy_night.png)
+<img src="no_phenomenon.svg" width="100" height="100" alt="no_phenomenon"> <img src="clear.svg" width="100" height="100" alt="clear"> <img src="clear_night.svg" width="100" height="100" alt="clear_night"> <img src="clouds.svg" width="100" height="100" alt="clouds"> <img src="cloudy.svg" width="100" height="100" alt="cloudy"> <img src="partially_cloudy.svg" width="100" height="100" alt="partially_cloudy"> <img src="partially_cloudy_night.svg" width="100" height="100" alt="partially_cloudy_night">
 
 ### Drizzle (+ with icing)
 
-![drizzle_mild.png](preview/drizzle_mild.png)
-![drizzle.png](preview/drizzle.png)
-![drizzle_strong.png](preview/drizzle_strong.png)
-![drizzle_mild_icing.png](preview/drizzle_mild_icing.png)
-![drizzle_icing.png](preview/drizzle_icing.png)
-![drizzle_strong_icing.png](preview/drizzle_strong_icing.png)
+<img src="drizzle_mild.svg" width="100" height="100" alt="drizzle_mild"> <img src="drizzle.svg" width="100" height="100" alt="drizzle"> <img src="drizzle_strong.svg" width="100" height="100" alt="drizzle_strong"> <img src="drizzle_mild_icing.svg" width="100" height="100" alt="drizzle_mild_icing"> <img src="drizzle_icing.svg" width="100" height="100" alt="drizzle_icing"> <img src="drizzle_strong_icing.svg" width="100" height="100" alt="drizzle_strong_icing">
 
 ### Mist and fog
 
-![mist.png](preview/mist.png)
-![fog.png](preview/fog.png)
+<img src="mist.svg" width="100" height="100" alt="mist"> <img src="fog.svg" width="100" height="100" alt="fog">
 
 ### Hail
 
-![partially_cloudy_hail_rain.png](preview/partially_cloudy_hail_rain.png)
-![partially_cloudy_hail_rain_night.png](preview/partially_cloudy_hail_rain_night.png)
+<img src="partially_cloudy_hail_rain.svg" width="100" height="100" alt="partially_cloudy_hail_rain"> <img src="partially_cloudy_hail_rain_night.svg" width="100" height="100" alt="partially_cloudy_hail_rain_night">
 
 ### Rain (+ with icing)
 
-![rain_mild.png](preview/rain_mild.png)
-![rain.png](preview/rain.png)
-![rain_strong.png](preview/rain_strong.png)
-![partially_cloudy_rain_mild.png](preview/partially_cloudy_rain_mild.png)
-![partially_cloudy_rain_mild_night.png](preview/partially_cloudy_rain_mild_night.png)
-![partially_cloudy_rain.png](preview/partially_cloudy_rain.png)
-![partially_cloudy_rain_night.png](preview/partially_cloudy_rain_night.png)
-![partially_cloudy_rain_strong.png](preview/partially_cloudy_rain_strong.png)
-![partially_cloudy_rain_strong_night.png](preview/partially_cloudy_rain_strong_night.png)
-![partially_cloudy_rain_horrible.png](preview/partially_cloudy_rain_horrible.png)
-![partially_cloudy_rain_horrible_night.png](preview/partially_cloudy_rain_horrible_night.png)
-![rain_mild_icing.png](preview/rain_mild_icing.png)
-![rain_icing.png](preview/rain_icing.png)
-![rain_strong_icing.png](preview/rain_strong_icing.png)
+<img src="rain_mild.svg" width="100" height="100" alt="rain_mild"> <img src="rain.svg" width="100" height="100" alt="rain"> <img src="rain_strong.svg" width="100" height="100" alt="rain_strong"> <img src="partially_cloudy_rain_mild.svg" width="100" height="100" alt="partially_cloudy_rain_mild"> <img src="partially_cloudy_rain_mild_night.svg" width="100" height="100" alt="partially_cloudy_rain_mild_night"> <img src="partially_cloudy_rain.svg" width="100" height="100" alt="partially_cloudy_rain"> <img src="partially_cloudy_rain_night.svg" width="100" height="100" alt="partially_cloudy_rain_night"> <img src="partially_cloudy_rain_strong.svg" width="100" height="100" alt="partially_cloudy_rain_strong"> <img src="partially_cloudy_rain_strong_night.svg" width="100" height="100" alt="partially_cloudy_rain_strong_night"> <img src="partially_cloudy_rain_horrible.svg" width="100" height="100" alt="partially_cloudy_rain_horrible"> <img src="partially_cloudy_rain_horrible_night.svg" width="100" height="100" alt="partially_cloudy_rain_horrible_night"> <img src="rain_mild_icing.svg" width="100" height="100" alt="rain_mild_icing"> <img src="rain_icing.svg" width="100" height="100" alt="rain_icing"> <img src="rain_strong_icing.svg" width="100" height="100" alt="rain_strong_icing">
 
 ### Sleet
 
-![sleet_mild.png](preview/sleet_mild.png)
-![sleet.png](preview/sleet.png)
-![sleet_strong.png](preview/sleet_strong.png)
-![partially_cloudy_sleet_mild.png](preview/partially_cloudy_sleet_mild.png)
-![partially_cloudy_sleet_mild_night.png](preview/partially_cloudy_sleet_mild_night.png)
-![partially_cloudy_sleet.png](preview/partially_cloudy_sleet.png)
-![partially_cloudy_sleet_night.png](preview/partially_cloudy_sleet_night.png)
-![partially_cloudy_sleet_strong.png](preview/partially_cloudy_sleet_strong.png)
-![partially_cloudy_sleet_strong_night.png](preview/partially_cloudy_sleet_strong_night.png)
+<img src="sleet_mild.svg" width="100" height="100" alt="sleet_mild"> <img src="sleet.svg" width="100" height="100" alt="sleet"> <img src="sleet_strong.svg" width="100" height="100" alt="sleet_strong"> <img src="partially_cloudy_sleet_mild.svg" width="100" height="100" alt="partially_cloudy_sleet_mild"> <img src="partially_cloudy_sleet_mild_night.svg" width="100" height="100" alt="partially_cloudy_sleet_mild_night"> <img src="partially_cloudy_sleet.svg" width="100" height="100" alt="partially_cloudy_sleet"> <img src="partially_cloudy_sleet_night.svg" width="100" height="100" alt="partially_cloudy_sleet_night"> <img src="partially_cloudy_sleet_strong.svg" width="100" height="100" alt="partially_cloudy_sleet_strong"> <img src="partially_cloudy_sleet_strong_night.svg" width="100" height="100" alt="partially_cloudy_sleet_strong_night">
 
 ### Snow
 
-![snow_mild.png](preview/snow_mild.png)
-![snow.png](preview/snow.png)
-![snow_strong.png](preview/snow_strong.png)
-![partially_cloudy_snow_mild.png](preview/partially_cloudy_snow_mild.png)
-![partially_cloudy_snow_mild_night.png](preview/partially_cloudy_snow_mild_night.png)
-![partially_cloudy_snow.png](preview/partially_cloudy_snow.png)
-![partially_cloudy_snow_night.png](preview/partially_cloudy_snow_night.png)
-![partially_cloudy_snow_strong.png](preview/partially_cloudy_snow_strong.png)
-![partially_cloudy_snow_strong_night.png](preview/partially_cloudy_snow_strong_night.png)
+<img src="snow_mild.svg" width="100" height="100" alt="snow_mild"> <img src="snow.svg" width="100" height="100" alt="snow"> <img src="snow_strong.svg" width="100" height="100" alt="snow_strong"> <img src="partially_cloudy_snow_mild.svg" width="100" height="100" alt="partially_cloudy_snow_mild"> <img src="partially_cloudy_snow_mild_night.svg" width="100" height="100" alt="partially_cloudy_snow_mild_night"> <img src="partially_cloudy_snow.svg" width="100" height="100" alt="partially_cloudy_snow"> <img src="partially_cloudy_snow_night.svg" width="100" height="100" alt="partially_cloudy_snow_night"> <img src="partially_cloudy_snow_strong.svg" width="100" height="100" alt="partially_cloudy_snow_strong"> <img src="partially_cloudy_snow_strong_night.svg" width="100" height="100" alt="partially_cloudy_snow_strong_night">
 
 ### Thunder
 
-![thunder.png](preview/thunder.png)
-![thunder_strong.png](preview/thunder_strong.png)
-![partially_cloudy_thunder.png](preview/partially_cloudy_thunder.png)
-![partially_cloudy_thunder_night.png](preview/partially_cloudy_thunder_night.png)
-![partially_cloudy_thunder_strong.png](preview/partially_cloudy_thunder_strong.png)
-![partially_cloudy_thunder_strong_night.png](preview/partially_cloudy_thunder_strong_night.png)
+<img src="thunder.svg" width="100" height="100" alt="thunder"> <img src="thunder_strong.svg" width="100" height="100" alt="thunder_strong"> <img src="partially_cloudy_thunder.svg" width="100" height="100" alt="partially_cloudy_thunder"> <img src="partially_cloudy_thunder_night.svg" width="100" height="100" alt="partially_cloudy_thunder_night"> <img src="partially_cloudy_thunder_strong.svg" width="100" height="100" alt="partially_cloudy_thunder_strong"> <img src="partially_cloudy_thunder_strong_night.svg" width="100" height="100" alt="partially_cloudy_thunder_strong_night">
 
 ### Precipitation
 
-![precipitation_mild.png](preview/precipitation_mild.png)
-![precipitation.png](preview/precipitation.png)
-![precipitation_heavy.png](preview/precipitation_heavy.png)
+<img src="precipitation_mild.svg" width="100" height="100" alt="precipitation_mild"> <img src="precipitation.svg" width="100" height="100" alt="precipitation"> <img src="precipitation_heavy.svg" width="100" height="100" alt="precipitation_heavy">
 
 ### Ice pellets
 
-![ice_pellets_mild.png](preview/ice_pellets_mild.png)
-![ice_pellets.png](preview/ice_pellets.png)
-![ice_pellets_strong.png](preview/ice_pellets_strong.png)
+<img src="ice_pellets_mild.svg" width="100" height="100" alt="ice_pellets_mild"> <img src="ice_pellets.svg" width="100" height="100" alt="ice_pellets"> <img src="ice_pellets_strong.svg" width="100" height="100" alt="ice_pellets_strong">
 
 ## Miscellaneous
 
-![sunrise.png](preview/sunrise.png)
-![sunset.png](preview/sunset.png)
-![wind_icon.png](preview/wind_icon.png)
-![temperature.png](preview/temperature.png)
-![temperature_feel.png](preview/temperature_feel.png)
-![humidity.png](preview/humidity.png)
-![wind.png](preview/wind.png)
-![pressure.png](preview/pressure.png)
-![warning.png](preview/warning.png)
+<img src="sunrise.svg" width="154" height="100" alt="sunrise"> <img src="sunset.svg" width="154" height="100" alt="sunset"> <img src="wind_icon.svg" width="100" height="100" alt="wind_icon"> <img src="temperature.svg" width="100" height="100" alt="temperature"> <img src="temperature_feel.svg" width="130" height="100" alt="temperature_feel"> <img src="humidity.svg" width="100" height="100" alt="humidity"> <img src="wind.svg" width="100" height="100" alt="wind"> <img src="pressure.svg" width="100" height="100" alt="pressure"> <img src="warning.svg" width="100" height="100" alt="warning">
 
 ## Battery level
 
-![battery_full.png](preview/battery_full.png)
-![battery_75.png](preview/battery_75.png)
-![battery_50.png](preview/battery_50.png)
-![battery_25.png](preview/battery_25.png)
-![battery_empty.png](preview/battery_empty.png)
+<img src="battery_full.svg" width="100" height="100" alt="battery_full"> <img src="battery_75.svg" width="100" height="100" alt="battery_75"> <img src="battery_50.svg" width="100" height="100" alt="battery_50"> <img src="battery_25.svg" width="100" height="100" alt="battery_25"> <img src="battery_empty.svg" width="100" height="100" alt="battery_empty">
 
 ## Signal strength
 
-![signal_high.png](preview/signal_high.png)
-![signal_med.png](preview/signal_med.png)
-![signal_low.png](preview/signal_low.png)
-![no_signal.png](preview/no_signal.png)
+<img src="signal_high.svg" width="100" height="100" alt="signal_high"> <img src="signal_med.svg" width="100" height="100" alt="signal_med"> <img src="signal_low.svg" width="100" height="100" alt="signal_low"> <img src="no_signal.svg" width="100" height="100" alt="no_signal">
 
 ## Cloud cover
 
-![cloud_cover_0.png](preview/cloud_cover_0.png)
-![cloud_cover_1.png](preview/cloud_cover_1.png)
-![cloud_cover_2.png](preview/cloud_cover_2.png)
-![cloud_cover_3.png](preview/cloud_cover_3.png)
-![cloud_cover_4.png](preview/cloud_cover_4.png)
-![cloud_cover_5.png](preview/cloud_cover_5.png)
-![cloud_cover_6.png](preview/cloud_cover_6.png)
-![cloud_cover_7.png](preview/cloud_cover_7.png)
-![cloud_cover_8.png](preview/cloud_cover_8.png)
-![cloud_cover_9.png](preview/cloud_cover_9.png)
+<img src="cloud_cover_0.svg" width="100" height="100" alt="cloud_cover_0"> <img src="cloud_cover_1.svg" width="100" height="100" alt="cloud_cover_1"> <img src="cloud_cover_2.svg" width="100" height="100" alt="cloud_cover_2"> <img src="cloud_cover_3.svg" width="100" height="100" alt="cloud_cover_3"> <img src="cloud_cover_4.svg" width="100" height="100" alt="cloud_cover_4"> <img src="cloud_cover_5.svg" width="100" height="100" alt="cloud_cover_5"> <img src="cloud_cover_6.svg" width="100" height="100" alt="cloud_cover_6"> <img src="cloud_cover_7.svg" width="100" height="100" alt="cloud_cover_7"> <img src="cloud_cover_8.svg" width="100" height="100" alt="cloud_cover_8"> <img src="cloud_cover_9.svg" width="100" height="100" alt="cloud_cover_9">
+
+## Backgrounds
+
+<img src="background.svg" width="100" height="100" alt="background"> <img src="background_day.svg" width="100" height="100" alt="background_day"> <img src="background_night.svg" width="100" height="100" alt="background_night">
