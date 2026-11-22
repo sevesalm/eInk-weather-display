@@ -51,17 +51,9 @@ python -m compileall -q .
 
 In dev mode the app draws the display image once, saves it as a PNG file and exits. The e-Ink display library is not loaded, and the weather and sensor data can be replaced with random data.
 
-### 1. Generate the PNG icons
+The icons are rendered at startup straight from the SVG files in [eInk-weather-display/svg_icons](eInk-weather-display/svg_icons) with [resvg-py](https://pypi.org/project/resvg-py/), so there is no conversion step. Edit an SVG and run the app again to see the change. `scripts/convert_preview.sh` (needs `brew install librsvg`) regenerates the small preview PNGs shown in the [icon gallery](eInk-weather-display/svg_icons/README.md).
 
-The icons are drawn from the SVG files in [svg_icons](svg_icons) and are not committed to the repository. Convert them once, and again whenever the SVGs change:
-
-```sh
-brew install librsvg
-mkdir -p eInk-weather-display/png_icons
-./scripts/convert.sh
-```
-
-### 2. Create a config file
+### 1. Create a config file
 
 ```sh
 cp eInk-weather-display/config_example.toml eInk-weather-display/config.toml
@@ -94,14 +86,13 @@ mac = "AA:BB:CC:DD:EE:02"
 
 Set `dev_mode_random_weather_data = false` to render real FMI data for `fmi_location`.
 
-### 3. Run
+### 2. Run
 
-The app reads `config.toml`, fonts and icons relative to the current directory, so run it from the `eInk-weather-display` directory:
+The app reads `config.toml`, fonts and icons from the `eInk-weather-display` directory and writes the image and the log there, so it can be run from any directory:
 
 ```sh
-cd eInk-weather-display
-python weather-display.py
-open image.png
+python eInk-weather-display/weather-display.py
+open eInk-weather-display/image.png
 ```
 
-Logs are printed to the terminal and written to `logger.log`.
+Logs are printed to the terminal and written to `eInk-weather-display/logger.log`.

@@ -15,11 +15,12 @@ A Python app that renders a weather dashboard (FMI Open API observations/forecas
   - `weather_data.py` (FMI API), `weather_data_mock.py` (random data), `sensor_data.py` (Ruuvi/Home Assistant), `celestial.py` (PyEphem), `feels_like_temperature.py`.
   - `app_config.py` – pydantic `AppConfig` loaded from `config.toml` (`extra='forbid'`). `config_example.toml` documents every option.
   - `type_alias.py` – shared `TypedDict`s and type aliases.
+  - `icons.py` – renders the icons from `svg_icons/` with `resvg-py` at startup, each at the size it's drawn at, and composites weather icons onto their day/night background.
+  - `svg_icons/` – source icons, used directly by the app. `README.md` + `preview/` (regenerated with `scripts/convert_preview.sh`) are an icon gallery; `preview/` and `archive/` aren't deployed.
   - `lib/epd78.so`, `lib/epd37.so` – prebuilt ARM shared libraries loaded with `ctypes`. Only `epd78.so` is used now.
   - `test/` – `unittest` tests.
 - `clib78/` (7.8"/10.3" IT8951) and `clib/` (legacy 3.7") – C sources for the display libraries. Built on the Pi against `bcm2835` via `scripts/compile.sh`.
-- `svg_icons/` – source icons. PNGs in `eInk-weather-display/png_icons/` are generated and gitignored.
-- `scripts/` – `deploy.sh` (installs deps, copies the app and restarts it; `--fresh` recreates the venv), `compile.sh`, `convert.sh`, etc. Remote scripts read `scripts/config.env` (copy from `config.env.example`; gitignored).
+- `scripts/` – `deploy.sh` (installs deps, copies the app and restarts it; `--fresh` recreates the venv), `compile.sh`, `convert_preview.sh`, etc. Remote scripts read `scripts/config.env` (copy from `config.env.example`; gitignored).
 - `requirements/` – `common.txt` (app), `development.txt` (+ ruff, ty), `raspberry.txt` (+ Pi-only: `RPi.GPIO`, `spidev`, `bleson`, `ruuvitag-sensor`).
 
 ## Commands
@@ -36,7 +37,7 @@ python -m unittest discover -s eInk-weather-display  # CI: tests
 
 Run all four before finishing a change; CI ([.github/workflows/default.yml](.github/workflows/default.yml)) runs exactly these.
 
-To render the display locally, see [DEVELOPMENT.md](DEVELOPMENT.md#running-the-app-locally): generate PNG icons with `./scripts/convert.sh`, create `eInk-weather-display/config.toml` with `dev_mode = true` and the random-data flags, then run `python eInk-weather-display/weather-display.py` (config, fonts, icons, `lib/`, the log and the output image are resolved from the app directory via `paths.APP_DIR`, so any working directory works). Output is `eInk-weather-display/image.png`; check it visually after any drawing change.
+To render the display locally, see [DEVELOPMENT.md](DEVELOPMENT.md#running-the-app-locally): create `eInk-weather-display/config.toml` with `dev_mode = true` and the random-data flags, then run `python eInk-weather-display/weather-display.py` (config, fonts, icons, `lib/`, the log and the output image are resolved from the app directory via `paths.APP_DIR`, so any working directory works). Output is `eInk-weather-display/image.png`; check it visually after any drawing change.
 
 ## Code style
 
@@ -52,7 +53,8 @@ To render the display locally, see [DEVELOPMENT.md](DEVELOPMENT.md#running-the-a
 - The display is 1872×1404, 8-bit grayscale (`'L'` mode) downsampled by the C library to `bits_per_pixel`. Prefer high-contrast drawing; subtle grays may disappear.
 - FMI data and icon mapping (`icon_mapping.py`, [weather_icon_codes.md](weather_icon_codes.md)) are Finland-specific.
 - `HomeAssistant` sensors fetch real data even in dev mode; random sensor data is only generated for `Ruuvi` sensors.
-- Don't commit `config.toml`, `scripts/config.env`, `png_icons/`, `image.png` or `logger.log`.
+- Don't commit `config.toml`, `scripts/config.env`, `image.png` or `logger.log`.
+- The SVGs set `style="background-color: white"` on the root for viewing while editing. resvg would paint it, so `icons.py` overrides it with a transparent background; keep that override (or remove the attribute from every SVG) when touching icon rendering.
 - Write code reviews and similar reports as Markdown files in `reviews/` (gitignored), not in the repo root.
 - The `.so` files can't be rebuilt locally; C changes must be compiled on the Pi with `scripts/compile.sh`, which copies the results back into `eInk-weather-display/lib/`.
 - `deploy.sh` and `compile.sh` act on a real device over SSH; don't run them unless asked.
