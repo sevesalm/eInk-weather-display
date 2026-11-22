@@ -126,11 +126,14 @@ static void DEV_GPIO_Mode(UWORD Pin, UWORD Mode)
 **/
 static void DEV_GPIO_Init(void)
 {
+	// Set the output levels before switching the pins to outputs, so RST never glitches low and resets
+	// a controller that was left in SLEEP by the previous call
+	DEV_Digital_Write(EPD_RST_PIN, HIGH);
+	DEV_Digital_Write(EPD_CS_PIN, HIGH);
+
 	DEV_GPIO_Mode(EPD_RST_PIN, BCM2835_GPIO_FSEL_OUTP);
 	DEV_GPIO_Mode(EPD_CS_PIN, BCM2835_GPIO_FSEL_OUTP);
 	DEV_GPIO_Mode(EPD_BUSY_PIN, BCM2835_GPIO_FSEL_INPT);
-
-	DEV_Digital_Write(EPD_CS_PIN, HIGH);
 }
 
 /******************************************************************************
@@ -164,12 +167,13 @@ UBYTE DEV_Module_Init(t_logger logger)
 /******************************************************************************
 function:	Module exits, closes SPI and BCM2835 library
 parameter:
-Info:
+Info:		Leaves RST high so the controller stays in SLEEP between calls instead of being held in reset,
+		and CS high (deselected)
 ******************************************************************************/
 void DEV_Module_Exit(void)
 {
-	DEV_Digital_Write(EPD_CS_PIN, LOW);
-	DEV_Digital_Write(EPD_RST_PIN, LOW);
+	DEV_Digital_Write(EPD_CS_PIN, HIGH);
+	DEV_Digital_Write(EPD_RST_PIN, HIGH);
 
 	bcm2835_spi_end();
 	bcm2835_close();

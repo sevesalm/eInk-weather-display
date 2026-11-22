@@ -210,6 +210,8 @@ void EPD_IT8951_Sleep(t_logger logger);
 
 IT8951_Dev_Info EPD_IT8951_Init(UWORD VCOM, t_logger logger);
 
+void EPD_IT8951_Wake(t_logger logger);
+
 void EPD_IT8951_Init_Refresh(IT8951_Dev_Info Dev_Info);
 
 void EPD_IT8951_1bp_Refresh(UBYTE *Frame_Buf, UWORD X, UWORD Y, UWORD W, UWORD H, UBYTE Mode, UDOUBLE Target_Memory_Addr, bool Packed_Write);

@@ -10,6 +10,11 @@ static long lap_ms(struct timespec *lap) {
   return elapsed;
 }
 
+// Kept across calls, since the library stays loaded in the app's process. controller_ready is true only after a call
+// that ended with the controller in SLEEP, so any failure makes the next call reset the controller.
+static bool controller_ready = false;
+static IT8951_Dev_Info cached_dev_info;
+
 static bool is_valid_area(const int *area, int panel_width, int panel_height) {
   const int x = area[0], y = area[1], w = area[2], h = area[3];
   return x >= 0 && y >= 0 && w > 0 && h > 0 && x + w <= panel_width && y + h <= panel_height && x % AREA_ALIGN == 0 && w % AREA_ALIGN == 0;
@@ -55,8 +60,16 @@ int draw_image_8bit_areas(UBYTE *image_8bit, bool init, const int voltage, const
 
   log_fmt(logger, LOG_LEVEL_INFO, L"Timing: DEV_Module_Init %ld ms", lap_ms(&lap));
 
-  IT8951_Dev_Info Dev_Info = EPD_IT8951_Init(voltage, logger);
-  log_fmt(logger, LOG_LEVEL_INFO, L"Timing: EPD_IT8951_Init %ld ms", lap_ms(&lap));
+  // Reset on full refreshes too, so a controller in a bad state recovers within full_refresh_interval
+  const bool reset = init || !controller_ready;
+  controller_ready = false;
+  if (reset) {
+    cached_dev_info = EPD_IT8951_Init(voltage, logger);
+  } else {
+    EPD_IT8951_Wake(logger);
+  }
+  IT8951_Dev_Info Dev_Info = cached_dev_info;
+  log_fmt(logger, LOG_LEVEL_INFO, L"Timing: EPD_IT8951_Init (%ls) %ld ms", reset ? L"reset" : L"wake", lap_ms(&lap));
 
   // get some important info from Dev_Info structure
   UWORD Panel_Width = Dev_Info.Panel_W;
@@ -132,6 +145,7 @@ int draw_image_8bit_areas(UBYTE *image_8bit, bool init, const int voltage, const
   EPD_IT8951_WaitForDisplayReady();
   log_fmt(logger, LOG_LEVEL_INFO, L"Timing: waveform %ld ms", lap_ms(&lap));
   EPD_IT8951_Sleep(logger);
+  controller_ready = true;
   logger(LOG_LEVEL_INFO, L"Exiting cleanly");
 
 cleanup:
