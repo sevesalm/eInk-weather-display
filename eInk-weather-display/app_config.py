@@ -72,9 +72,16 @@ class AppConfig(BaseModel):
   epd_voltage: int = Field(gt=0)
   bits_per_pixel: Literal[1, 2, 4]
 
-  # Refreshes are scheduled with `minute % interval`, so intervals over 60 minutes would never trigger
-  refresh_full_interval: int = Field(ge=1, le=60)
-  refresh_partial_interval: int = Field(ge=1, le=60)
+  # Seconds. Both are scheduled in slots counted from the start of each hour, so they must divide an hour evenly
+  full_refresh_interval: int = Field(ge=1, le=3600)
+  update_interval: int = Field(ge=1, le=3600)
+
+  @field_validator('full_refresh_interval', 'update_interval')
+  @classmethod
+  def validate_interval_divides_hour(cls, value: int) -> int:
+    if 3600 % value != 0:
+      raise ValueError(f'must divide 3600 seconds evenly, got {value}')
+    return value
 
   high_temperature_warning_threshold: int
   extreme_high_temperature_warning_threshold: int

@@ -31,8 +31,8 @@ epd_model = "10.3"
 epd_voltage = 1140
 bits_per_pixel = 4
 
-refresh_full_interval = 60
-refresh_partial_interval = 1
+full_refresh_interval = 3600
+update_interval = 60
 
 high_temperature_warning_threshold = 25
 extreme_high_temperature_warning_threshold = 30
@@ -125,11 +125,21 @@ class TestAppConfig(unittest.TestCase):
     with self.assertRaisesRegex(ConfigLoadError, r'sensor_poll_timeout\s+Input should be greater than 0'):
       load_config(str(config_file))
 
-  def test_refresh_interval_over_60_fails(self):
-    invalid = VALID_CONFIG.replace('refresh_full_interval = 60', 'refresh_full_interval = 120')
+  def test_refresh_interval_over_hour_fails(self):
+    invalid = VALID_CONFIG.replace('full_refresh_interval = 3600', 'full_refresh_interval = 7200')
     config_file = self._write_temp_config(invalid)
-    with self.assertRaisesRegex(ConfigLoadError, r'refresh_full_interval\s+Input should be less than or equal to 60'):
+    with self.assertRaisesRegex(ConfigLoadError, r'full_refresh_interval\s+Input should be less than or equal to 3600'):
       load_config(str(config_file))
+
+  def test_interval_not_dividing_hour_fails(self):
+    invalid = VALID_CONFIG.replace('update_interval = 60', 'update_interval = 7')
+    config_file = self._write_temp_config(invalid)
+    with self.assertRaisesRegex(ConfigLoadError, r'update_interval\s+Value error, must divide 3600 seconds evenly, got 7'):
+      load_config(str(config_file))
+
+  def test_sub_minute_update_interval_is_valid(self):
+    config_file = self._write_temp_config(VALID_CONFIG.replace('update_interval = 60', 'update_interval = 10'))
+    self.assertEqual(load_config(str(config_file)).update_interval, 10)
 
   def test_duplicate_sensor_names_fail(self):
     duplicate = SENSORS_CONFIG.replace('name = "Living room"', 'name = "Out"')

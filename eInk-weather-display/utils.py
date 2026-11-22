@@ -14,7 +14,7 @@ from paths import APP_DIR
 import icons
 
 NAN_SYMBOL = '?'
-FULL_REFRESH_MINUTE_OFFSET = 5
+FULL_REFRESH_OFFSET_SECONDS = 5 * 60
 
 TABULAR_NUMBERS_FEATURES = ["tnum"]  # OpenType feature for tabular numbers
 RAQM_SUPPORTED = features.check_feature('raqm')
@@ -174,9 +174,10 @@ def get_next_forecast_start_timestamp() -> Datetime:
 
 
 def get_latest_full_refresh_slot(now: Datetime, interval: int) -> Datetime:
-  '''Latest scheduled full refresh time at or before now. Slots are at minutes 5, 5 + interval, ... of each hour.'''
+  '''Latest scheduled full refresh time at or before now. Slots are 5 minutes, 5 minutes + interval, ... after the start of each hour (interval in seconds).'''
   hour = now.replace(minute=0, second=0, microsecond=0)
-  return hour + timedelta(minutes=now.minute - (now.minute - FULL_REFRESH_MINUTE_OFFSET) % interval)
+  seconds = now.minute * 60 + now.second
+  return hour + timedelta(seconds=seconds - (seconds - FULL_REFRESH_OFFSET_SECONDS) % interval)
 
 
 def should_full_refresh(now: Datetime, last_full_refresh: Optional[Datetime], interval: int) -> bool:
