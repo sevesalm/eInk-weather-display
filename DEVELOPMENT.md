@@ -6,16 +6,17 @@ All commands are run from the repository root unless stated otherwise.
 
 ## Setup
 
-Install [uv](https://docs.astral.sh/uv/) and create a virtual environment. CI uses Python 3.14, so use the same version locally:
+Install [uv](https://docs.astral.sh/uv/) and create the virtual environment:
 
 ```sh
 brew install uv
-uv venv --python 3.14
+uv sync
 . .venv/bin/activate
-uv pip install -r requirements/development.txt
 ```
 
-`requirements/development.txt` includes the common app dependencies, `ruff` and `ty`. The Raspberry Pi only dependencies (`RPi.GPIO`, `spidev`, `bleson`, `ruuvitag-sensor`) are not needed on macOS.
+`uv sync` installs the Python version in [.python-version](.python-version) (the same one CI and the Raspberry Pi use) and makes `.venv` match [uv.lock](uv.lock): the app dependencies plus the `dev` group (`ruff`, `ty`). The Raspberry Pi only dependencies (`RPi.GPIO`, `spidev`, `bleson`, `ruuvitag-sensor`, the `raspberry` group) are not installed on macOS.
+
+Dependencies are declared in [pyproject.toml](pyproject.toml) and pinned, including the transitive ones, in `uv.lock`, which CI, local development and `scripts/deploy.sh` all install from. After changing `pyproject.toml`, run `uv lock` (or add packages with `uv add`/`uv add --group raspberry`) and commit `uv.lock` too; CI fails if it is out of date. Upgrade a package with `uv lock --upgrade-package <name>` after raising its pin.
 
 Note: Avoid Python versions newer than the pinned packages support. For example, `Pillow==11.3.0` has no prebuilt wheel for Python 3.15 and fails to install.
 

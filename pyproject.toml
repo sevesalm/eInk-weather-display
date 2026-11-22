@@ -1,0 +1,33 @@
+[project]
+name = "eink-weather-display"
+version = "0.1.0"
+description = "Weather dashboard for a Waveshare e-Ink display on a Raspberry Pi"
+requires-python = ">=3.14"
+dependencies = [
+  "APScheduler==3.11.3",
+  "ephem==4.2.1",
+  "Pillow==13.0.0",
+  "python-dateutil==4.0.0",
+  "requests==2.34.2",
+  "pydantic==2.14.3",
+  "resvg-py==0.5.0",
+]
+
+[dependency-groups]
+dev = [
+  "ruff==0.17.5",
+  "ty==0.0.105",
+]
+# Raspberry Pi only, installed by scripts/deploy.sh. The Linux marker keeps their macOS and Windows dependencies out of uv.lock.
+raspberry = [
+  "bleson==0.1.8; sys_platform == 'linux'",
+  "RPi.GPIO==0.7.1; sys_platform == 'linux'",
+  "ruuvitag-sensor==3.1.0; sys_platform == 'linux'",
+  "spidev==3.8; sys_platform == 'linux'",
+]
+
+[tool.uv]
+# The app is a flat directory of modules run as a script, not an installable package
+package = false
+# Lock only for the platforms used: macOS for development, Linux for CI and the Raspberry Pi
+environments = ["sys_platform == 'darwin'", "sys_platform == 'linux'"]

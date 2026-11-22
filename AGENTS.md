@@ -20,15 +20,15 @@ A Python app that renders a weather dashboard (FMI Open API observations/forecas
   - `lib/epd78.so`, `lib/epd37.so` – prebuilt ARM shared libraries loaded with `ctypes`. Only `epd78.so` is used now.
   - `test/` – `unittest` tests.
 - `clib78/` (7.8"/10.3" IT8951) and `clib/` (legacy 3.7") – C sources for the display libraries. Built on the Pi against `bcm2835` via `scripts/compile.sh`.
-- `scripts/` – `deploy.sh` (installs deps, copies the app and restarts it; `--fresh` recreates the venv), `compile.sh`, etc. Remote scripts read `scripts/config.env` (copy from `config.env.example`; gitignored).
-- `requirements/` – `common.txt` (app), `development.txt` (+ ruff, ty), `raspberry.txt` (+ Pi-only: `RPi.GPIO`, `spidev`, `bleson`, `ruuvitag-sensor`).
+- `scripts/` – `deploy.sh` (copies the app with `pyproject.toml`/`uv.lock`, installs deps with `uv sync --frozen`, installs and restarts the `eink-weather` systemd service; `--fresh` recreates the venv), `compile.sh`, etc. Remote scripts read `scripts/config.env` (copy from `config.env.example`; gitignored).
+- `pyproject.toml` – dependencies: app deps, the `dev` group (ruff, ty) and the `raspberry` group (Pi-only: `RPi.GPIO`, `spidev`, `bleson`, `ruuvitag-sensor`). `uv.lock` pins everything and is used by CI, local dev and `deploy.sh`; `.python-version` sets the Python version for all three. Run `uv lock` after changing dependencies and commit `uv.lock`.
 
 ## Commands
 
-Run from the repo root with the `.venv` activated (Python 3.14, managed with `uv`):
+Run from the repo root with the `.venv` activated (Python version from `.python-version`, managed with `uv`):
 
 ```sh
-uv pip install -r requirements/development.txt
+uv sync                                            # install/update .venv from uv.lock
 python -m compileall -q .                          # CI: code compiles
 ruff check                                         # CI: lint
 ty check                                           # CI: type check
