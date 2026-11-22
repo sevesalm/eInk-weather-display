@@ -2,7 +2,7 @@
 
 # Installs uv, Python and the Python dependencies on Raspberry, copies the app over and (re)starts it as a systemd service.
 # Usage: scripts/deploy.sh [--fresh]
-#   --fresh  Recreate the virtual env from scratch (e.g. after a Python upgrade or to remove stale packages)
+#   --fresh  Recreate the virtual env from scratch (e.g. after a Python upgrade or if it is broken)
 
 set -euxo pipefail
 
@@ -41,7 +41,10 @@ $SSH $HOSTNAME FRESH=$FRESH PYTHON_VERSION=$PYTHON_VERSION SERVICE_NAME=$SERVICE
   else
     test -d $VENV_DIRECTORY || $UV venv --python $PYTHON_VERSION $VENV_DIRECTORY
   fi
-  $UV pip install --compile-bytecode --python $VENV_DIRECTORY -r $VENV_ROOT_DIRECTORY/requirements/raspberry.txt
+  # Sync makes the venv match the requirements exactly, removing dropped packages. The requirements only pin
+  # the direct dependencies and sync installs only what is listed, so first resolve the full set for this Python.
+  $UV pip compile --quiet --python $VENV_DIRECTORY -o $VENV_ROOT_DIRECTORY/requirements/raspberry.lock.txt $VENV_ROOT_DIRECTORY/requirements/raspberry.txt
+  $UV pip sync --compile-bytecode --python $VENV_DIRECTORY $VENV_ROOT_DIRECTORY/requirements/raspberry.lock.txt
   rm -rf $VENV_ROOT_DIRECTORY/requirements
 
   # Service. Runs as root, which the BCM2835 display library (/dev/mem) and bleson Bluetooth need.
