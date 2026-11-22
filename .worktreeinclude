@@ -1,0 +1,3 @@
+# Gitignored local files that Claude Code copies into new worktrees
+eInk-weather-display/config.toml
+scripts/config.env
