@@ -64,6 +64,15 @@ RestartSec=60
 [Install]
 WantedBy=multi-user.target
 EOF
+  # Keep the systemd journal in RAM only to reduce SD card wear. Logs are lost on reboot; warnings and errors
+  # are also in logger.log. journald is restarted only when the setting changes.
+  JOURNALD_CONF=/etc/systemd/journald.conf.d/eink-weather-volatile.conf
+  if ! printf '[Journal]\nStorage=volatile\n' | cmp -s - $JOURNALD_CONF; then
+    sudo mkdir -p $(dirname $JOURNALD_CONF)
+    printf '[Journal]\nStorage=volatile\n' | sudo tee $JOURNALD_CONF >/dev/null
+    sudo systemctl restart systemd-journald
+  fi
+
   # Stop the app if it was started in tmux by an older version of this script
   tmux kill-session -t eInk-weather-display 2>/dev/null || true
   sudo systemctl daemon-reload

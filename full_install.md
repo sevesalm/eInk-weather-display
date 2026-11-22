@@ -111,3 +111,5 @@ Do the steps from the host machine:
 1. Deploy: `scripts/deploy.sh`. This installs uv, Python and the Python dependencies on Raspberry, copies the app and (re)starts it as the systemd service `eink-weather`, which also starts on boot and restarts after a crash. Run it again after any change; use `scripts/deploy.sh --fresh` to recreate the virtual env from scratch (e.g. after a Python upgrade). The dependencies are installed from `uv.lock` with `uv sync --frozen`, so the Raspberry gets exactly the locked versions and packages dropped from `pyproject.toml` are removed on a normal deploy.
 
 On Raspberry, follow the logs with `journalctl -u eink-weather -f` and check the state with `systemctl status eink-weather`. Warnings and errors are also written to `logger.log` in the app directory.
+
+To reduce SD card wear, `scripts/deploy.sh` configures the systemd journal to be kept in RAM only (`Storage=volatile` in `/etc/systemd/journald.conf.d/eink-weather-volatile.conf`), so the journal is lost on reboot; `logger.log` persists. Journal files written before the change stay in `/var/log/journal` and can be removed with `sudo rm -rf /var/log/journal`.
