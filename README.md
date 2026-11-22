@@ -35,7 +35,7 @@ The development can be done on the host machine and the app can be deployed remo
 
 For detailed instructions on how to setup RaspberryPi and install all dependencies, please see [Full Instructions](full_install.md). If you have Raspberry Pi up and running, skip to section [Install eInk Weather Display](full_install.md#install-eink-weather-display).
 
-The script [scripts/deploy.sh](scripts/deploy.sh) is a small helper which installs the Python dependencies into a venv on Raspberry Pi, copies all the files over SSH and starts the application remotely. The script [scripts/compile.sh](scripts/compile.sh) allows compiling the shared C libraries on Raspberry Pi. The script [scripts/convert.sh](scripts/convert.sh) allows converting SVG icons to PNG format to be used by the application.
+The script [scripts/deploy.sh](scripts/deploy.sh) is a small helper which installs the Python dependencies into a venv on Raspberry Pi, copies all the files over SSH and starts the application remotely. The script [scripts/compile.sh](scripts/compile.sh) allows compiling the shared C libraries on Raspberry Pi.
 
 Note: Scripts won't work unless dependencies are installed.
 
@@ -60,11 +60,11 @@ The application shows sunrise and sunset times and the phase of the Moon. These 
 
 ## Weather icons
 
-This repository contains a custom set of [weather icons](svg_icons/README.md) to be used with the application. The icon set also contains icons for showing the moon phase, RuuviTag battery charge level.
+This repository contains a custom set of [weather icons](eInk-weather-display/svg_icons/README.md) to be used with the application. The icon set also contains icons for showing the moon phase, RuuviTag battery charge level.
 
 The data from FMI API includes [WaWa, SmartSymbol and WeatherSymbol3](weather_icon_codes.md) codes which can be used to show a weather icon or a description to the user. There are a lot of free weather icons or icon fonts available in the Internet but it is hard to find one which covers all the codes FMI uses. For this reason I have created a set of weather icons for this need.
 
-The weather icon set contains a unique icon for almost all weather codes. The icons were drawn programmatically in svg. Because the PILLOW library doesn't support SVG format, the icons have to be converted to PNG images using the provided [script](scripts/convert.sh) before usage.
+The weather icon set contains a unique icon for almost all weather codes. The icons were drawn programmatically in svg. The app renders them at startup with [resvg-py](https://pypi.org/project/resvg-py/) at the size each icon is drawn at.
 
 The icons contain night variants for some icons. The night varian is used when the observation/forecast time is determined to happen after sunset but before sunrise - commonly know as "during the night".
 

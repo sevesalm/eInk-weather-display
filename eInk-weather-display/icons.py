@@ -1,12 +1,18 @@
+import io
 import logging
 from timeit import default_timer as timer
+from typing import Mapping, Optional
+import resvg_py
 from PIL import Image
 from icon_mapping import observation_mapping, weather_symbol_3_mapping, smart_symbol_mapping
-from typing import Mapping
 from type_alias import Icons, DayNightIcons
 from paths import APP_DIR
 
-# Icons are pre-scaled at load to the size they're drawn at, so panels can paste them as is
+SVG_ICON_DIR = APP_DIR / 'svg_icons'
+# The SVGs set a white background for viewing them while editing. resvg paints it, so make it transparent to let icons overlay their background.
+SVG_STYLE_SHEET = 'svg { background-color: transparent !important }'
+
+# Icons are rendered at load at the size they're drawn at, so panels can paste them as is
 OBSERVATION_ICON_SIZE = 280
 FORECAST_ICON_SIZE = 200
 CLOUD_COVER_ICON_SIZE = 160
@@ -31,18 +37,18 @@ OBSERVATION_CLOUD_COVER_SYMBOLS = [1, 2, 3]
 
 def get_weather_images() -> Icons:
   logger = logging.getLogger(__name__)
-  logger.info('Importing icons')
+  logger.info('Rendering icons')
   start_time = timer()
 
   # The same icon is used in many mappings and for both day and night, so share the images.
-  # Glyphs and backgrounds are scaled separately and composited at the target size, which needs far fewer resizes.
+  # Glyphs and backgrounds are rendered separately and composited, which needs far fewer renders.
   glyphs: dict[tuple[str, int], Image.Image] = {}
   weather_icons: dict[tuple[str, str, int], Image.Image] = {}
 
   def get_glyph(icon_name: str, size: int) -> Image.Image:
     key = (icon_name, size)
     if key not in glyphs:
-      glyphs[key] = get_scaled_image(read_icon(icon_name), size)
+      glyphs[key] = render_icon(icon_name, width=size)
     return glyphs[key]
 
   def get_weather_icon(icon_name: str, variant: str, size: int) -> Image.Image:
@@ -61,12 +67,12 @@ def get_weather_images() -> Icons:
 
   misc_images: dict[str, Image.Image] = {}
   for icon_name, width in MISC_ICON_WIDTHS.items():
-    misc_images[icon_name] = to_la(get_scaled_image(read_icon(icon_name), width))
+    misc_images[icon_name] = to_la(render_icon(icon_name, width=width))
   for icon_name, height in MISC_ICON_HEIGHTS.items():
-    misc_images[icon_name] = to_la(get_scaled_image_by_height(read_icon(icon_name), height))
-  # Kept at full size for the missing icon fallback, which is drawn at different sizes
-  misc_images['background_day'] = to_la(read_icon('background_day'))
-  misc_images['background_night'] = to_la(read_icon('background_night'))
+    misc_images[icon_name] = to_la(render_icon(icon_name, height=height))
+  # The missing icon fallback scales these down to the size it's drawn at, so render them at the largest one
+  misc_images['background_day'] = to_la(get_glyph('background_day', OBSERVATION_ICON_SIZE))
+  misc_images['background_night'] = to_la(get_glyph('background_night', OBSERVATION_ICON_SIZE))
 
   result: Icons = {
     "observation": {key: get_icon_set(icon_set, OBSERVATION_ICON_SIZE) for key, icon_set in observation_mapping.items()},
@@ -77,12 +83,14 @@ def get_weather_images() -> Icons:
   }
 
   icon_count = len(misc_images) + len(weather_icons)
-  logger.info(f'Imported {icon_count} icons in {timer() - start_time:.2f} s')
+  logger.info(f'Rendered {icon_count} icons in {timer() - start_time:.2f} s')
   return result
 
 
-def read_icon(icon_name: str) -> Image.Image:
-  with Image.open(APP_DIR / 'png_icons' / f'{icon_name}.png') as image:
+def render_icon(icon_name: str, width: Optional[int] = None, height: Optional[int] = None) -> Image.Image:
+  '''Renders svg_icons/<icon_name>.svg to the given width or height, keeping the aspect ratio.'''
+  png = resvg_py.svg_to_bytes(svg_path=str(SVG_ICON_DIR / f'{icon_name}.svg'), width=width, height=height, style_sheet=SVG_STYLE_SHEET, skip_system_fonts=True)
+  with Image.open(io.BytesIO(png)) as image:
     return image.convert('RGBA')
 
 
@@ -94,8 +102,3 @@ def to_la(image: Image.Image) -> Image.Image:
 def get_scaled_image(image: Image.Image, new_width: int) -> Image.Image:
   height = int(image.height/image.width * new_width)
   return image.resize((new_width, height))
-
-
-def get_scaled_image_by_height(image: Image.Image, new_height: int) -> Image.Image:
-  width = int(image.width/image.height * new_height)
-  return image.resize((width, new_height))
