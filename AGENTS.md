@@ -10,7 +10,7 @@ A Python app that renders a weather dashboard (FMI Open API observations/forecas
 
 - `eInk-weather-display/` – the app. Flat module layout, no package; modules import each other by bare name (`import utils`).
   - `weather-display.py` – entry point. Loads config, fonts, icons, does an initial refresh, then runs an APScheduler job every `update_interval` seconds, aligned to the hour (a full refresh every `full_refresh_interval` seconds, otherwise an update of only the changed areas). In dev mode it refreshes once and exits.
-  - `refresh.py` – fetches data, draws panels, pastes them into the full image, then saves a PNG (dev mode) or calls the C library in a forked subprocess with a timeout.
+  - `refresh.py` – fetches data, draws panels, pastes them into the full image, then saves a PNG (dev mode) or diffs the frame against the last one drawn (`display_areas.py`) and calls the C library's `draw_image_8bit_areas()` with the changed areas. The C library times out on its own if the controller stops responding.
   - `*_panel.py` – each returns a PIL image for one region (observation, sensor, forecast, celestial, info).
   - `weather_data.py` (FMI API), `weather_data_mock.py` (random data), `sensor_data.py` (Ruuvi/Home Assistant), `celestial.py` (PyEphem), `feels_like_temperature.py`.
   - `app_config.py` – pydantic `AppConfig` loaded from `config.toml` (`extra='forbid'`). `config_example.toml` documents every option.
