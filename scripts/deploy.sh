@@ -25,12 +25,15 @@ SSH_CONTROL_DIR=$(mktemp -d /tmp/deploy-ssh.XXXXXX)
 SSH="ssh -o ControlMaster=auto -o ControlPath=${SSH_CONTROL_DIR}/%C -o ControlPersist=60"
 trap '$SSH -O exit $HOSTNAME 2>/dev/null; rm -rf "$SSH_CONTROL_DIR"' EXIT
 
-# Copy the requirements and the app. The app copy includes all needed files (and a bit more).
-rsync -av -e "$SSH" --rsync-path="mkdir -p $VENV_ROOT_DIRECTORY && rsync" --delete requirements $HOSTNAME:$VENV_ROOT_DIRECTORY
+# Requirements are passed in a variable instead of copying the files over. raspberry.txt includes common.txt with -r,
+# so both are concatenated without the -r line. Base64 keeps the newlines intact through the remote shell.
+REQUIREMENTS=$(cat requirements/common.txt requirements/raspberry.txt | sed '/^-r /d' | base64 | tr -d '\n')
+
+# Copy the app. The copy includes all needed files (and a bit more).
 rsync -av -e "$SSH" --rsync-path="sudo rsync" --delete --exclude "logger.log*" --exclude "svg_icons/README.md" --exclude "svg_icons/archive" ./${APP_NAME} ${HOSTNAME}:${APP_ROOT_DIRECTORY}
 
 # Install dependencies and (re)start the service
-$SSH $HOSTNAME FRESH=$FRESH PYTHON_VERSION=$PYTHON_VERSION SERVICE_NAME=$SERVICE_NAME APP_DIRECTORY=$APP_DIRECTORY VENV_ROOT_DIRECTORY=$VENV_ROOT_DIRECTORY VENV_DIRECTORY=$VENV_DIRECTORY 'bash -s' <<'ENDSSH'
+$SSH $HOSTNAME REQUIREMENTS=$REQUIREMENTS FRESH=$FRESH PYTHON_VERSION=$PYTHON_VERSION SERVICE_NAME=$SERVICE_NAME APP_DIRECTORY=$APP_DIRECTORY VENV_DIRECTORY=$VENV_DIRECTORY 'bash -s' <<'ENDSSH'
   set -euxo pipefail
   UV=~/.local/bin/uv # Full path since ~/.local/bin is not in PATH for non-interactive SSH sessions
 
@@ -43,9 +46,7 @@ $SSH $HOSTNAME FRESH=$FRESH PYTHON_VERSION=$PYTHON_VERSION SERVICE_NAME=$SERVICE
   fi
   # Sync makes the venv match the requirements exactly, removing dropped packages. The requirements only pin
   # the direct dependencies and sync installs only what is listed, so first resolve the full set for this Python.
-  $UV pip compile --quiet --python $VENV_DIRECTORY -o $VENV_ROOT_DIRECTORY/requirements/raspberry.lock.txt $VENV_ROOT_DIRECTORY/requirements/raspberry.txt
-  $UV pip sync --compile-bytecode --python $VENV_DIRECTORY $VENV_ROOT_DIRECTORY/requirements/raspberry.lock.txt
-  rm -rf $VENV_ROOT_DIRECTORY/requirements
+  base64 -d <<<"$REQUIREMENTS" | $UV pip compile --quiet --python $VENV_DIRECTORY - | $UV pip sync --compile-bytecode --python $VENV_DIRECTORY -
 
   # Service. Runs as root, which the BCM2835 display library (/dev/mem) and bleson Bluetooth need.
   # Paths are resolved here since config.env may use paths relative to the SSH user's home.
