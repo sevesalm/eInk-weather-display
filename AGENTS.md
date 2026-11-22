@@ -20,7 +20,7 @@ A Python app that renders a weather dashboard (FMI Open API observations/forecas
   - `lib/epd78.so`, `lib/epd37.so` – prebuilt ARM shared libraries loaded with `ctypes`. Only `epd78.so` is used now.
   - `test/` – `unittest` tests.
 - `clib78/` (7.8"/10.3" IT8951) and `clib/` (legacy 3.7") – C sources for the display libraries. Built on the Pi against `bcm2835` via `scripts/compile.sh`.
-- `scripts/` – `deploy.sh` (installs deps, copies the app and restarts it; `--fresh` recreates the venv), `compile.sh`, etc. Remote scripts read `scripts/config.env` (copy from `config.env.example`; gitignored).
+- `scripts/` – `deploy.sh` (installs deps, copies the app, installs and restarts the `eink-weather` systemd service; `--fresh` recreates the venv), `compile.sh`, etc. Remote scripts read `scripts/config.env` (copy from `config.env.example`; gitignored).
 - `requirements/` – `common.txt` (app), `development.txt` (+ ruff, ty), `raspberry.txt` (+ Pi-only: `RPi.GPIO`, `spidev`, `bleson`, `ruuvitag-sensor`).
 
 ## Commands

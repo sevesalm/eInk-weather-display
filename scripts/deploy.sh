@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Installs uv, Python and the Python dependencies on Raspberry, copies the app over and (re)starts it.
+# Installs uv, Python and the Python dependencies on Raspberry, copies the app over and (re)starts it as a systemd service.
 # Usage: scripts/deploy.sh [--fresh]
 #   --fresh  Recreate the virtual env from scratch (e.g. after a Python upgrade or to remove stale packages)
 
@@ -17,6 +17,7 @@ for arg in "$@"; do
 done
 
 PYTHON_VERSION=3.14
+SERVICE_NAME=eink-weather
 UV='~/.local/bin/uv' # Full path since ~/.local/bin is not in PATH for non-interactive SSH sessions
 
 # Dependencies
@@ -32,6 +33,34 @@ ssh $HOSTNAME "$UV pip install --compile-bytecode --python $VENV_DIRECTORY -r $V
 
 # App. This copies all needed files (and a bit more) on Raspberry
 rsync -av --rsync-path="sudo rsync" --delete --exclude "logger.log*" --exclude "svg_icons/README.md" --exclude "svg_icons/archive" ./${APP_NAME} ${HOSTNAME}:${APP_ROOT_DIRECTORY}
-rsync -av --rsync-path="sudo rsync" scripts/run.sh scripts/start_tmux_session.sh scripts/config.env ${HOSTNAME}:${APP_DIRECTORY}
 
-ssh ${HOSTNAME} "cd ${APP_DIRECTORY}; ./start_tmux_session.sh"
+# Service. Runs as root, which the BCM2835 display library (/dev/mem) and bleson Bluetooth need.
+# Paths are resolved on Raspberry since config.env may use paths relative to the SSH user's home.
+ssh ${HOSTNAME} SERVICE_NAME=${SERVICE_NAME} APP_DIRECTORY=${APP_DIRECTORY} VENV_DIRECTORY=${VENV_DIRECTORY} 'bash -s' <<'ENDSSH'
+  set -euo pipefail
+  APP_DIRECTORY=$(realpath "$APP_DIRECTORY")
+  VENV_DIRECTORY=$(realpath "$VENV_DIRECTORY")
+  sudo tee /etc/systemd/system/${SERVICE_NAME}.service >/dev/null <<EOF
+[Unit]
+Description=eInk weather display
+Wants=network-online.target
+After=network-online.target time-sync.target
+
+[Service]
+WorkingDirectory=${APP_DIRECTORY}
+Environment=RUUVI_BLE_ADAPTER=bleson
+Environment=PYTHONUNBUFFERED=1
+ExecStart=${VENV_DIRECTORY}/bin/python ${APP_DIRECTORY}/weather-display.py
+# Always, since the app logs errors and exits with status 0
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  # Stop the app if it was started in tmux by an older version of this script
+  tmux kill-session -t eInk-weather-display 2>/dev/null || true
+  sudo systemctl daemon-reload
+  sudo systemctl enable ${SERVICE_NAME}
+  sudo systemctl restart ${SERVICE_NAME}
+ENDSSH
