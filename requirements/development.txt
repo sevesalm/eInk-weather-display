@@ -1,4 +1,0 @@
--r common.txt
-
-ruff==0.17.5
-ty==0.0.105
