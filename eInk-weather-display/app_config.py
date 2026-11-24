@@ -114,6 +114,13 @@ class AppConfig(BaseModel):
 
     return self
 
+  @model_validator(mode='after')
+  def validate_home_assistant_configured(self) -> 'AppConfig':
+    if self.home_assistant is None and any(sensor.type == 'HomeAssistant' for sensor in self.sensors):
+      raise ValueError('HomeAssistant sensors need the [home_assistant] table')
+
+    return self
+
 
 class ConfigLoadError(Exception):
   pass
