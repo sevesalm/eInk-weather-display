@@ -41,7 +41,7 @@ Note: Scripts won't work unless dependencies are installed.
 
 ## Configuration
 
-The app is configured with `eInk-weather-display/config.toml`. Create it from [config_example.toml](eInk-weather-display/config_example.toml), which documents all options. The config is validated on startup and invalid values are reported with a clear error. The previous `config.ini` format is no longer supported, so existing configs must be converted to TOML.
+The app is configured with `eInk-weather-display/config.toml`. Create it from [config_example.toml](eInk-weather-display/config_example.toml). All options, and the `scripts/config.env` used for deploying, are documented in [CONFIGURATION.md](CONFIGURATION.md). The config is validated on startup and invalid values are reported with a clear error. The previous `config.ini` format is no longer supported, so existing configs must be converted to TOML.
 
 ## Observations and forecast data
 

@@ -13,7 +13,7 @@ A Python app that renders a weather dashboard (FMI Open API observations/forecas
   - `refresh.py` – fetches data, draws panels, pastes them into the full image, then saves a PNG (dev mode) or diffs the frame against the last one drawn (`display_areas.py`) and calls the C library's `draw_image_8bit_areas()` with the changed areas. The C library times out on its own if the controller stops responding.
   - `*_panel.py` – each returns a PIL image for one region (observation, sensor, forecast, celestial, info).
   - `weather_data.py` (FMI API), `weather_data_mock.py` (random data), `sensor_data.py` (Ruuvi/Home Assistant), `celestial.py` (PyEphem), `feels_like_temperature.py`.
-  - `app_config.py` – pydantic `AppConfig` loaded from `config.toml` (`extra='forbid'`). `config_example.toml` documents every option.
+  - `app_config.py` – pydantic `AppConfig` loaded from `config.toml` (`extra='forbid'`). `config_example.toml` is the starting point for `config.toml`; [CONFIGURATION.md](CONFIGURATION.md) documents every option and `scripts/config.env`.
   - `type_alias.py` – shared `TypedDict`s and type aliases.
   - `icons.py` – renders the icons from `svg_icons/` with `resvg-py` at startup, each at the size it's drawn at, and composites weather icons onto their day/night background.
   - `svg_icons/` – source icons, used directly by the app. `README.md` is an icon gallery that shows the SVGs directly; it and `archive/` aren't deployed.
@@ -49,7 +49,7 @@ To render the display locally, see [DEVELOPMENT.md](DEVELOPMENT.md#running-the-a
 
 ## Gotchas
 
-- Adding a config option means updating `AppConfig` in `app_config.py` **and** `config_example.toml`; unknown keys are rejected at startup.
+- Adding a config option means updating `AppConfig` in `app_config.py`, `config_example.toml` **and** [CONFIGURATION.md](CONFIGURATION.md); unknown keys are rejected at startup and `test/test_config_docs.py` fails if the example or the docs miss an option.
 - The display is 1872×1404, 8-bit grayscale (`'L'` mode) downsampled by the C library to `bits_per_pixel`. Prefer high-contrast drawing; subtle grays may disappear.
 - FMI data and icon mapping (`icon_mapping.py`, [weather_icon_codes.md](weather_icon_codes.md)) are Finland-specific.
 - `HomeAssistant` sensors fetch real data even in dev mode; random sensor data is only generated for `Ruuvi` sensors.

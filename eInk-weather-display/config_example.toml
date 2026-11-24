@@ -1,4 +1,5 @@
 # Edit this example file to suit your needs and save it as config.toml
+# All options are documented in CONFIGURATION.md in the repository root
 
 # If True, save to a png file
 # If False, display on EPD
@@ -21,7 +22,7 @@ override_longitude = 24.9384
 # For debugging, draws borders around each panel
 draw_panel_borders = false
 
-# Subtle dividers to improve readibility
+# Subtle dividers to improve readability
 draw_borders = true
 
 # Increase in case of bad reception, seconds
@@ -36,7 +37,7 @@ mirror_horizontal = true
 # Currently the only supported models: '7.8', '10.3'
 epd_model = "10.3"
 
-# The input voltage of the display in millivolts
+# The VCOM voltage of the display in millivolts, printed on its FPC cable (e.g. -1.37V -> 1370)
 epd_voltage = 1370
 
 # 4, 2 or 1 bits per pixel

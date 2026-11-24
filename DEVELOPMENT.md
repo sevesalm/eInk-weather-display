@@ -60,7 +60,7 @@ The icons are rendered at startup straight from the SVG files in [eInk-weather-d
 cp eInk-weather-display/config_example.toml eInk-weather-display/config.toml
 ```
 
-`config.toml` is ignored by git. Set these values in it:
+`config.toml` is ignored by git. All options are documented in [CONFIGURATION.md](CONFIGURATION.md). Set these values in it:
 
 ```toml
 dev_mode = true                      # Save to a PNG instead of drawing on the display
