@@ -158,6 +158,12 @@ class TestAppConfig(unittest.TestCase):
     self.assertIsNone(home_assistant.battery_sensor_id)
     self.assertIsNotNone(config.home_assistant)
 
+  def test_home_assistant_sensor_without_home_assistant_config_fails(self):
+    no_home_assistant = SENSORS_CONFIG[SENSORS_CONFIG.index('[[sensors]]'):]
+    config_file = self._write_temp_config(VALID_CONFIG + no_home_assistant)
+    with self.assertRaisesRegex(ConfigLoadError, r'HomeAssistant sensors need the \[home_assistant\] table'):
+      load_config(str(config_file))
+
   def test_ruuvi_mac_normalized_to_uppercase(self):
     lowercase = SENSORS_CONFIG.replace('"AA:BB:CC:DD:EE:FF"', '"aa:bb:cc:dd:ee:ff"')
     config_file = self._write_temp_config(VALID_CONFIG + lowercase)

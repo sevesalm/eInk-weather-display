@@ -51,9 +51,12 @@ class TestConfigDocs(unittest.TestCase):
 
   def test_configuration_md_has_every_option(self):
     text = CONFIGURATION_MD.read_text()
-    # An option is documented in a table row (`name`) or in an example code block
-    missing = {field for field in ALL_FIELDS if f'`{field}`' not in text} - option_names(text)
-    self.assertEqual(missing, set(), 'Options missing from CONFIGURATION.md')
+    # An option is documented in a table row (| `name` | ...) or in an example code block.
+    # Lowercase only, so the uppercase config.env variables are left out.
+    table_rows = set(re.findall(r'^\| `([a-z0-9_]+)` \|', text, flags=re.MULTILINE))
+    documented = table_rows | option_names(text)
+    self.assertEqual(ALL_FIELDS - documented, set(), 'Options missing from CONFIGURATION.md')
+    self.assertEqual(documented - ALL_FIELDS, set(), 'Unknown options in CONFIGURATION.md')
 
 
 if __name__ == '__main__':

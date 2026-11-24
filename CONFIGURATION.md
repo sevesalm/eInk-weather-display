@@ -90,7 +90,7 @@ name = "Balcony"           # Shown on the display
 mac = "AA:BB:CC:DD:EE:FF"  # The RuuviTag's MAC address, any case
 ```
 
-**Home Assistant** sensors read the current state of Home Assistant entities and need the `[home_assistant]` table:
+**Home Assistant** sensors read the current state of Home Assistant entities and need the [`[home_assistant]`](#home-assistant-optional) table; without it the app doesn't start:
 
 ```toml
 [[sensors]]
